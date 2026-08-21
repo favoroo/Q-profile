@@ -1,0 +1,8 @@
+.trae/
+.agents/
+.workbuddy/
+node_modules/
+skills-lock.json
+evkit2-image/
+.DS_Store
+*.log

@@ -1,0 +1,1087 @@
+<!doctype html>
+<html lang="zh-CN" data-edit-version="huang-homepage-v4">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>黄谦 · 汽车技术工程师｜个人主页</title>
+  <meta name="description" content="黄谦的个人主页：汽车技术工程师，5 年行业经验，现就职于湖南道通科技，毕业于中南林业科技大学汽车服务工程。项目经历（四轮定位 / VIN 识别 / EV 高压测量 / AI Agent 工具开发）与联系方式见站内。" />
+  <meta property="og:title" content="黄谦 · 汽车技术工程师｜个人主页" />
+  <meta property="og:description" content="汽车技术工程师，5 年行业经验，现就职于湖南道通科技，毕业于中南林业科技大学汽车服务工程。" />
+  <meta property="og:type" content="profile" />
+  <meta property="og:image" content="images/avatar.jpg" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231d1d1f'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='white' font-family='PingFang SC, sans-serif' font-weight='700'%3E黄%3C/text%3E%3C/svg%3E" />
+  <!--
+    ════════════════════════════════════════════════════════════════
+    【修改指南】黄谦的个人主页（单文件静态页，改完保存即生效）
+
+    1. 改文字：浏览器里直接改——把鼠标移到页面左上角，出现「编辑」
+       按钮后点开，像改文档一样修改文字，改完点「导出 HTML」，
+       用导出的文件替换本文件。
+    2. 换照片：用同名文件覆盖 images/ 里的图片即可
+       avatar.jpg 头像 ｜ project-1~5.jpg 项目配图
+    3. 增删项目：复制或删除任意 <article class="project-card">…</article> 整块；
+       新增图片按 project-4.jpg、project-5.jpg 规律命名。
+    4. 部署：把 index.html 和 images/ 整个目录上传到 Edge One Pages
+       （控制台直接上传，或关联 Git 仓库后构建命令留空、输出目录填根目录）。
+    ════════════════════════════════════════════════════════════════
+  -->
+  <style>
+    :root {
+      --bg: #FFFFFF;
+      --bg-alt: #F5F5F7;
+      --ink: #1D1D1F;
+      --ink-2: #6E6E73;
+      --ink-3: #86868B;
+      --line: rgba(0, 0, 0, .08);
+      --accent: #0071E3;
+      --accent-deep: #0060C9;
+      --dark: #000000;
+      --dark-2: #1D1D1F;
+      --radius-lg: 28px;
+      --radius-md: 20px;
+      --shadow-card: 0 4px 24px rgba(0, 0, 0, .04);
+      --shadow-card-hover: 0 16px 48px -12px rgba(0, 0, 0, .12);
+      --ease-out: cubic-bezier(.22, 1, .36, 1);
+      --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+    body {
+      margin: 0; min-width: 320px;
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    ::selection { background: rgba(0, 113, 227, .16); }
+    a { color: inherit; }
+    img { max-width: 100%; }
+    .wrap { width: min(1080px, calc(100% - 48px)); margin: 0 auto; }
+    .wrap--narrow { width: min(760px, calc(100% - 48px)); margin: 0 auto; }
+    .ic { width: 18px; height: 18px; flex: none; }
+
+    /* ===== 焦点可访问性 ===== */
+    a:focus-visible, button:focus-visible, [contenteditable="true"]:focus {
+      outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px;
+    }
+
+    /* ===== 顶部导航（毛玻璃） ===== */
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255, 255, 255, .72);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid transparent;
+      transition: border-color .35s ease, background .35s ease;
+    }
+    .site-header.scrolled { border-bottom-color: var(--line); background: rgba(255, 255, 255, .82); }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 52px; }
+    .brand { display: flex; align-items: baseline; gap: 8px; text-decoration: none; }
+    .brand strong { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
+    .brand small { font-size: 12px; color: var(--ink-3); letter-spacing: .02em; }
+    .nav-links { display: flex; gap: 34px; }
+    .nav-links a {
+      position: relative; padding: 4px 0; font-size: 13px; color: var(--ink-2);
+      text-decoration: none; transition: color .25s ease;
+    }
+    .nav-links a::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1.5px;
+      background: var(--ink); border-radius: 2px;
+      transform: scaleX(0); transform-origin: center; transition: transform .3s var(--ease-out);
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+    .nav-links a.active { color: var(--ink); font-weight: 600; }
+    .nav-links a.active::after { transform: scaleX(1); }
+    .menu-toggle {
+      display: none; width: 38px; height: 38px; padding: 0;
+      border: none; border-radius: 10px;
+      background: transparent; color: var(--ink); cursor: pointer;
+      align-items: center; justify-content: center;
+    }
+    .menu-toggle:hover { background: rgba(0, 0, 0, .05); }
+    .menu-toggle .ic-x { display: none; }
+    .site-header.menu-open .menu-toggle .ic-x { display: block; }
+    .site-header.menu-open .menu-toggle .ic-menu { display: none; }
+    .mobile-menu { display: none; border-top: 1px solid var(--line); }
+    .site-header.menu-open .mobile-menu { display: block; }
+    .mobile-menu a {
+      display: block; padding: 15px 4px; font-size: 15px; color: var(--ink-2);
+      text-decoration: none; border-bottom: 1px solid var(--line);
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a.active { color: var(--ink); font-weight: 600; }
+
+    /* ===== Hero（居中大字排版） ===== */
+    .hero { position: relative; text-align: center; }
+    .hero-inner { position: relative; z-index: 1; padding: 96px 0 88px; }
+    .eyebrow {
+      margin: 0; font-size: 13px; font-weight: 600;
+      letter-spacing: .28em; color: var(--accent); text-transform: uppercase;
+    }
+    .hero-name {
+      margin: 18px 0 0; font-weight: 700;
+      font-size: clamp(60px, 11vw, 128px); line-height: 1.02; letter-spacing: -.03em;
+    }
+    .hero-name .dot { color: var(--accent); }
+    .hero-tagline {
+      margin: 26px auto 0; max-width: 640px;
+      font-size: clamp(21px, 3vw, 30px); font-weight: 600; line-height: 1.4; letter-spacing: -.01em;
+    }
+    .hero-lead {
+      margin: 18px auto 0; max-width: 600px;
+      font-size: 17px; line-height: 1.8; color: var(--ink-2);
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; margin-top: 34px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 12px 26px; border-radius: 980px; border: none;
+      font-size: 16px; font-weight: 500; text-decoration: none; cursor: pointer;
+      transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out), background .25s ease, color .25s ease;
+    }
+    .btn .ic { width: 16px; height: 16px; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-deep); transform: scale(1.03); box-shadow: 0 12px 32px -10px rgba(0, 113, 227, .5); }
+    .btn-link {
+      padding: 12px 4px; background: none; color: var(--accent); font-size: 16px; font-weight: 500;
+    }
+    .btn-link .ic { transition: transform .3s var(--ease-out); }
+    .btn-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+    .btn-link:hover .ic { transform: translateX(4px); }
+    .btn-white { background: #fff; color: var(--ink); }
+    .btn-white:hover { transform: scale(1.03); box-shadow: 0 12px 32px -10px rgba(0, 0, 0, .45); }
+
+    .hero-portrait { margin: 64px auto 0; width: min(320px, 72vw); will-change: transform; }
+    .portrait-frame {
+      position: relative; border-radius: 32px; overflow: hidden;
+      background: var(--bg-alt);
+      box-shadow: 0 24px 60px -16px rgba(0, 0, 0, .2), 0 2px 8px rgba(0, 0, 0, .04);
+    }
+    .portrait-frame img { display: block; width: 100%; height: auto; object-fit: cover; object-position: center top; }
+
+    /* ===== 数字速览 ===== */
+    .stats-band { padding: 96px 0; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; text-align: center; }
+    .stat-value { font-weight: 700; font-size: clamp(34px, 4.6vw, 56px); line-height: 1.1; letter-spacing: -.02em; }
+    .stat-label { margin-top: 10px; font-size: 14px; color: var(--ink-2); }
+
+    /* ===== 区块通用 ===== */
+    .section { padding: 130px 0; }
+    .section--alt { background: var(--bg-alt); }
+    .sec-head { text-align: center; margin-bottom: 72px; }
+    .sec-eyebrow {
+      margin: 0 0 14px; font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+      letter-spacing: .22em; color: var(--accent); text-transform: uppercase;
+    }
+    .sec-title { margin: 0; font-weight: 700; font-size: clamp(38px, 5.6vw, 64px); line-height: 1.08; letter-spacing: -.025em; }
+    .sec-desc { margin: 18px auto 0; max-width: 560px; font-size: 17px; line-height: 1.75; color: var(--ink-2); }
+
+    /* ===== 关于我 ===== */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 56px;
+      align-items: start;
+    }
+    .about-text {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .about-text p {
+      margin: 0;
+      font-size: 16.5px;
+      line-height: 1.85;
+      color: var(--ink-2);
+    }
+    .about-text p.lead-text {
+      font-size: 18.5px;
+      font-weight: 500;
+      line-height: 1.8;
+      color: var(--ink);
+    }
+    .about-quote {
+      margin-top: 8px;
+      padding: 22px 26px;
+      background: rgba(0, 113, 227, .04);
+      border: 1px solid rgba(0, 113, 227, .12);
+      border-left: 4px solid var(--accent);
+      border-radius: var(--radius-md);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .about-quote-icon {
+      color: var(--accent);
+      flex: none;
+      margin-top: 2px;
+    }
+    .about-quote-content {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .about-quote-content .quote-text {
+      margin: 0;
+      font-size: 15.5px;
+      font-weight: 600;
+      line-height: 1.7;
+      color: var(--ink);
+    }
+    .about-quote-content .quote-author {
+      font-size: 13px;
+      color: var(--ink-3);
+    }
+
+    /* 个人档案卡片 */
+    .about-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 32px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-shadow: var(--shadow-card);
+    }
+    .about-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .about-card-title {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -.01em;
+      margin: 0;
+    }
+    .about-card-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      color: var(--accent);
+      text-transform: uppercase;
+      background: rgba(0, 113, 227, 0.08);
+      padding: 4px 10px;
+      border-radius: 980px;
+    }
+    .about-facts {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 0;
+    }
+    .about-fact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .fact-icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      color: var(--ink-2);
+      flex: none;
+      margin-top: 1px;
+    }
+    .fact-icon-box svg {
+      width: 16px;
+      height: 16px;
+    }
+    .fact-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+    .fact-detail .fact-label {
+      font-size: 12px;
+      color: var(--ink-3);
+      font-weight: 500;
+    }
+    .fact-detail .fact-value {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .about-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 0;
+    }
+    .about-tags-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .about-tags-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-3);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 0;
+    }
+    .about-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .about-pill {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--ink);
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      padding: 5px 12px;
+      border-radius: 980px;
+      transition: border-color .2s ease, color .2s ease;
+    }
+    .about-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ===== 专业能力 ===== */
+    .skills-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .skill-card {
+      padding: 44px 44px 40px; border-radius: var(--radius-lg);
+      background: var(--bg); box-shadow: var(--shadow-card);
+      transition: transform .45s var(--ease-out), box-shadow .45s var(--ease-out);
+    }
+    .skill-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-card-hover); }
+    .sk-index { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .2em; color: var(--accent); margin-bottom: 18px; }
+    .skill-card h3 { margin: 0 0 12px; font-size: 24px; font-weight: 700; letter-spacing: -.015em; }
+    .skill-card p { margin: 0; font-size: 15.5px; line-height: 1.8; color: var(--ink-2); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .tag {
+      font-size: 12.5px; color: var(--ink-2);
+      padding: 5px 14px; border-radius: 980px; background: var(--bg-alt);
+    }
+
+    /* ===== 项目经历 ===== */
+    .projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .project-card {
+      display: flex; flex-direction: column; overflow: hidden;
+      border-radius: var(--radius-lg); background: var(--bg-alt);
+      transition: transform .45s var(--ease-out), box-shadow .45s var(--ease-out);
+    }
+    .project-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-card-hover); }
+    .project-card.featured { grid-column: span 2; display: grid; grid-template-columns: 1.1fr 1fr; }
+    .pc-media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
+    .project-card.featured .pc-media { aspect-ratio: auto; height: 100%; min-height: 380px; }
+    .pc-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .8s var(--ease-out); }
+    .project-card:hover .pc-media img { transform: scale(1.04); }
+    .pc-tag {
+      position: absolute; top: 18px; left: 18px;
+      padding: 6px 14px; border-radius: 980px; font-size: 12px; font-weight: 600;
+      color: var(--ink); background: rgba(255, 255, 255, .82);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    .pc-body { flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 36px 40px 40px; }
+    .project-card.featured .pc-body { justify-content: center; padding: 48px 52px; }
+    .pc-meta { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-3); letter-spacing: .04em; }
+    .pc-body h3 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.015em; }
+    .pc-desc { margin: 0; font-size: 15.5px; line-height: 1.8; color: var(--ink-2); }
+    .pc-points { margin: 0; padding: 0; list-style: none; }
+    .pc-points li { position: relative; padding-left: 18px; font-size: 14px; line-height: 1.75; color: var(--ink-2); }
+    .pc-points li + li { margin-top: 5px; }
+    .pc-points li::before { content: ""; position: absolute; left: 0; top: .72em; width: 8px; height: 1.5px; background: var(--accent); border-radius: 2px; }
+    .pc-result {
+      margin: auto 0 0; padding: 12px 16px;
+      font-size: 13.5px; line-height: 1.7; color: var(--accent-deep);
+      background: rgba(0, 113, 227, .08); border-radius: 14px;
+    }
+
+    /* ===== 时间轴 ===== */
+    .timeline { list-style: none; margin: 0; padding: 0; }
+    .tl-item {
+      display: grid; grid-template-columns: 200px 1fr; gap: 48px;
+      padding: 44px 0;
+    }
+    .tl-item + .tl-item { border-top: 1px solid var(--line); }
+    .tl-period { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: var(--ink-3); letter-spacing: .04em; padding-top: 8px; }
+    .tl-body h3 { margin: 0 0 10px; font-size: 24px; font-weight: 700; letter-spacing: -.015em; }
+    .tl-body p { margin: 0; max-width: 560px; font-size: 16px; line-height: 1.8; color: var(--ink-2); }
+
+    /* ===== 联系我（深色收尾） ===== */
+    .section--dark { background: var(--dark); color: #F5F5F7; }
+    .section--dark .sec-title { color: #fff; }
+    .section--dark .sec-desc { color: rgba(245, 245, 247, .62); }
+    .contact-card {
+      display: grid; grid-template-columns: 1.1fr .9fr; gap: 32px;
+    }
+    .contact-panel {
+      padding: 48px; border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, .07);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, .1);
+    }
+    .contact-rows { display: flex; flex-direction: column; gap: 26px; }
+    .contact-row { display: flex; align-items: center; gap: 18px; }
+    .cr-icon {
+      width: 48px; height: 48px; flex: none; display: grid; place-items: center;
+      border-radius: 14px; background: rgba(255, 255, 255, .1); color: #fff;
+    }
+    .cr-label { font-size: 12px; color: rgba(245, 245, 247, .55); letter-spacing: .06em; }
+    .cr-value { margin-top: 3px; font-size: 17px; font-weight: 600; color: #fff; }
+    .cta-panel {
+      display: flex; flex-direction: column; justify-content: center; gap: 16px;
+      padding: 48px; border-radius: var(--radius-lg); color: #fff;
+      background: linear-gradient(150deg, #2C2C2E, #161617);
+      border: 1px solid rgba(255, 255, 255, .08);
+    }
+    .cta-panel h3 { margin: 0; font-size: 28px; font-weight: 700; line-height: 1.35; letter-spacing: -.015em; }
+    .cta-panel p { margin: 0; font-size: 15px; line-height: 1.8; color: rgba(245, 245, 247, .62); }
+    .cta-panel .btn { align-self: flex-start; margin-top: 8px; }
+
+    /* ===== 页脚 / 回到顶部 ===== */
+    .site-footer { background: var(--dark); border-top: 1px solid rgba(255, 255, 255, .08); padding: 32px 0; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: rgba(245, 245, 247, .45); }
+    .to-top {
+      position: fixed; right: 26px; bottom: 26px; z-index: 90;
+      width: 46px; height: 46px; padding: 0; border-radius: 50%;
+      border: none; background: rgba(29, 29, 31, .85); color: #fff;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      display: grid; place-items: center; cursor: pointer;
+      box-shadow: 0 12px 32px -10px rgba(0, 0, 0, .35);
+      opacity: 0; transform: translateY(12px); pointer-events: none;
+      transition: opacity .35s ease, transform .35s var(--ease-out), background .25s ease;
+    }
+    .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+    .to-top:hover { background: var(--accent); }
+
+    /* ===== 滚动渐显 ===== */
+    .reveal {
+      opacity: 0; transform: translateY(24px) scale(.985);
+      transition: opacity .8s var(--ease-out), transform .8s var(--ease-out);
+      transition-delay: var(--d, 0s);
+    }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ===== 页内编辑（左上角隐藏入口） ===== */
+    .edit-hotzone { position: fixed; left: 0; top: 0; width: 100px; height: 76px; z-index: 1000; }
+    .edit-toolbar {
+      position: fixed; left: 16px; top: 14px; z-index: 1001;
+      display: flex; gap: 8px; opacity: 0; transform: translateY(-6px); pointer-events: none;
+      transition: opacity .25s ease, transform .25s var(--ease-out);
+    }
+    .edit-hotzone:hover ~ .edit-toolbar,
+    .edit-toolbar:hover, .edit-toolbar:focus-within,
+    body.editing .edit-toolbar { opacity: 1; transform: none; pointer-events: auto; }
+    .edit-btn {
+      font-family: var(--font-body); font-size: 12.5px; font-weight: 600;
+      padding: 8px 16px; border-radius: 980px; cursor: pointer; color: var(--ink);
+      border: 1px solid rgba(0, 0, 0, .1);
+      background: rgba(255, 255, 255, .85); backdrop-filter: blur(14px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
+    }
+    .edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+    body.editing [contenteditable="true"] { outline: 1.5px dashed rgba(0, 113, 227, .55); outline-offset: 3px; border-radius: 4px; cursor: text; }
+    body.editing [contenteditable="true"]:focus { outline: 2px solid var(--accent); background: rgba(0, 113, 227, .05); }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 1024px) {
+      .about-grid { gap: 44px; }
+    }
+    @media (max-width: 900px) {
+      .wrap, .wrap--narrow { width: calc(100% - 40px); }
+      .nav-links { display: none; }
+      .menu-toggle { display: inline-flex; }
+      .hero-inner { padding: 72px 0 64px; }
+      .hero-portrait { margin-top: 56px; }
+      .stats-band { padding: 72px 0; }
+      .stats { grid-template-columns: 1fr; gap: 32px; }
+      .section { padding: 88px 0; }
+      .sec-head { margin-bottom: 52px; }
+      .about-grid { grid-template-columns: 1fr; gap: 36px; }
+      .about-card { padding: 28px 24px; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .project-card.featured { grid-column: span 1; grid-template-columns: 1fr; }
+      .project-card.featured .pc-media { aspect-ratio: 16 / 10; height: auto; min-height: 0; }
+      .project-card.featured .pc-body { padding: 36px 40px 40px; }
+      .contact-card { grid-template-columns: 1fr; }
+      .contact-panel, .cta-panel { padding: 36px; }
+      .tl-item { grid-template-columns: 1fr; gap: 10px; padding: 36px 0; }
+      .tl-period { padding-top: 0; }
+    }
+    @media (max-width: 700px) {
+      .hero-actions { gap: 18px; }
+      .about-card { padding: 24px 20px; }
+      .about-quote { padding: 18px 20px; }
+      .pc-body { padding: 28px 26px 30px; }
+      .skill-card { padding: 32px 28px; }
+      .contact-panel, .cta-panel { padding: 28px 24px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+    @media print {
+      .edit-hotzone, .edit-toolbar, .to-top, .menu-toggle { display: none !important; }
+      .site-header { position: static; }
+      .section--dark, .site-footer { background: #fff; color: #000; }
+    }
+  </style>
+  <noscript><style>.reveal { opacity: 1; transform: none; }</style></noscript>
+</head>
+<body>
+  <!-- 页内编辑入口（鼠标移到左上角出现，或按 E 键） -->
+  <div class="edit-hotzone" aria-hidden="true"></div>
+  <div class="edit-toolbar">
+    <button type="button" class="edit-btn" id="editToggle" aria-pressed="false">编辑</button>
+    <button type="button" class="edit-btn" id="exportBtn">导出 HTML</button>
+  </div>
+
+  <!-- ═══════ 顶部导航 ═══════ -->
+  <header class="site-header" id="siteHeader">
+    <div class="wrap nav">
+      <a class="brand" href="#home" aria-label="回到顶部">
+        <strong>黄谦</strong><small>汽车技术工程师</small>
+      </a>
+      <nav class="nav-links" aria-label="主导航">
+        <a href="#about">关于</a>
+        <a href="#skills">能力</a>
+        <a href="#projects">项目</a>
+        <a href="#journey">经历</a>
+        <a href="#contact">联系</a>
+      </nav>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="打开菜单">
+        <svg class="ic ic-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
+        <svg class="ic ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="wrap">
+        <a href="#home">首页</a>
+        <a href="#about">关于</a>
+        <a href="#skills">能力</a>
+        <a href="#projects">项目</a>
+        <a href="#journey">经历</a>
+        <a href="#contact">联系</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ═══════ Hero 首屏 ═══════ -->
+    <section class="hero" id="home">
+      <div class="wrap hero-inner">
+        <p class="eyebrow reveal" data-edit-id="hero-eyebrow">汽车技术工程师 · Automotive Engineer</p>
+        <h1 class="hero-name reveal" style="--d:.08s" data-edit-id="hero-name">黄谦<span class="dot">.</span></h1>
+        <p class="hero-tagline reveal" style="--d:.16s" data-edit-id="hero-tagline">把复杂的汽车诊断，<br />做成可靠的交付与好用的工具。</p>
+        <p class="hero-lead reveal" style="--d:.24s" data-edit-id="hero-lead">现就职于湖南道通科技，任汽车技术工程师。从四轮定位到 VIN 车型识别、从 EV 高压测量流程到 AI Agent 工具开发，持续用数据与工程化方法把问题落地。</p>
+        <div class="hero-actions reveal" style="--d:.32s">
+          <a class="btn btn-primary" href="#projects">查看项目经历</a>
+          <a class="btn btn-link" href="#contact">联系我<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></a>
+        </div>
+        <figure class="hero-portrait reveal" style="--d:.4s;" data-parallax="0.04">
+          <div class="portrait-frame">
+            <img src="images/avatar.jpg" alt="黄谦的个人照片" width="864" height="1152" />
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ═══════ 数字速览 ═══════ -->
+    <section class="stats-band section--alt" aria-label="个人亮点速览">
+      <div class="wrap stats">
+        <div class="stat reveal">
+          <div class="stat-value" data-edit-id="stat-1-value">5 年</div>
+          <div class="stat-label" data-edit-id="stat-1-label">汽车行业工作经验</div>
+        </div>
+        <div class="stat reveal" style="--d:.1s">
+          <div class="stat-value" data-edit-id="stat-2-value">道通科技</div>
+          <div class="stat-label" data-edit-id="stat-2-label">现就职 · 汽车技术工程师</div>
+        </div>
+        <div class="stat reveal" style="--d:.2s">
+          <div class="stat-value" data-edit-id="stat-3-value">中南林科大</div>
+          <div class="stat-label" data-edit-id="stat-3-label">本科 · 汽车服务工程</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ 01 关于我 ═══════ -->
+    <section class="section" id="about">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <p class="sec-eyebrow">About</p>
+          <h2 class="sec-title">关于我</h2>
+          <p class="sec-desc">扎根汽车工程一线实践，持续探索工程标准化与 AI 工具提效</p>
+        </header>
+        <div class="about-grid">
+          <div class="about-text">
+            <p class="lead-text reveal" data-edit-id="about-p1">我是黄谦，来自湖南邵阳，本科毕业于中南林业科技大学汽车服务工程专业，现就职于湖南道通科技，任汽车技术工程师。从学校到职场，我先后参与了汽车诊断、四轮定位、新能源高压测量等多个项目，并主导了公司内部 AI 工具的开发。</p>
+            <p class="reveal" style="--d:.08s" data-edit-id="about-p2">我习惯先拆解问题、再用数据和流程去验证，把每个环节做到可落地。四轮定位的参数与流程、几十个品牌的 VIN 车型识别，都在我手上从方案走向了量产交付。</p>
+            <p class="reveal" style="--d:.16s" data-edit-id="about-p3">近两年我把重心转向用 Agent 工具给团队提效：翻译的规范性整改、资料的治理与知识库检索，都是我亲手设计和推动落地的事。</p>
+
+            <div class="about-quote reveal" style="--d:.24s">
+              <div class="about-quote-icon">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 7 1 8 3 8z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2h-4c-1.25 0-2 .75-2 2v6c0 7 1 8 3 8z"/></svg>
+              </div>
+              <div class="about-quote-content">
+                <p class="quote-text" data-edit-id="about-motto">“拆解复杂问题，以数据和流程闭环验证，把每一个细节做到稳定可落地。”</p>
+                <span class="quote-author" data-edit-id="about-motto-label">工程实践原则</span>
+              </div>
+            </div>
+          </div>
+
+          <aside class="about-card reveal" style="--d:.12s">
+            <div class="about-card-head">
+              <h3 class="about-card-title">工程师档案</h3>
+              <span class="about-card-badge">Profile</span>
+            </div>
+            <div class="about-facts">
+              <div class="about-fact-item">
+                <div class="fact-icon-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </div>
+                <div class="fact-detail">
+                  <span class="fact-label">现任职位</span>
+                  <span class="fact-value" data-edit-id="fact-1">湖南道通科技 · 汽车技术工程师</span>
+                </div>
+              </div>
+              <div class="about-fact-item">
+                <div class="fact-icon-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                </div>
+                <div class="fact-detail">
+                  <span class="fact-label">教育背景</span>
+                  <span class="fact-value" data-edit-id="fact-2">中南林业科技大学 · 汽车服务工程</span>
+                </div>
+              </div>
+              <div class="about-fact-item">
+                <div class="fact-icon-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <div class="fact-detail">
+                  <span class="fact-label">工作坐标</span>
+                  <span class="fact-value" data-edit-id="fact-3">湖南邵阳</span>
+                </div>
+              </div>
+              <div class="about-fact-item">
+                <div class="fact-icon-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="fact-detail">
+                  <span class="fact-label">当前状态</span>
+                  <span class="fact-value" data-edit-id="fact-4">在职 · 开放机会与技术交流</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="about-divider" aria-hidden="true"></div>
+
+            <div class="about-tags-section">
+              <div class="about-tags-title">核心实践方向</div>
+              <div class="about-pills">
+                <span class="about-pill">四轮定位标定</span>
+                <span class="about-pill">VIN 车型识别</span>
+                <span class="about-pill">EV 新能源高压测量</span>
+                <span class="about-pill">AI Agent 工具开发</span>
+                <span class="about-pill">知识库治理</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ 02 专业能力 ═══════ -->
+    <section class="section section--alt" id="skills">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <p class="sec-eyebrow">Expertise</p>
+          <h2 class="sec-title">专业能力</h2>
+          <p class="sec-desc">围绕维修资料、数据开发与 AI 提效三个维度，介绍我的核心能力。</p>
+        </header>
+        <div class="skills-grid">
+          <article class="skill-card reveal">
+            <div class="sk-index">01</div>
+            <h3 data-edit-id="skill-1-title">汽车维修资料解析与运用</h3>
+            <p data-edit-id="skill-1-desc">熟悉汽车维修资料体系，从维修手册到诊断资料都能快速读懂、拆解并复用，让资料真正为诊断与开发服务。</p>
+            <div class="tags"><span class="tag">维修手册</span><span class="tag">诊断资料</span><span class="tag">资料拆解</span></div>
+          </article>
+          <article class="skill-card reveal" style="--d:.08s">
+            <div class="sk-index">02</div>
+            <h3 data-edit-id="skill-2-title">基于维修资料的数据开发</h3>
+            <p data-edit-id="skill-2-desc">善于把散落的海量维修资料整理成结构化数据与内容，支撑 VIN 车型识别、诊断内容、知识库等产品稳定落地。</p>
+            <div class="tags"><span class="tag">数据开发</span><span class="tag">VIN 识别</span><span class="tag">知识库建设</span></div>
+          </article>
+          <article class="skill-card reveal" style="--d:.16s">
+            <div class="sk-index">03</div>
+            <h3 data-edit-id="skill-3-title">AI 工具与 Agent 提效</h3>
+            <p data-edit-id="skill-3-desc">熟练使用 AI 工具，用 Agent 把翻译规范性整改、资料治理等重复劳动自动化，为团队带来实实在在的效率提升。</p>
+            <div class="tags"><span class="tag">AI 工具</span><span class="tag">Agent 开发</span><span class="tag">效率提升</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ 03 项目经历 ═══════ -->
+    <section class="section" id="projects">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <p class="sec-eyebrow">Projects</p>
+          <h2 class="sec-title">项目经历</h2>
+          <p class="sec-desc">每个项目写清楚三件事：做了什么、我负责什么、结果如何。</p>
+        </header>
+        <div class="projects-grid">
+          <article class="project-card featured reveal">
+            <div class="pc-media">
+              <img src="images/project-1.jpg" alt="EV Kit 2 高压测量项目配图" width="1152" height="864" />
+              <span class="pc-tag">重点项目</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-meta" data-edit-id="p1-meta">EV Kit 2 · 高压测量 · 全流程</div>
+              <h3 data-edit-id="p1-name">EV Kit 2：新能源高压测量项目</h3>
+              <p class="pc-desc" data-edit-id="p1-desc">负责整个高压测量数据项目的流程开发，覆盖从 UE 交互设计到测量流程落地的完整链路，打通界面与测试环节。</p>
+              <ul class="pc-points">
+                <li data-edit-id="p1-pt1">负责 UE 设计，输出清晰可用的测量交互流程</li>
+                <li data-edit-id="p1-pt2">落地高压测量流程，保障测量数据准确、流程规范</li>
+              </ul>
+              <p class="pc-result" data-edit-id="p1-result">成果：高压测量全流程从设计到落地完整交付</p>
+            </div>
+          </article>
+
+          <article class="project-card reveal" style="--d:.1s">
+            <div class="pc-media">
+              <img src="images/project-2.jpg" alt="四轮定位项目配图" width="1152" height="864" />
+              <span class="pc-tag">四轮定位</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-meta" data-edit-id="p2-meta">四轮定位 · 参数与流程</div>
+              <h3 data-edit-id="p2-name">四轮定位项目</h3>
+              <p class="pc-desc" data-edit-id="p2-desc">负责四轮定位功能中定位参数与作业流程的开发，保证测量准确、操作规范、流程可复用。</p>
+              <ul class="pc-points">
+                <li data-edit-id="p2-pt1">定义四轮定位参数并完成标定</li>
+                <li data-edit-id="p2-pt2">开发并落地整套定位作业流程</li>
+              </ul>
+              <p class="pc-result" data-edit-id="p2-result">成果：四轮定位参数与流程稳定交付</p>
+            </div>
+          </article>
+
+          <article class="project-card reveal" style="--d:.18s">
+            <div class="pc-media">
+              <img src="images/project-3.jpg" alt="VIN 车型识别项目配图" width="1152" height="864" />
+              <span class="pc-tag">VIN 识别</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-meta" data-edit-id="p3-meta">VIN · 车型识别 · 多个品牌</div>
+              <h3 data-edit-id="p3-name">VIN 车型识别解析</h3>
+              <p class="pc-desc" data-edit-id="p3-desc">负责公司几十个汽车品牌的 VIN 车型识别解析内容开发，把车型信息准确、结构化地识别与呈现。</p>
+              <ul class="pc-points">
+                <li data-edit-id="p3-pt1">覆盖几十个品牌的 VIN 识别规则与数据开发</li>
+                <li data-edit-id="p3-pt2">保证车型解析结果的准确与结构化</li>
+              </ul>
+              <p class="pc-result" data-edit-id="p3-result">成果：几十个品牌的 VIN 车型识别稳定可用</p>
+            </div>
+          </article>
+
+          <article class="project-card reveal" style="--d:.26s">
+            <div class="pc-media">
+              <img src="images/project-4.jpg" alt="翻译 Agent 工具配图" width="1152" height="864" />
+              <span class="pc-tag">AI 工具</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-meta" data-edit-id="p4-meta">Agent · 主导开发 · 翻译提效</div>
+              <h3 data-edit-id="p4-name">翻译 Agent 工具</h3>
+              <p class="pc-desc" data-edit-id="p4-desc">主导开发公司的翻译 Agent 工具，为翻译同事提供翻译与规范性整改能力，显著提升协作效率。</p>
+              <ul class="pc-points">
+                <li data-edit-id="p4-pt1">设计并主导整个翻译 Agent 工具的开发</li>
+                <li data-edit-id="p4-pt2">覆盖翻译与规范化整改，直接服务翻译同事日常提效</li>
+              </ul>
+              <p class="pc-result" data-edit-id="p4-result">成果：翻译环节效率与规范性显著提升</p>
+            </div>
+          </article>
+
+          <article class="project-card reveal" style="--d:.34s">
+            <div class="pc-media">
+              <img src="images/project-5.jpg" alt="资料治理 Agent 项目配图" width="1152" height="864" />
+              <span class="pc-tag">AI 工具</span>
+            </div>
+            <div class="pc-body">
+              <div class="pc-meta" data-edit-id="p5-meta">Agent · 知识库 · 检索</div>
+              <h3 data-edit-id="p5-name">资料治理 Agent（知识库）</h3>
+              <p class="pc-desc" data-edit-id="p5-desc">参与资料治理 Agent 的开发：从大量资料中提取信息、梳理为可检索的知识库，让 Agent 工具可以快速检索使用。</p>
+              <ul class="pc-points">
+                <li data-edit-id="p5-pt1">从海量资料中提取关键信息并结构化</li>
+                <li data-edit-id="p5-pt2">梳理成可检索知识库，供 Agent 工具检索调用</li>
+              </ul>
+              <p class="pc-result" data-edit-id="p5-result">成果：资料治理为知识库，检索使用更高效</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ 04 教育与职业经历 ═══════ -->
+    <section class="section section--alt" id="journey">
+      <div class="wrap wrap--narrow">
+        <header class="sec-head reveal">
+          <p class="sec-eyebrow">Journey</p>
+          <h2 class="sec-title">教育与职业经历</h2>
+        </header>
+        <ol class="timeline">
+          <li class="tl-item reveal">
+            <div class="tl-period" data-edit-id="tl-1-period">2021 – 至今</div>
+            <div class="tl-body">
+              <h3 data-edit-id="tl-1-title">湖南道通科技 · 汽车技术工程师</h3>
+              <p data-edit-id="tl-1-desc">先后负责四轮定位参数与流程开发、几十个品牌 VIN 车型识别解析、EV Kit 2 高压测量全流程，并主导翻译 Agent 与资料治理 Agent 等 AI 工具的开发（详见上方「项目经历」）。</p>
+            </div>
+          </li>
+          <li class="tl-item reveal" style="--d:.1s">
+            <div class="tl-period" data-edit-id="tl-2-period">本科 · — 2021</div>
+            <div class="tl-body">
+              <h3 data-edit-id="tl-2-title">中南林业科技大学 · 汽车服务工程</h3>
+              <p data-edit-id="tl-2-desc">本科阶段，构建了汽车工程与技术服务能力的专业基础。</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ═══════ 05 联系我 ═══════ -->
+    <section class="section section--dark" id="contact">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <p class="sec-eyebrow">Contact</p>
+          <h2 class="sec-title">联系我</h2>
+          <p class="sec-desc">无论是项目合作、职位机会，还是行业交流，都欢迎随时联系。</p>
+        </header>
+        <div class="contact-card reveal">
+          <div class="contact-panel">
+            <div class="contact-rows">
+              <div class="contact-row">
+                <span class="cr-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+                <div><div class="cr-label">邮箱</div><div class="cr-value" data-edit-id="c-email">favoro@qq.com</div></div>
+              </div>
+              <div class="contact-row">
+                <span class="cr-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+                <div><div class="cr-label">电话</div><div class="cr-value" data-edit-id="c-phone">137-8913-0001</div></div>
+              </div>
+              <div class="contact-row">
+                <span class="cr-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                <div><div class="cr-label">微信号</div><div class="cr-value" data-edit-id="c-wechat">13789130001</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="cta-panel">
+            <h3 data-edit-id="cta-title">有合适的机会，<br />或想聊聊技术？</h3>
+            <p data-edit-id="cta-text">看到这里，说明我们可能有交集。发一封邮件，我们从一次简单的沟通开始。</p>
+            <a class="btn btn-white" href="mailto:favoro@qq.com">发邮件给我<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══════ 页脚 ═══════ -->
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span>黄谦 · 汽车技术工程师</span>
+      <span>© 2026 黄谦 · 部署于 Edge One Pages</span>
+    </div>
+  </footer>
+
+  <button class="to-top" id="toTop" type="button" aria-label="回到顶部">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  </button>
+
+  <script>
+    (function () {
+      'use strict';
+      var header = document.getElementById('siteHeader');
+      var menuBtn = header.querySelector('.menu-toggle');
+      var toTop = document.getElementById('toTop');
+      var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* 顶栏状态 & 回到顶部 */
+      function onScroll() {
+        header.classList.toggle('scrolled', window.scrollY > 8);
+        toTop.classList.toggle('show', window.scrollY > 640);
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+      toTop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+      /* 移动端菜单 */
+      function closeMenu() {
+        header.classList.remove('menu-open');
+        menuBtn.setAttribute('aria-expanded', 'false');
+      }
+      menuBtn.addEventListener('click', function () {
+        var open = header.classList.toggle('menu-open');
+        menuBtn.setAttribute('aria-expanded', String(open));
+      });
+      document.querySelectorAll('.mobile-menu a').forEach(function (a) {
+        a.addEventListener('click', closeMenu);
+      });
+
+      /* 滚动渐显 */
+      if ('IntersectionObserver' in window) {
+        var revealObs = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) { en.target.classList.add('in'); revealObs.unobserve(en.target); }
+          });
+        }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
+        document.querySelectorAll('.reveal').forEach(function (el) { revealObs.observe(el); });
+
+        /* 导航高亮 */
+        var navLinks = document.querySelectorAll('.nav-links a, .mobile-menu a');
+        var navObs = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (!en.isIntersecting) return;
+            var id = '#' + en.target.id;
+            navLinks.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === id); });
+          });
+        }, { rootMargin: '-45% 0px -50% 0px' });
+        document.querySelectorAll('main section[id]').forEach(function (s) { navObs.observe(s); });
+      } else {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+      }
+
+      /* 视差浮动（桌面端 & 非减弱动效时启用） */
+      var parallaxEls = Array.prototype.slice.call(document.querySelectorAll('[data-parallax]'));
+      if (parallaxEls.length && !reducedMotion) {
+        var ticking = false;
+        var parallaxEnabled = function () { return window.innerWidth > 900; };
+        var updateParallax = function () {
+          ticking = false;
+          if (!parallaxEnabled()) {
+            parallaxEls.forEach(function (el) { el.style.transform = ''; });
+            return;
+          }
+          var vh = window.innerHeight;
+          parallaxEls.forEach(function (el) {
+            var rect = el.getBoundingClientRect();
+            // 仅在元素处于视口或临近视口时计算微视差，并限制位移范围（±24px），避免长页面滚动时位移失控
+            if (rect.bottom > -100 && rect.top < vh + 100) {
+              var factor = parseFloat(el.getAttribute('data-parallax')) || 0.04;
+              var offset = (rect.top + rect.height / 2) - vh / 2;
+              var shift = Math.max(-24, Math.min(24, -offset * factor));
+              el.style.transform = 'translate3d(0,' + shift.toFixed(1) + 'px,0)';
+            }
+          });
+        };
+        var requestParallax = function () {
+          if (!ticking) { ticking = true; window.requestAnimationFrame(updateParallax); }
+        };
+        window.addEventListener('scroll', requestParallax, { passive: true });
+        window.addEventListener('resize', requestParallax, { passive: true });
+        updateParallax();
+      }
+
+      /* 页内编辑器：hover 左上角出现「编辑」，可像改文档一样改字，
+         localStorage 按 data-edit-id 存储，「导出 HTML」可导出改好的整页文件 */
+      function InlineEditor() {
+        var version = document.documentElement.dataset.editVersion || '';
+        this.key = 'huang-homepage-edits:' + (version ? version + ':' : '') + location.pathname;
+        this.toggleBtn = document.getElementById('editToggle');
+        this.exportBtn = document.getElementById('exportBtn');
+        this.nodes = [];
+        this.isActive = false;
+        this.load();
+        this.bind();
+      }
+      InlineEditor.prototype.readData = function () {
+        try {
+          var data = JSON.parse(localStorage.getItem(this.key) || '{}');
+          return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+        } catch (e) { localStorage.removeItem(this.key); return {}; }
+      };
+      InlineEditor.prototype.load = function () {
+        var self = this;
+        this.nodes = Array.prototype.slice.call(document.querySelectorAll('[data-edit-id]'));
+        var saved = this.readData();
+        this.nodes.forEach(function (n) {
+          if (typeof saved[n.dataset.editId] === 'string') n.innerHTML = saved[n.dataset.editId];
+        });
+      };
+      InlineEditor.prototype.save = function (withHint) {
+        var data = {};
+        this.nodes.forEach(function (n) { data[n.dataset.editId] = n.innerHTML; });
+        try { localStorage.setItem(this.key, JSON.stringify(data)); } catch (e) {}
+        if (withHint) this.flash('已保存');
+      };
+      InlineEditor.prototype.flash = function (text) {
+        var self = this;
+        this.toggleBtn.textContent = text;
+        window.setTimeout(function () {
+          self.toggleBtn.textContent = self.isActive ? '编辑中' : '编辑';
+        }, 900);
+      };
+      InlineEditor.prototype.setActive = function (active) {
+        var self = this;
+        this.isActive = active;
+        document.body.classList.toggle('editing', active);
+        this.toggleBtn.setAttribute('aria-pressed', String(active));
+        this.toggleBtn.textContent = active ? '编辑中' : '编辑';
+        this.nodes.forEach(function (n) {
+          n.setAttribute('contenteditable', active ? 'true' : 'false');
+          n.setAttribute('spellcheck', 'false');
+        });
+        if (!active) this.save(true);
+      };
+      InlineEditor.prototype.exportHtml = function () {
+        if (this.isActive) { this.setActive(false); }
+        this.save();
+        var clone = document.documentElement.cloneNode(true);
+        Array.prototype.slice.call(clone.querySelectorAll('.edit-hotzone, .edit-toolbar, .to-top')).forEach(function (el) { el.remove(); });
+        Array.prototype.slice.call(clone.querySelectorAll('[contenteditable]')).forEach(function (el) { el.setAttribute('contenteditable', 'false'); });
+        var body = clone.querySelector('body');
+        if (body) body.classList.remove('editing');
+        Array.prototype.slice.call(clone.querySelectorAll('.reveal')).forEach(function (el) { el.classList.remove('in'); });
+        Array.prototype.slice.call(clone.querySelectorAll('a.active')).forEach(function (el) { el.classList.remove('active'); });
+        Array.prototype.slice.call(clone.querySelectorAll('[data-parallax]')).forEach(function (el) { el.style.transform = ''; });
+        var menu = clone.querySelector('.mobile-menu');
+        if (menu) menu.style.display = '';
+        var clonedHeader = clone.querySelector('.site-header');
+        if (clonedHeader) clonedHeader.classList.remove('scrolled', 'menu-open');
+        clone.setAttribute('data-edit-version', 'export-' + Date.now());
+        var html = '<!doctype html>\n' + clone.outerHTML;
+        var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+        this.flash('已导出');
+        return html;
+      };
+      InlineEditor.prototype.bind = function () {
+        var self = this;
+        this.toggleBtn.addEventListener('click', function () { self.setActive(!self.isActive); });
+        this.exportBtn.addEventListener('click', function () { self.exportHtml(); });
+        this.nodes.forEach(function (n) { n.addEventListener('input', function () { self.save(); }); });
+        document.addEventListener('keydown', function (e) {
+          var editingText = e.target.closest && e.target.closest('[contenteditable="true"]');
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+            e.preventDefault(); self.save(true);
+          } else if (!editingText && !e.metaKey && !e.ctrlKey && !e.altKey && e.key.toLowerCase() === 'e') {
+            e.preventDefault(); self.setActive(!self.isActive);
+          }
+        });
+      };
+      var editor = new InlineEditor();
+      window.__editor = editor;
+      window.__exportHtml = function () { return editor.exportHtml(); };
+    })();
+  </script>
+</body>
+</html>
