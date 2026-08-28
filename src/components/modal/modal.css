@@ -1,0 +1,130 @@
+.lb-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--color-bg-alt);
+  border-top-color: var(--color-accent);
+  animation: lb-spin 0.8s linear infinite;
+}
+@keyframes lb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== Markdown 内容排版（.md-view，对齐 legacy 916-960 行） ===== */
+.md-view {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--color-ink);
+}
+.md-view h1,
+.md-view h2,
+.md-view h3 {
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.md-view h1 {
+  margin: 8px 0 20px;
+  font-size: 26px;
+  font-weight: 700;
+}
+.md-view h2 {
+  margin: 36px 0 16px;
+  padding-bottom: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+.md-view h3 {
+  margin: 28px 0 12px;
+  font-size: 17px;
+  font-weight: 600;
+}
+.md-view h1:first-child {
+  margin-top: 0;
+}
+.md-view p {
+  margin: 0 0 14px;
+}
+.md-view ul,
+.md-view ol {
+  margin: 0 0 16px;
+  padding-left: 24px;
+}
+.md-view li {
+  margin: 4px 0;
+}
+.md-view li::marker {
+  color: var(--color-accent);
+}
+.md-view img {
+  display: block;
+  max-width: 100%;
+  margin: 14px 0 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+.md-view a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.md-view a:hover {
+  text-decoration: underline;
+}
+.md-view strong {
+  font-weight: 700;
+}
+.md-view hr {
+  margin: 28px 0;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+.md-view pre {
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  background: var(--color-bg-alt);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+  -webkit-overflow-scrolling: touch;
+}
+.md-view pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+.md-view code {
+  padding: 2px 7px;
+  border-radius: 7px;
+  background: var(--color-bg-alt);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+.md-view blockquote {
+  margin: 0 0 16px;
+  padding: 4px 0 4px 16px;
+  border-left: 3px solid var(--color-accent);
+  color: var(--color-ink-2);
+}
+.md-view .md-error {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--color-ink-3);
+  font-size: 14px;
+}
+.md-view .md-error button {
+  margin-top: 16px;
+  padding: 8px 20px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 980px;
+  background: none;
+  color: var(--color-accent);
+  font-size: 13px;
+  cursor: pointer;
+}
