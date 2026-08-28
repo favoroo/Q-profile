@@ -1,8 +1,37 @@
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS metadata
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Agent & AI Tool temporary directories
 .trae/
 .agents/
 .workbuddy/
+.gemini/
+.antigravity/
+
+# Dependencies & Lockfiles
 node_modules/
 skills-lock.json
+
+# Local temp & scratch directories
 evkit2-image/
-.DS_Store
-*.log
+tmp/
+temp/

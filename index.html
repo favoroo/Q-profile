@@ -680,6 +680,90 @@
       font-size: 13px; line-height: 1.65; color: var(--accent-deep);
       background: rgba(0, 113, 227, .08); border-radius: 12px;
     }
+    .pc-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+
+    /* 项目卡片上的圆形视频按钮（位于配图右上角） */
+    .pc-video-btn {
+      position: absolute; top: 14px; right: 14px; z-index: 2;
+      width: 44px; height: 44px; border: none; border-radius: 50%; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--ink); background: rgba(255, 255, 255, .85);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+      transition: transform .3s var(--ease-out), color .25s ease, box-shadow .3s var(--ease-out);
+    }
+    .pc-video-btn svg { width: 16px; height: 16px; margin-left: 2px; }
+    .pc-video-btn:hover { color: var(--accent); transform: scale(1.08); box-shadow: 0 8px 24px rgba(0, 0, 0, .18); }
+
+    /* ===== 通用 Lightbox 弹窗（视频 / iframe 两种模式） ===== */
+    .lb { position: fixed; inset: 0; z-index: 300; display: none; }
+    .lb.open { display: block; }
+    .lb-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(0, 0, 0, .4);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      opacity: 0; transition: opacity .3s ease;
+    }
+    .lb.open .lb-backdrop { opacity: 1; }
+    .lb-panel {
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%) scale(.96);
+      background: var(--bg); border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card-hover);
+      display: flex; flex-direction: column; overflow: hidden;
+      opacity: 0; transition: opacity .35s var(--ease-out), transform .35s var(--ease-out);
+    }
+    .lb.open .lb-panel { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .lb-close {
+      position: absolute; top: 12px; right: 12px; z-index: 3;
+      width: 36px; height: 36px; border: none; border-radius: 50%; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--ink); background: rgba(255, 255, 255, .85);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .14);
+      transition: transform .3s var(--ease-out), color .25s ease;
+    }
+    .lb-close:hover { color: var(--accent); transform: scale(1.08); }
+    .lb-close svg { width: 14px; height: 14px; }
+    /* 视频模式 */
+    .lb--video .lb-panel { width: min(880px, 92vw); }
+    .lb-tabs {
+      display: flex; gap: 8px; padding: 14px 60px 12px 16px; overflow-x: auto;
+      border-bottom: 1px solid var(--line);
+    }
+    .lb-tab {
+      flex: none; padding: 6px 14px; border: 1px solid var(--line); border-radius: 980px;
+      background: none; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--ink-2);
+      transition: background .25s ease, color .25s ease, border-color .25s ease;
+    }
+    .lb-tab:hover { color: var(--accent); border-color: var(--accent); }
+    .lb-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .lb-video-wrap { background: #000; }
+    .lb-video-wrap video { display: block; width: 100%; max-height: 72vh; }
+    /* iframe 模式 */
+    .lb--frame .lb-panel { width: 95vw; height: 92vh; }
+    .lb-content { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .lb-frame-wrap { position: relative; flex: 1; min-height: 0; background: var(--bg-alt); }
+    .lb-frame-wrap iframe { display: block; width: 100%; height: 100%; border: none; }
+    .lb-frame-tip {
+      flex: none; padding: 6px 16px; font-size: 12px; color: var(--ink-3);
+      background: var(--bg); border-bottom: 1px solid var(--line);
+      display: none;
+    }
+    .lb-loading {
+      position: absolute; inset: 0; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+      background: var(--bg-alt); color: var(--ink-3); font-size: 13.5px;
+      transition: opacity .35s ease;
+    }
+    .lb-loading.done { opacity: 0; pointer-events: none; }
+    .lb-spinner {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 3px solid var(--line); border-top-color: var(--accent);
+      animation: lb-spin .8s linear infinite;
+    }
+    @keyframes lb-spin { to { transform: rotate(360deg); } }
+    body.lb-lock { overflow: hidden; }
 
     /* 紧凑型支撑项目（横向条形展示，保留图片） */
     .projects-subdivider {
@@ -953,6 +1037,9 @@
       .pc-compact-body { padding: 14px 14px; }
       .pc-compact-footer { flex-direction: column; align-items: flex-start; gap: 6px; }
       .contact-panel, .cta-panel { padding: 20px 16px; }
+      .lb--video .lb-panel { width: 94vw; }
+      .lb--frame .lb-panel { width: 100dvw; height: 100dvh; border-radius: 0; }
+      .lb-frame-tip { display: block; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -960,7 +1047,7 @@
       .reveal { opacity: 1 !important; transform: none !important; }
     }
     @media print {
-      .edit-hotzone, .edit-toolbar, .to-top, .menu-toggle { display: none !important; }
+      .edit-hotzone, .edit-toolbar, .to-top, .menu-toggle, .lb { display: none !important; }
       .site-header { position: static; }
       .section--dark, .site-footer { background: #fff; color: #000; }
     }
@@ -1284,6 +1371,12 @@
                 <li data-edit-id="p1-pt2">落地高压测量流程，保障测量数据准确、流程规范</li>
               </ul>
               <p class="pc-result" data-edit-id="p1-result">成果：高压测量全流程从设计到落地完整交付</p>
+              <div class="pc-actions">
+                <button type="button" class="btn btn-primary" data-lb-frame="evkit/05WZT/TSL-GYKT-MD3-1_CN.html">
+                  <svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72c0 .8.87 1.3 1.56.88l10.5-6.86a1.04 1.04 0 0 0 0-1.76L9.56 4.26A1.04 1.04 0 0 0 8 5.14z"/></svg>
+                  在线体验
+                </button>
+              </div>
             </div>
           </article>
 
@@ -1292,6 +1385,9 @@
             <div class="pc-media">
               <img src="images/project-4.jpg" alt="翻译 Agent 工具配图" width="1152" height="864" />
               <span class="pc-tag">AI 工具</span>
+              <button type="button" class="pc-video-btn" data-lb-video="trans" aria-label="查看翻译 Agent 演示视频" title="查看演示视频">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72c0 .8.87 1.3 1.56.88l10.5-6.86a1.04 1.04 0 0 0 0-1.76L9.56 4.26A1.04 1.04 0 0 0 8 5.14z"/></svg>
+              </button>
             </div>
             <div class="pc-body">
               <div class="pc-meta" data-edit-id="p4-meta">Agent · 主导开发 · 翻译提效</div>
@@ -1310,6 +1406,9 @@
             <div class="pc-media">
               <img src="images/project-5.jpg" alt="资料治理 Agent 项目配图" width="1152" height="864" />
               <span class="pc-tag">AI 工具</span>
+              <button type="button" class="pc-video-btn" data-lb-video="docs" aria-label="查看资料治理 Agent 演示视频" title="查看演示视频">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72c0 .8.87 1.3 1.56.88l10.5-6.86a1.04 1.04 0 0 0 0-1.76L9.56 4.26A1.04 1.04 0 0 0 8 5.14z"/></svg>
+              </button>
             </div>
             <div class="pc-body">
               <div class="pc-meta" data-edit-id="p5-meta">Agent · 知识库 · 检索</div>
@@ -1458,6 +1557,17 @@
   <button class="to-top" id="toTop" type="button" aria-label="回到顶部">
     <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
   </button>
+
+  <!-- 通用 Lightbox 弹窗（视频 / iframe 两种模式，内容由 JS 填充） -->
+  <div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="lb-backdrop" data-lb-close></div>
+    <div class="lb-panel">
+      <button type="button" class="lb-close" data-lb-close aria-label="关闭弹窗">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+      <div class="lb-content" id="lbContent"></div>
+    </div>
+  </div>
 
   <script>
     (function () {
@@ -1811,6 +1921,13 @@
         this.save();
         var clone = document.documentElement.cloneNode(true);
         Array.prototype.slice.call(clone.querySelectorAll('.edit-hotzone, .edit-toolbar, .to-top')).forEach(function (el) { el.remove(); });
+        var lb = clone.querySelector('.lb');
+        if (lb) {
+          lb.className = 'lb';
+          lb.setAttribute('aria-hidden', 'true');
+          var lbContent = lb.querySelector('.lb-content');
+          if (lbContent) lbContent.innerHTML = '';
+        }
         Array.prototype.slice.call(clone.querySelectorAll('[contenteditable]')).forEach(function (el) { el.setAttribute('contenteditable', 'false'); });
         var body = clone.querySelector('body');
         if (body) body.classList.remove('editing');
@@ -1850,6 +1967,116 @@
           }
         });
       };
+      /* 通用 Lightbox：视频弹窗（多视频标签切换）与 iframe 弹窗（EV Kit 在线体验）共用 */
+      var Lightbox = (function () {
+        var VIDEO_MAP = {
+          trans: [
+            { src: 'videos/trans-agent-01.mp4', label: '中英整改翻译' },
+            { src: 'videos/trans-agent-02.mp4', label: '小语种翻译' }
+          ],
+          docs: [
+            { src: 'videos/docs-agent-01.mp4', label: '资料检索' },
+            { src: 'videos/docs-agent-02.mp4', label: '资料数量统计' }
+          ]
+        };
+        var root = document.getElementById('lightbox');
+        var content = document.getElementById('lbContent');
+        var lastTrigger = null;
+        var lockedY = 0;
+
+        function lockScroll() {
+          lockedY = window.scrollY || 0;
+          document.body.classList.add('lb-lock');
+        }
+        function unlockScroll() {
+          document.body.classList.remove('lb-lock');
+          window.scrollTo(0, lockedY);
+        }
+        function open(mode, payload, trigger) {
+          lastTrigger = trigger || null;
+          root.className = 'lb lb--' + mode;
+          root.setAttribute('aria-hidden', 'false');
+          content.innerHTML = '';
+          if (mode === 'video') buildVideo(payload);
+          else if (mode === 'frame') buildFrame(payload);
+          root.classList.add('open');
+          lockScroll();
+        }
+        function buildVideo(key) {
+          var list = VIDEO_MAP[key] || [];
+          if (!list.length) return;
+          var tabs = document.createElement('div');
+          tabs.className = 'lb-tabs';
+          var wrap = document.createElement('div');
+          wrap.className = 'lb-video-wrap';
+          var video = document.createElement('video');
+          video.controls = true;
+          video.preload = 'metadata';
+          video.setAttribute('playsinline', '');
+          wrap.appendChild(video);
+          list.forEach(function (item, i) {
+            var tab = document.createElement('button');
+            tab.type = 'button';
+            tab.className = 'lb-tab' + (i === 0 ? ' active' : '');
+            tab.textContent = item.label;
+            tab.addEventListener('click', function () {
+              tabs.querySelectorAll('.lb-tab').forEach(function (t) { t.classList.remove('active'); });
+              tab.classList.add('active');
+              video.src = item.src;
+              video.play().catch(function () {});
+            });
+            tabs.appendChild(tab);
+          });
+          video.src = list[0].src;
+          content.appendChild(tabs);
+          content.appendChild(wrap);
+        }
+        function buildFrame(src) {
+          var tip = document.createElement('div');
+          tip.className = 'lb-frame-tip';
+          tip.textContent = '小屏幕设备建议旋转横屏，或在桌面端体验完整交互';
+          var wrap = document.createElement('div');
+          wrap.className = 'lb-frame-wrap';
+          var loading = document.createElement('div');
+          loading.className = 'lb-loading';
+          loading.innerHTML = '<div class="lb-spinner"></div><span>正在加载体验页面…</span>';
+          var iframe = document.createElement('iframe');
+          iframe.setAttribute('allow', 'clipboard-write');
+          iframe.setAttribute('title', 'EV Kit 2 高压测量在线体验');
+          iframe.addEventListener('load', function () { loading.classList.add('done'); });
+          iframe.src = src;
+          wrap.appendChild(loading);
+          wrap.appendChild(iframe);
+          content.appendChild(tip);
+          content.appendChild(wrap);
+        }
+        function close() {
+          if (!root.classList.contains('open')) return;
+          root.classList.remove('open');
+          root.setAttribute('aria-hidden', 'true');
+          var video = content.querySelector('video');
+          if (video) { video.pause(); video.removeAttribute('src'); video.load(); }
+          var iframe = content.querySelector('iframe');
+          if (iframe) iframe.src = 'about:blank';
+          content.innerHTML = '';
+          unlockScroll();
+          if (lastTrigger && lastTrigger.focus) lastTrigger.focus();
+        }
+        root.addEventListener('click', function (e) {
+          if (e.target.closest && e.target.closest('[data-lb-close]')) close();
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') close();
+        });
+        document.addEventListener('click', function (e) {
+          var v = e.target.closest && e.target.closest('[data-lb-video]');
+          if (v) { open('video', v.getAttribute('data-lb-video'), v); return; }
+          var f = e.target.closest && e.target.closest('[data-lb-frame]');
+          if (f) { open('frame', f.getAttribute('data-lb-frame'), f); }
+        });
+        return { open: open, close: close };
+      })();
+
       var editor = new InlineEditor();
       window.__editor = editor;
       window.__exportHtml = function () { return editor.exportHtml(); };
