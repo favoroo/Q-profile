@@ -31,6 +31,9 @@ ehthumbs.db
 node_modules/
 skills-lock.json
 
+# Build output
+dist/
+
 # Local temp & scratch directories
 evkit2-image/
 tmp/
