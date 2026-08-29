@@ -1,4 +1,5 @@
 import type { DocKey, DocResource } from './types';
+import { withBase } from '../lib/asset';
 
 /**
  * Agent 开发手册（Markdown）。
@@ -8,12 +9,13 @@ import type { DocKey, DocResource } from './types';
 export const DOCS: Record<DocKey, DocResource> = {
   'trans-doc': {
     title: '翻译 Agent 开发手册',
-    url: '/docs/trans-agent/manual.md',
-    base: '/docs/trans-agent/',
+    url: withBase('/docs/trans-agent/manual.md'),
+    base: withBase('/docs/trans-agent/'),
   },
   'docs-doc': {
     title: '资料问答 Agent 开发手册',
-    url: '/docs/qa-agent/manual.md',
-    base: '/docs/qa-agent/',
+    url: withBase('/docs/qa-agent/manual.md'),
+    base: withBase('/docs/qa-agent/'),
   },
 };
+

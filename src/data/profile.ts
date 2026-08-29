@@ -1,4 +1,5 @@
 import type { Profile } from './types';
+import { withBase } from '../lib/asset';
 
 export const profile: Profile = {
   name: '黄谦',
@@ -7,7 +8,7 @@ export const profile: Profile = {
   pill: '汽车技术工程师 · AUTOMOTIVE ENGINEER',
   tagline: 'AI时代的汽车技术工程师',
   lead: '现就职于湖南道通科技，任汽车技术工程师。从四轮定位到 VIN 车型识别、从 EV 高压测量流程到 AI Agent 工具开发，持续用数据与工程化方法把问题落地。',
-  avatar: '/images/avatar.jpg',
+  avatar: withBase('/images/avatar.jpg'),
   badgeBack: {
     skills: [
       '四轮定位工艺与参数标准化',
