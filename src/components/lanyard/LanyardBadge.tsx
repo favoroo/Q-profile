@@ -9,7 +9,7 @@ import styles from './LanyardBadge.module.css';
  */
 export function LanyardBadge() {
   const reducedMotion = useReducedMotion() ?? false;
-  const { stageRef, badgeRef, strapRef, isFlipped, toggleFlip } =
+  const { stageRef, badgeRef, strapRef, strapHighlightRef, isFlipped, toggleFlip } =
     useLanyardPhysics(reducedMotion);
 
   return (
@@ -22,22 +22,45 @@ export function LanyardBadge() {
         toggleFlip();
       }}
     >
-      {/* 动态挂绳（极简细线） */}
+      {/* 动态工牌织带挂绳 */}
       <svg className={styles.svgContainer} viewBox="0 0 320 180" aria-hidden="true">
-        <path ref={strapRef} d="" fill="none" stroke="#c8c8cc" strokeWidth="1.5" strokeLinecap="round" />
+        {/* 主织带（深色扁平带） */}
+        <path
+          ref={strapRef}
+          d=""
+          fill="none"
+          stroke="#262628"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+        {/* 织带中间精细编织质感线 */}
+        <path
+          ref={strapHighlightRef}
+          d=""
+          fill="none"
+          stroke="rgba(255, 255, 255, 0.22)"
+          strokeWidth="1.2"
+          strokeDasharray="3 2"
+          strokeLinecap="round"
+        />
       </svg>
 
-      {/* 顶部极简固定横条 */}
+      {/* 顶部固定端 */}
       <div className={styles.topAnchor} aria-hidden="true" />
 
       {/* 工牌主体 */}
       <div ref={badgeRef} className={styles.badgeBody}>
-        {/* 极简扁平扣夹 */}
+        {/* 工牌金属扣夹 */}
         <div className={styles.clipUnit} aria-hidden="true">
-          <svg viewBox="0 0 16 12" fill="none">
-            <rect x="5" y="0" width="6" height="2.5" rx="1.25" fill="#3a3a3c" />
-            <rect x="2" y="2" width="12" height="10" rx="2" fill="#1d1d1f" />
-            <rect x="4" y="5" width="8" height="1.5" rx="0.75" fill="#48484a" />
+          <svg viewBox="0 0 18 18" fill="none">
+            {/* 织带金属压箍 */}
+            <rect x="4" y="0" width="10" height="3" rx="1.2" fill="#48484a" />
+            {/* 金属连接环 */}
+            <rect x="7" y="2.5" width="4" height="5" rx="1.5" fill="none" stroke="#636366" strokeWidth="1.2" />
+            {/* 工牌金属夹片 */}
+            <rect x="3" y="7" width="12" height="10" rx="2" fill="#242426" />
+            {/* 夹片金属亮边 */}
+            <rect x="5" y="9.5" width="8" height="1.5" rx="0.75" fill="#8e8e93" />
           </svg>
         </div>
 

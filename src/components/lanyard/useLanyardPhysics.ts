@@ -86,6 +86,7 @@ export interface LanyardPhysics {
   stageRef: React.RefObject<HTMLDivElement | null>;
   badgeRef: React.RefObject<HTMLDivElement | null>;
   strapRef: React.RefObject<SVGPathElement | null>;
+  strapHighlightRef: React.RefObject<SVGPathElement | null>;
   isFlipped: boolean;
   toggleFlip: () => void;
   /** 最近一次拖拽刚结束（250ms 内），用于抑制双击误触 */
@@ -97,12 +98,13 @@ export interface LanyardPhysics {
  * - 全部物理状态存于 useRef，rAF 每帧直接写 DOM，零 setState、零 re-render
  * - Pointer Events 统一鼠标/触摸（替代旧站 mouse+touch 两套监听）
  * - 双击翻转：桌面走 React onDoubleClick，移动端由 pointerup 兜底检测
- * - reducedMotion 时跳过 idle 摆动/倾斜积分
+ * - 静止状态保持平稳无晃动，鼠标悬浮 3D 倾斜与拖拽甩动自然响应
  */
 export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const badgeRef = useRef<HTMLDivElement | null>(null);
   const strapRef = useRef<SVGPathElement | null>(null);
+  const strapHighlightRef = useRef<SVGPathElement | null>(null);
   const stateRef = useRef<LanyardState>(initialState());
   const reducedRef = useRef(reducedMotion);
   reducedRef.current = reducedMotion;
@@ -239,20 +241,31 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
 
       if (!reducedRef.current) {
         if (!s.isDragging) {
-          const idleX = Math.sin(s.time * 1.3) * 2.0;
-          const idleAngle = Math.sin(s.time * 1.3 + 0.5) * 1.3;
-
-          const fx = -(s.x - idleX) * SPRING_K;
+          const fx = -s.x * SPRING_K;
           const fy = -s.y * SPRING_K;
           s.vx = (s.vx + fx) * DAMPING;
           s.vy = (s.vy + fy) * DAMPING;
           s.x += s.vx;
           s.y += s.vy;
 
-          const targetAngle = Math.atan2(s.x, REST_Y + s.y) * (180 / Math.PI) * 0.68 + idleAngle;
+          if (Math.abs(s.x) < 0.001 && Math.abs(s.vx) < 0.001) {
+            s.x = 0;
+            s.vx = 0;
+          }
+          if (Math.abs(s.y) < 0.001 && Math.abs(s.vy) < 0.001) {
+            s.y = 0;
+            s.vy = 0;
+          }
+
+          const targetAngle = Math.atan2(s.x, REST_Y + s.y) * (180 / Math.PI) * 0.68;
           const torque = (targetAngle - s.angle) * ROT_SPRING_K;
           s.vAngle = (s.vAngle + torque) * ROT_DAMPING;
           s.angle += s.vAngle;
+
+          if (Math.abs(s.angle) < 0.001 && Math.abs(s.vAngle) < 0.001) {
+            s.angle = 0;
+            s.vAngle = 0;
+          }
         }
         s.tiltX += (s.targetTiltX - s.tiltX) * TILT_LERP;
         s.tiltY += (s.targetTiltY - s.tiltY) * TILT_LERP;
@@ -277,10 +290,9 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
       const cp2x = bx - Math.sin(rad) * 24;
       const cp2y = by - Math.cos(rad) * 24;
 
-      strapRef.current?.setAttribute(
-        'd',
-        `M ${ax.toFixed(1)},${ay.toFixed(1)} C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)}`,
-      );
+      const pathData = `M ${ax.toFixed(1)},${ay.toFixed(1)} C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)}`;
+      strapRef.current?.setAttribute('d', pathData);
+      strapHighlightRef.current?.setAttribute('d', pathData);
 
       raf = requestAnimationFrame(loop);
     };
@@ -289,5 +301,5 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  return { stageRef, badgeRef, strapRef, isFlipped, toggleFlip, justDragged };
+  return { stageRef, badgeRef, strapRef, strapHighlightRef, isFlipped, toggleFlip, justDragged };
 }
