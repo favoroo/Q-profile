@@ -7,7 +7,13 @@ export const contact = {
   rows: [
     { icon: 'mail', label: '邮箱', value: 'favoro@qq.com', href: 'mailto:favoro@qq.com' },
     { icon: 'phone', label: '电话', value: '137-8913-0001', href: 'tel:13789130001' },
-    { icon: 'wechat', label: '微信号', value: '同上' },
+    {
+      icon: 'wechat',
+      label: '微信号',
+      value: '同上',
+      copyValue: '13789130001',
+      copyNotice: '微信号 (13789130001) 已复制，打开微信即可粘贴添加',
+    },
   ] as ContactRow[],
   cta: {
     title: '有合适的机会，\n或想聊聊技术？',

@@ -1,8 +1,48 @@
+import { useState, useRef } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { contact } from '../../data';
 import { Icon } from '../ui/icons';
 import { Reveal } from '../motion/Reveal';
 
 export function Contact() {
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
+
+  const handleCopy = async (text: string, notice?: string) => {
+    let success = false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        success = true;
+      }
+    } catch {
+      // Fallback
+    }
+
+    if (!success) {
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        textarea.style.top = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        success = document.execCommand('copy');
+        document.body.removeChild(textarea);
+      } catch {
+        success = false;
+      }
+    }
+
+    if (success) {
+      setToast(notice || `已复制到剪贴板：${text}`);
+      if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = window.setTimeout(() => setToast(null), 2800);
+    }
+  };
+
   return (
     <section className="bg-black pt-[60px] pb-[72px] text-[#F5F5F7]" id="contact">
       <div className="mx-auto w-[min(1080px,calc(100%-48px))]">
@@ -39,6 +79,14 @@ export function Contact() {
                           >
                             {row.value}
                           </a>
+                        ) : row.copyValue ? (
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(row.copyValue!, row.copyNotice)}
+                            className="text-left text-white transition-colors hover:text-accent cursor-pointer"
+                          >
+                            {row.value}
+                          </button>
                         ) : (
                           row.value
                         )}
@@ -51,6 +99,26 @@ export function Contact() {
           </div>
         </Reveal>
       </div>
+
+      {/* 复制成功浮动 Toast 气泡 */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.94 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.94 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed bottom-8 left-1/2 z-50 flex max-w-[calc(100vw-32px)] -translate-x-1/2 items-center gap-2.5 rounded-full border border-white/20 bg-[#1c1c1e]/95 px-5 py-3 shadow-[0_12px_36px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+          >
+            <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-emerald-500/20 text-[12px] font-bold text-emerald-400 ring-1 ring-emerald-500/30">
+              ✓
+            </span>
+            <span className="text-[13.5px] font-medium text-white/95 truncate">
+              {toast}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

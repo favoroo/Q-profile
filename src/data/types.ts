@@ -138,4 +138,6 @@ export interface ContactRow {
   label: string;
   value: string;
   href?: string;
+  copyValue?: string;
+  copyNotice?: string;
 }
