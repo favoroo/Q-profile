@@ -10,7 +10,7 @@ import { Icon } from '../ui/icons';
 import './modal.css';
 
 const panelSize: Record<string, string> = {
-  video: 'w-[min(1380px,96vw)] max-h-[94vh]',
+  video: 'w-[min(1280px,96vw)] max-h-[94vh]',
   frame: 'w-[95vw] h-[92vh] max-sm:w-[100dvw] max-sm:h-[100dvh] max-sm:rounded-none',
   doc: 'w-[min(860px,94vw)] h-[max(560px,88vh)] max-sm:w-[96vw] max-sm:h-[92vh]',
 };

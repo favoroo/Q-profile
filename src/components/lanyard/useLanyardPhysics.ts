@@ -248,11 +248,11 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
           s.x += s.vx;
           s.y += s.vy;
 
-          if (Math.abs(s.x) < 0.001 && Math.abs(s.vx) < 0.001) {
+          if (Math.abs(s.x) < 0.02 && Math.abs(s.vx) < 0.02) {
             s.x = 0;
             s.vx = 0;
           }
-          if (Math.abs(s.y) < 0.001 && Math.abs(s.vy) < 0.001) {
+          if (Math.abs(s.y) < 0.02 && Math.abs(s.vy) < 0.02) {
             s.y = 0;
             s.vy = 0;
           }
@@ -262,7 +262,7 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
           s.vAngle = (s.vAngle + torque) * ROT_DAMPING;
           s.angle += s.vAngle;
 
-          if (Math.abs(s.angle) < 0.001 && Math.abs(s.vAngle) < 0.001) {
+          if (Math.abs(s.angle) < 0.02 && Math.abs(s.vAngle) < 0.02) {
             s.angle = 0;
             s.vAngle = 0;
           }
