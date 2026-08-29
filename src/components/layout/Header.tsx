@@ -32,7 +32,10 @@ export function Header() {
     >
       <div className="mx-auto flex h-[52px] w-[min(1080px,calc(100%-48px))] items-center justify-between">
         <a className="flex items-baseline gap-2 no-underline" href="#home" aria-label="回到顶部">
-          <strong className="text-[17px] font-bold tracking-[-0.01em] text-ink">{site.brand.name}</strong>
+          <strong className="text-[17px] font-bold tracking-[-0.01em] text-ink">
+            {site.brand.name}
+            <span className="text-accent">.</span>
+          </strong>
           <small className="text-[12px] tracking-[0.02em] text-ink-3">{site.brand.subtitle}</small>
         </a>
         <nav className="hidden gap-[34px] md:flex" aria-label="主导航">

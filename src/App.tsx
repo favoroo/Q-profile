@@ -1,7 +1,6 @@
 import { LightboxProvider } from './components/modal/LightboxProvider';
 import { LightboxModal } from './components/modal/LightboxModal';
 import { Header } from './components/layout/Header';
-import { Footer } from './components/layout/Footer';
 import { BackToTop } from './components/layout/BackToTop';
 import { Hero } from './components/sections/Hero';
 import { About } from './components/sections/About';
@@ -22,7 +21,6 @@ export default function App() {
         <Projects />
         <Contact />
       </main>
-      <Footer />
       <BackToTop />
       <LightboxModal />
     </LightboxProvider>

@@ -1279,7 +1279,7 @@
   <header class="site-header" id="siteHeader">
     <div class="wrap nav">
       <a class="brand" href="#home" aria-label="回到顶部">
-        <strong>黄谦</strong><small>汽车技术工程师</small>
+        <strong>黄谦<span class="dot" style="color:var(--color-accent)">.</span></strong><small>汽车技术工程师</small>
       </a>
       <nav class="nav-links" aria-label="主导航">
         <a href="#about">关于</a>
@@ -1309,12 +1309,6 @@
     <!-- ═══════ Hero 首屏 ═══════ -->
     <section class="hero" id="home">
       <div class="wrap hero-inner">
-        <!-- 顶部身份微徽章 -->
-        <div class="hero-pill-badge reveal" data-edit-id="hero-eyebrow">
-          <span class="hero-pill-dot" aria-hidden="true"></span>
-          <span class="hero-pill-text">汽车技术工程师 · AUTOMOTIVE ENGINEER</span>
-        </div>
-
         <!-- ══════ 极简悬吊工牌组件（居中舞台） ══════ -->
         <div class="lanyard-stage-wrapper reveal" style="--d:.08s" id="lanyardStage" aria-label="黄谦的工程师工牌（支持拖拽晃动与翻转）">
           <!-- 动态极简挂绳 SVG 容器 -->
@@ -1396,32 +1390,13 @@
         </div>
 
         <!-- 居中标题与文案 -->
-        <h1 class="hero-name reveal" style="--d:.14s" data-edit-id="hero-name">黄谦<span class="dot">.</span></h1>
-        <p class="hero-tagline reveal" style="--d:.20s" data-edit-id="hero-tagline">把复杂的汽车诊断，<br />做成可靠的交付与好用的工具。</p>
-        <p class="hero-lead reveal" style="--d:.26s" data-edit-id="hero-lead">现就职于湖南道通科技，任汽车技术工程师。从四轮定位到 VIN 车型识别、从 EV 高压测量流程到 AI Agent 工具开发，持续用数据与工程化方法把问题落地。</p>
+        <h1 class="hero-tagline reveal" style="--d:.14s; font-size: clamp(24px, 3.2vw, 36px); font-weight: 700; margin-top: 16px;" data-edit-id="hero-tagline">把复杂的汽车诊断，<br />做成可靠的交付与好用的工具。</h1>
+        <p class="hero-lead reveal" style="--d:.22s" data-edit-id="hero-lead">现就职于湖南道通科技，任汽车技术工程师。从四轮定位到 VIN 车型识别、从 EV 高压测量流程到 AI Agent 工具开发，持续用数据与工程化方法把问题落地。</p>
         
         <!-- 行动按钮 -->
         <div class="hero-actions reveal" style="--d:.32s">
           <a class="btn btn-primary" href="#projects">查看项目经历</a>
           <a class="btn btn-secondary" href="#contact">联系我<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></a>
-        </div>
-
-        <!-- 核心亮点微标签条 -->
-        <div class="hero-metrics-strip reveal" style="--d:.38s">
-          <div class="hero-metric-item">
-            <span class="hmi-val">5 年+</span>
-            <span class="hmi-label">一线汽车工程实战</span>
-          </div>
-          <div class="hmi-divider" aria-hidden="true"></div>
-          <div class="hero-metric-item">
-            <span class="hmi-val">全流程</span>
-            <span class="hmi-label">诊断与 EV 高压测量</span>
-          </div>
-          <div class="hmi-divider" aria-hidden="true"></div>
-          <div class="hero-metric-item">
-            <span class="hmi-val">AI Agent</span>
-            <span class="hmi-label">工程工具与知识库落地</span>
-          </div>
         </div>
       </div>
     </section>
@@ -1775,27 +1750,14 @@
               </div>
               <div class="contact-row">
                 <span class="cr-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-                <div><div class="cr-label">微信号</div><div class="cr-value" data-edit-id="c-wechat">13789130001</div></div>
+                <div><div class="cr-label">微信号</div><div class="cr-value" data-edit-id="c-wechat">同上</div></div>
               </div>
             </div>
-          </div>
-          <div class="cta-panel">
-            <h3 data-edit-id="cta-title">有合适的机会，<br />或想聊聊技术？</h3>
-            <p data-edit-id="cta-text">看到这里，说明我们可能有交集。发一封邮件，我们从一次简单的沟通开始。</p>
-            <a class="btn btn-white" href="mailto:favoro@qq.com">发邮件给我<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
           </div>
         </div>
       </div>
     </section>
   </main>
-
-  <!-- ═══════ 页脚 ═══════ -->
-  <footer class="site-footer">
-    <div class="wrap footer-inner">
-      <span>黄谦 · 汽车技术工程师</span>
-      <span>© 2026 黄谦 · 部署于 Edge One Pages</span>
-    </div>
-  </footer>
 
   <button class="to-top" id="toTop" type="button" aria-label="回到顶部">
     <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>

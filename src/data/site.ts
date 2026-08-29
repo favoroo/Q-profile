@@ -12,7 +12,7 @@ export const site = {
   mobileHomeLink: { label: '首页', href: '#home' },
   footer: {
     left: '黄谦 · 汽车技术工程师',
-    right: '© 2026 黄谦 · 部署于 Edge One Pages',
+    right: '',
   },
   sections: {
     journey: { eyebrow: 'Journey', title: '教育与职业经历' },

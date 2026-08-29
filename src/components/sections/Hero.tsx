@@ -19,37 +19,21 @@ export function Hero() {
         aria-hidden="true"
       />
 
-      <div className="relative z-1 flex flex-col items-center pt-12 pb-10 max-md:pt-10 max-md:pb-8">
-        {/* 状态徽章 */}
-        <Reveal>
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/[0.16] bg-white/82 px-4 py-1.5 backdrop-blur-[14px] transition-all duration-300 ease-[var(--ease-out-apple)] hover:-translate-y-px hover:border-accent/[0.35] max-md:mb-[18px]">
-            <span className="h-[7px] w-[7px] rounded-full bg-[#10b981] shadow-[0_0_0_3px_rgba(16,185,129,0.2)] [animation:pulse-dot_2.4s_infinite_ease-in-out]" />
-            <span className="text-[12.5px] font-semibold tracking-[0.06em] text-accent uppercase max-md:text-[11.5px]">
-              {profile.pill}
-            </span>
-          </div>
-        </Reveal>
-
+      <div className="relative z-1 flex flex-col items-center pt-6 pb-10 max-md:pt-4 max-md:pb-8">
         {/* 悬吊工牌 */}
-        <Reveal delay={0.08}>
+        <Reveal>
           <LanyardBadge />
         </Reveal>
 
-        {/* 标题与文案 */}
+        {/* 标语与文案 */}
         <Reveal delay={0.14}>
-          <h1 className="mt-4 mb-2.5 text-[clamp(38px,6vw,64px)] leading-[1.08] font-bold tracking-[-0.025em] text-ink max-md:mt-3 max-md:mb-2 max-md:text-[clamp(34px,9vw,44px)]">
-            {profile.name}
-            <span className="text-accent">{profile.nameSuffix}</span>
-          </h1>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <p className="mx-auto mb-3 max-w-[680px] text-[clamp(20px,2.6vw,28px)] leading-[1.42] font-semibold tracking-[-0.01em] text-ink max-md:mb-2.5 max-md:text-[18px]">
+          <h1 className="mx-auto mt-4 mb-3.5 max-w-[700px] text-[clamp(24px,3.2vw,36px)] leading-[1.35] font-bold tracking-[-0.02em] text-ink max-md:mt-3 max-md:mb-2.5 max-md:text-[22px]">
             {taglineLine1}
             <br />
             {taglineLine2}
-          </p>
+          </h1>
         </Reveal>
-        <Reveal delay={0.26}>
+        <Reveal delay={0.22}>
           <p className="mx-auto mb-6 max-w-[620px] text-[15.5px] leading-[1.75] text-ink-2 max-md:mb-5 max-md:text-[14px]">
             {profile.lead}
           </p>
@@ -57,7 +41,7 @@ export function Hero() {
 
         {/* 行动按钮 */}
         <Reveal delay={0.32}>
-          <div className="mb-7 flex flex-wrap items-center justify-center gap-4 max-md:mb-[22px] max-md:gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-4 max-md:gap-3">
             {site.heroActions.map((action) => (
               <Button
                 key={action.href}
@@ -69,23 +53,6 @@ export function Hero() {
                   <Icon name="chevron" className="h-4 w-4" strokeWidth={2} />
                 )}
               </Button>
-            ))}
-          </div>
-        </Reveal>
-
-        {/* 亮点微指标条 */}
-        <Reveal delay={0.38}>
-          <div className="inline-flex items-center justify-center gap-[clamp(16px,3vw,36px)] rounded-full border border-black/[0.08] bg-bg-alt/85 px-[26px] py-[11px] backdrop-blur-[10px] max-md:flex-col max-md:gap-2 max-md:rounded-2xl max-md:w-full max-md:max-w-[320px] max-md:px-5 max-md:py-3.5">
-            {profile.metrics.map((metric, i) => (
-              <div key={metric.label} className="contents max-md:contents">
-                {i > 0 && <span className="h-[13px] w-px bg-black/[0.08] max-md:hidden" aria-hidden="true" />}
-                <div className="flex items-baseline gap-1.5 max-md:justify-center">
-                  <span className="font-mono text-[14.5px] font-bold tracking-[-0.01em] text-ink">
-                    {metric.value}
-                  </span>
-                  <span className="text-[12.5px] font-medium text-ink-2">{metric.label}</span>
-                </div>
-              </div>
             ))}
           </div>
         </Reveal>
