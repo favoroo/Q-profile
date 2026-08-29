@@ -1,4 +1,4 @@
-/* 悬吊工牌：3D 结构与卡套样式（迁移自 legacy.html，保留像素级视觉） */
+/* 悬吊工牌：极简扁平风（对齐 Apple 纯净设计哲学） */
 
 .stage {
   display: flex;
@@ -10,14 +10,14 @@
   user-select: none;
   -webkit-user-select: none;
   z-index: 10;
-  width: clamp(146px, 14vw, 176px);
-  margin: 52px auto 18px;
+  width: clamp(146px, 14vw, 172px);
+  margin: 50px auto 16px;
   touch-action: none;
 }
 @media (max-width: 700px) {
   .stage {
-    width: clamp(130px, 36vw, 152px);
-    margin: 48px auto 14px;
+    width: clamp(130px, 36vw, 150px);
+    margin: 44px auto 12px;
   }
 }
 
@@ -38,11 +38,10 @@
   top: -44px;
   left: 50%;
   transform: translateX(-50%);
-  width: 28px;
-  height: 5.5px;
-  background: #18181b;
-  border-radius: 3px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+  width: 20px;
+  height: 2.5px;
+  background: #c8c8cc;
+  border-radius: 1.25px;
   z-index: 2;
   pointer-events: none;
 }
@@ -63,73 +62,34 @@
   cursor: grabbing;
 }
 
-/* 极简一体化金属卡扣 */
+/* 极简扁平扣夹 */
 .clipUnit {
   position: relative;
-  width: 24px;
-  height: 24px;
-  margin: 0 auto -8px;
+  width: 16px;
+  height: 12px;
+  margin: 0 auto -4px;
   z-index: 8;
   pointer-events: none;
   display: flex;
   justify-content: center;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.08));
 }
 .clipUnit svg {
   width: 100%;
   height: 100%;
   display: block;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
 }
 
-/* 极简透明保护套 */
-.cardCase {
-  position: relative;
-  width: 100%;
-  border-radius: 18px;
-  padding: 14px 7px 8px;
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  box-shadow:
-    0 18px 38px -10px rgba(0, 0, 0, 0.1),
-    0 6px 16px rgba(0, 0, 0, 0.04),
-    inset 0 1px 1.5px rgba(255, 255, 255, 0.98);
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-  transition: box-shadow 0.3s ease;
-}
-.cardCase:hover {
-  box-shadow:
-    0 24px 48px -10px rgba(0, 0, 0, 0.14),
-    0 8px 20px rgba(0, 0, 0, 0.05),
-    inset 0 1px 1.5px rgba(255, 255, 255, 1);
-}
-
-/* 卡套顶部插孔 */
-.slotHole {
-  position: absolute;
-  top: 5.5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 4.5px;
-  background: rgba(0, 0, 0, 0.16);
-  border-radius: 4px;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
-  pointer-events: none;
-  z-index: 6;
-}
-
-/* 3D 翻转容器 */
+/* 一体化 3D 翻转卡片（单层纯净结构） */
 .cardInner {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1.35;
-  border-radius: 12px;
+  aspect-ratio: 1 / 1.36;
+  border-radius: 16px;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
+  transition: transform 0.5s var(--ease-out-apple);
+  box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 .cardInner.is-flipped {
   transform: rotateY(180deg);
@@ -139,48 +99,29 @@
 .face {
   position: absolute;
   inset: 0;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .faceFront {
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-  padding: 7px 7px 8px;
+  padding: 6px 6px 8px;
+  justify-content: space-between;
 }
 
-/* 微妙高光 */
-.glare {
-  position: absolute;
-  inset: -50%;
-  pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.55) 50%,
-    transparent 60%
-  );
-  opacity: 0.22;
-  transform: translateZ(2px);
-  mix-blend-mode: overlay;
-  transition: opacity 0.3s ease;
-}
-
-/* 照片装裱 */
+/* 照片区域：极简圆角，去除多层嵌套线条 */
 .photoBox {
   position: relative;
   width: 100%;
   flex: 1;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  background: #f5f5f7;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  background: #f2f2f7;
   min-height: 0;
 }
 .photoBox img {
@@ -189,55 +130,59 @@
   object-fit: cover;
   object-position: center top;
   display: block;
+  /* 照片不拦截事件：拖拽全部落到卡片层 */
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 
 /* 身份信息 */
 .infoBox {
   text-align: center;
-  padding: 7px 2px 2px;
+  padding: 6px 2px 2px;
   flex-shrink: 0;
 }
 .nameCn {
-  font-size: 15.5px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--color-ink);
-  line-height: 1.15;
+  line-height: 1.2;
   letter-spacing: -0.01em;
 }
 .titleCn {
   font-size: 11px;
   font-weight: 600;
   color: var(--color-accent);
-  margin-top: 2.5px;
+  margin-top: 2px;
   line-height: 1.2;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
-/* 背面 */
+/* 背面：纯净浅灰 + 极简信息排列 */
 .faceBack {
-  background: #18181b;
-  color: #f4f4f5;
+  background: #fafafc;
+  color: #1d1d1f;
   transform: rotateY(180deg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 11px 10px 9px;
+  padding: 12px 11px 9px;
+  justify-content: space-between;
 }
 .backHead {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   padding-bottom: 5px;
   text-align: left;
 }
 .backHead .nameCn {
-  color: #ffffff;
-  font-size: 14.5px;
+  color: var(--color-ink);
+  font-size: 14px;
 }
 .backHead .titleCn {
-  color: #60a5fa;
+  color: var(--color-accent);
   font-size: 10.5px;
+  margin-top: 1px;
 }
 .backList {
   list-style: none;
   padding: 0;
-  margin: 7px 0;
+  margin: 6px 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -246,58 +191,33 @@
 .backList li {
   font-size: 8px;
   line-height: 1.35;
-  color: #d4d4d8;
+  color: #6e6e73;
   display: flex;
   align-items: center;
-  gap: 4.5px;
+  gap: 4px;
 }
 .backList li::before {
   content: '';
-  width: 2.5px;
-  height: 2.5px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
   background: var(--color-accent);
   flex-shrink: 0;
 }
 .backFooter {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
   padding-top: 4px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 7.5px;
-  color: #a1a1aa;
+  color: #86868b;
 }
 
-/* 翻转小按钮 */
-.flipBtn {
-  position: absolute;
-  right: -6px;
-  bottom: -6px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: #ffffff;
-  color: var(--color-ink-2);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 20;
-  padding: 0;
-  transition:
-    transform 0.25s var(--ease-out-apple),
-    background 0.2s ease,
-    color 0.2s ease;
+/* 无障碍：减少动态时取消翻转过渡 */
+@media (prefers-reduced-motion: reduce) {
+  .cardInner {
+    transition-duration: 0.01ms;
+  }
 }
-.flipBtn:hover {
-  transform: scale(1.12) rotate(180deg);
-  background: var(--color-accent);
-  color: #ffffff;
-}
-.flipBtn svg {
-  width: 12px;
-  height: 12px;
-}
+

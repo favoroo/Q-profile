@@ -15,6 +15,14 @@ import {
   TILT_MAX,
 } from './constants';
 
+/** 双击判定：两次点按间隔与位移上限 */
+const TAP_INTERVAL = 300;
+const TAP_MOVE_MAX = 10;
+/** 拖动判定阈值（px），超过则视为拖拽而非点按 */
+const DRAG_MOVE_MIN = 8;
+/** justDragged 冷却时间（ms） */
+const DRAG_COOLDOWN = 250;
+
 interface LanyardState {
   x: number;
   y: number;
@@ -32,6 +40,16 @@ interface LanyardState {
   lastPointerX: number;
   lastPointerY: number;
   lastPointerTime: number;
+  /* 本次拖动是否产生位移（区分点按与拖拽） */
+  dragMoved: boolean;
+  dragStartClientX: number;
+  dragStartClientY: number;
+  /* 上次拖拽结束时间（justDragged 冷却用） */
+  lastDragEnd: number;
+  /* 移动端双击检测 */
+  lastTapTime: number;
+  lastTapX: number;
+  lastTapY: number;
   time: number;
 }
 
@@ -53,6 +71,13 @@ function initialState(): LanyardState {
     lastPointerX: 0,
     lastPointerY: 0,
     lastPointerTime: 0,
+    dragMoved: false,
+    dragStartClientX: 0,
+    dragStartClientY: 0,
+    lastDragEnd: 0,
+    lastTapTime: 0,
+    lastTapX: 0,
+    lastTapY: 0,
     time: 0,
   };
 }
@@ -61,30 +86,39 @@ export interface LanyardPhysics {
   stageRef: React.RefObject<HTMLDivElement | null>;
   badgeRef: React.RefObject<HTMLDivElement | null>;
   strapRef: React.RefObject<SVGPathElement | null>;
-  shadowRef: React.RefObject<SVGPathElement | null>;
-  glareRef: React.RefObject<HTMLDivElement | null>;
   isFlipped: boolean;
   toggleFlip: () => void;
+  /** 最近一次拖拽刚结束（250ms 内），用于抑制双击误触 */
+  justDragged: () => boolean;
 }
 
 /**
  * 悬吊工牌物理系统（React 化）：
  * - 全部物理状态存于 useRef，rAF 每帧直接写 DOM，零 setState、零 re-render
  * - Pointer Events 统一鼠标/触摸（替代旧站 mouse+touch 两套监听）
+ * - 双击翻转：桌面走 React onDoubleClick，移动端由 pointerup 兜底检测
  * - reducedMotion 时跳过 idle 摆动/倾斜积分
  */
 export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const badgeRef = useRef<HTMLDivElement | null>(null);
   const strapRef = useRef<SVGPathElement | null>(null);
-  const shadowRef = useRef<SVGPathElement | null>(null);
-  const glareRef = useRef<HTMLDivElement | null>(null);
   const stateRef = useRef<LanyardState>(initialState());
   const reducedRef = useRef(reducedMotion);
   reducedRef.current = reducedMotion;
 
   const [isFlipped, setIsFlipped] = useState(false);
-  const toggleFlip = useCallback(() => setIsFlipped((v) => !v), []);
+  const toggleFlip = useCallback(() => {
+    const s = stateRef.current;
+    /* 翻面瞬间归零倾斜，避免斜着翻面 */
+    s.targetTiltX = 0;
+    s.targetTiltY = 0;
+    setIsFlipped((v) => !v);
+  }, []);
+
+  const justDragged = useCallback(() => {
+    return performance.now() - stateRef.current.lastDragEnd < DRAG_COOLDOWN;
+  }, []);
 
   /* pointerdown 由 stage 的 React 合成事件触发 */
   useEffect(() => {
@@ -92,9 +126,11 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
     if (!stage) return;
 
     const onPointerDown = (e: PointerEvent) => {
-      if ((e.target as HTMLElement).closest?.('[data-flip-btn]')) return;
       const s = stateRef.current;
       s.isDragging = true;
+      s.dragMoved = false;
+      s.dragStartClientX = e.clientX;
+      s.dragStartClientY = e.clientY;
       badgeRef.current?.classList.add('is-dragging');
       s.dragStartX = e.clientX - s.x;
       s.dragStartY = e.clientY - s.y;
@@ -117,6 +153,12 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
           targetX = (targetX / dist) * DRAG_LIMIT;
           targetY = (targetY / dist) * DRAG_LIMIT;
         }
+
+        const movedDist = Math.hypot(
+          e.clientX - s.dragStartClientX,
+          e.clientY - s.dragStartClientY,
+        );
+        if (movedDist > DRAG_MOVE_MIN) s.dragMoved = true;
 
         const now = performance.now();
         const dt = Math.max(1, now - s.lastPointerTime);
@@ -148,12 +190,28 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
       }
     };
 
-    const onPointerUp = () => {
+    const onPointerUp = (e: PointerEvent) => {
       const s = stateRef.current;
       if (s.isDragging) {
         s.isDragging = false;
         badgeRef.current?.classList.remove('is-dragging');
         s.vAngle = s.vx * FLING_GAIN;
+        if (s.dragMoved) {
+          s.lastDragEnd = performance.now();
+        } else if (e.pointerType !== 'mouse') {
+          /* 移动端双击兜底：iOS Safari 对 dblclick 支持不稳 */
+          const now = performance.now();
+          const dx = e.clientX - s.lastTapX;
+          const dy = e.clientY - s.lastTapY;
+          if (now - s.lastTapTime < TAP_INTERVAL && Math.hypot(dx, dy) < TAP_MOVE_MAX) {
+            s.lastTapTime = 0;
+            toggleFlip();
+          } else {
+            s.lastTapTime = now;
+            s.lastTapX = e.clientX;
+            s.lastTapY = e.clientY;
+          }
+        }
       }
       s.targetTiltX = 0;
       s.targetTiltY = 0;
@@ -169,9 +227,9 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
     };
-  }, []);
+  }, [toggleFlip]);
 
-  /* rAF 主循环：弹簧积分 + 挂绳贝塞尔重算 + 光泽跟随 */
+  /* rAF 主循环：弹簧积分 + 挂绳贝塞尔重算 */
   useEffect(() => {
     let raf = 0;
     const s = stateRef.current;
@@ -208,16 +266,7 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
           `rotateX(${s.tiltX.toFixed(2)}deg) rotateY(${s.tiltY.toFixed(2)}deg)`;
       }
 
-      const glare = glareRef.current;
-      if (glare) {
-        const glareShiftX = (s.tiltY * 2.5).toFixed(1);
-        const glareShiftY = (-s.tiltX * 2.5).toFixed(1);
-        const glareOpacity = 0.15 + (Math.abs(s.tiltX) + Math.abs(s.tiltY)) * 0.015;
-        glare.style.transform = `translate3d(${glareShiftX}px,${glareShiftY}px,2px)`;
-        glare.style.opacity = String(Math.min(0.5, Math.max(0.08, glareOpacity)));
-      }
-
-      /* 挂绳贝塞尔（主带 + 阴影偏移 4px） */
+      /* 挂绳贝塞尔 */
       const ax = ANCHOR_X;
       const ay = ANCHOR_Y;
       const bx = REST_X + s.x;
@@ -232,10 +281,6 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
         'd',
         `M ${ax.toFixed(1)},${ay.toFixed(1)} C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)}`,
       );
-      shadowRef.current?.setAttribute(
-        'd',
-        `M ${(ax + 2).toFixed(1)},${(ay + 4).toFixed(1)} C ${(cp1x + 4).toFixed(1)},${(cp1y + 4).toFixed(1)} ${(cp2x + 4).toFixed(1)},${(cp2y + 4).toFixed(1)} ${(bx + 2).toFixed(1)},${(by + 4).toFixed(1)}`,
-      );
 
       raf = requestAnimationFrame(loop);
     };
@@ -244,5 +289,5 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  return { stageRef, badgeRef, strapRef, shadowRef, glareRef, isFlipped, toggleFlip };
+  return { stageRef, badgeRef, strapRef, isFlipped, toggleFlip, justDragged };
 }

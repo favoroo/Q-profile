@@ -5,8 +5,6 @@ import { Icon } from '../ui/icons';
 import { Reveal } from '../motion/Reveal';
 
 export function Hero() {
-  const [taglineLine1, taglineLine2] = profile.tagline.split('\n');
-
   return (
     <section className="relative overflow-hidden text-center" id="home">
       {/* 顶部层次光影 */}
@@ -27,10 +25,8 @@ export function Hero() {
 
         {/* 标语与文案 */}
         <Reveal delay={0.14}>
-          <h1 className="mx-auto mt-4 mb-3.5 max-w-[700px] text-[clamp(24px,3.2vw,36px)] leading-[1.35] font-bold tracking-[-0.02em] text-ink max-md:mt-3 max-md:mb-2.5 max-md:text-[22px]">
-            {taglineLine1}
-            <br />
-            {taglineLine2}
+          <h1 className="mx-auto mt-4 mb-3.5 max-w-[760px] text-center text-[clamp(24px,3.6vw,38px)] font-bold tracking-tight text-ink max-md:mt-3 max-md:mb-2.5 max-md:text-[22px]">
+            <span className="text-accent">AI 时代</span>的汽车技术工程师
           </h1>
         </Reveal>
         <Reveal delay={0.22}>

@@ -54,6 +54,16 @@ export interface AboutFact {
   value: string;
 }
 
+export interface TimelineItem {
+  period: string;
+  organization: string;
+  role: string;
+  badge?: string;
+  description: string;
+  highlights?: string[];
+  tags?: string[];
+}
+
 export interface About {
   eyebrow: string;
   title: string;
@@ -63,19 +73,14 @@ export interface About {
     text: string;
     author: string;
   };
-  card: {
+  facts: AboutFact[];
+  timeline: {
     title: string;
     badge: string;
-    facts: AboutFact[];
-    tagsTitle: string;
-    pills: string[];
+    items: TimelineItem[];
   };
-}
-
-export interface TimelineItem {
-  period: string;
-  title: string;
-  description: string;
+  skillsTagsTitle: string;
+  skillsTags: string[];
 }
 
 export interface Skill {

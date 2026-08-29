@@ -5,7 +5,7 @@ export const profile: Profile = {
   nameSuffix: '.',
   title: '汽车技术工程师',
   pill: '汽车技术工程师 · AUTOMOTIVE ENGINEER',
-  tagline: '把复杂的汽车诊断，\n做成可靠的交付与好用的工具。',
+  tagline: 'AI时代的汽车技术工程师',
   lead: '现就职于湖南道通科技，任汽车技术工程师。从四轮定位到 VIN 车型识别、从 EV 高压测量流程到 AI Agent 工具开发，持续用数据与工程化方法把问题落地。',
   avatar: '/images/avatar.jpg',
   badgeBack: {

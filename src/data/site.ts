@@ -4,7 +4,6 @@ export const site = {
   brand: { name: '黄谦', subtitle: '汽车技术工程师' },
   navLinks: [
     { label: '关于', href: '#about' },
-    { label: '经历', href: '#journey' },
     { label: '能力', href: '#skills' },
     { label: '项目', href: '#projects' },
     { label: '联系', href: '#contact' },
@@ -15,7 +14,6 @@ export const site = {
     right: '',
   },
   sections: {
-    journey: { eyebrow: 'Journey', title: '教育与职业经历' },
     skills: {
       eyebrow: 'Expertise',
       title: '专业能力',

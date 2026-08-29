@@ -10,7 +10,7 @@ export const ROT_DAMPING = 0.86;
 /* 拖拽限位（px） */
 export const DRAG_LIMIT = 180;
 /* hover 3D 倾斜 */
-export const TILT_MAX = 14;
+export const TILT_MAX = 6;
 export const TILT_LERP = 0.12;
 
 /* 挂绳 SVG 坐标 */
