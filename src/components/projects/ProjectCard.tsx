@@ -31,6 +31,9 @@ function ActionButtons({ actions }: { actions: ProjectAction[] }) {
 export function ProjectCard({ project }: { project: Project }) {
   const { open } = useLightbox();
   const featured = project.size === 'featured';
+  const mediaActions = (project.actions ?? [])
+    .filter((a) => a.kind === 'doc' || a.kind === 'video')
+    .sort((a) => (a.kind === 'doc' ? -1 : 1));
 
   return (
     <Reveal
@@ -56,33 +59,6 @@ export function ProjectCard({ project }: { project: Project }) {
             loading="lazy"
             className="block h-full w-full object-cover transition-transform duration-700 ease-[var(--ease-out-apple)] group-hover:scale-[1.04]"
           />
-          <span className="absolute top-3.5 left-3.5 rounded-full bg-white/82 px-3 py-[5px] text-[11.5px] font-semibold text-ink backdrop-blur-xl">
-            {project.tag}
-          </span>
-          {/* 视频 / 文档圆形按钮 */}
-          {project.actions?.map((action, i) => {
-            if (action.kind === 'iframe') return null;
-            const isDoc = action.kind === 'doc';
-            return (
-              <button
-                key={i}
-                type="button"
-                aria-label={action.ariaLabel}
-                title={isDoc ? '查看开发手册' : '查看演示视频'}
-                onClick={() => open(action)}
-                className={`absolute top-3.5 z-2 grid h-11 w-11 cursor-pointer place-items-center rounded-full border-none bg-white/85 text-ink backdrop-blur-xl transition-all duration-300 ease-[var(--ease-out-apple)] hover:scale-[1.08] hover:text-accent ${
-                  isDoc ? 'right-[66px]' : 'right-3.5'
-                }`}
-                style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}
-              >
-                <Icon
-                  name={isDoc ? 'doc' : 'play'}
-                  className={`h-4 w-4 ${isDoc ? '' : 'ml-0.5'}`}
-                  stroke={isDoc}
-                />
-              </button>
-            );
-          })}
         </div>
 
         {/* 内容区 */}
@@ -91,7 +67,32 @@ export function ProjectCard({ project }: { project: Project }) {
             featured ? 'lg:justify-center lg:px-8 lg:py-7' : ''
           }`}
         >
-          <div className="font-mono text-[12px] tracking-[0.03em] text-ink-3">{project.meta}</div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="font-mono text-[12px] tracking-[0.03em] text-ink-3">{project.meta}</div>
+            {mediaActions.length > 0 && (
+              <div className="flex items-center gap-2">
+                {mediaActions.map((action, i) => {
+                  const isDoc = action.kind === 'doc';
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      aria-label={action.ariaLabel}
+                      title={isDoc ? '查看开发手册' : '查看演示视频'}
+                      onClick={() => open(action)}
+                      className="grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-black/[0.08] bg-white text-ink shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-all duration-300 ease-[var(--ease-out-apple)] hover:scale-[1.08] hover:border-black/[0.18] hover:text-accent hover:shadow-[0_4px_14px_rgba(0,0,0,0.1)] active:scale-95"
+                    >
+                      <Icon
+                        name={isDoc ? 'doc' : 'play'}
+                        className={`h-4 w-4 ${isDoc ? '' : 'ml-0.5'}`}
+                        stroke={isDoc}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
           <h3 className="m-0 text-[21px] font-bold tracking-[-0.015em]">{project.title}</h3>
           <p className="m-0 text-[14.5px] leading-[1.7] text-ink-2">{project.description}</p>
           {project.points && (

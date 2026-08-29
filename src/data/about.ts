@@ -37,8 +37,8 @@ export const about: About = {
         role: '汽车技术工程师',
         badge: '现任',
         description:
-          '深耕新能源高压测量全流程、四轮定位标定与车型识别开发；主导自研系列 AI Agent 工具推动团队流程自动化与效率革新。',
-        tags: ['EV高压测量', '四轮定位', 'VIN车型识别', 'AI Agent开发'],
+          '深耕新能源高压测量全流程、四轮定位标定与VIN码解析开发；主导自研系列 AI Agent 工具推动团队流程自动化与效率革新。',
+        tags: ['EV高压测量', '四轮定位', 'VIN码解析', 'AI Agent开发'],
       },
     ],
   },

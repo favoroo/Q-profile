@@ -15,9 +15,7 @@ export function ProjectCompactCard({ project, delay = 0 }: { project: Project; d
             loading="lazy"
             className="block h-full w-full object-cover transition-transform duration-500 ease-[var(--ease-out-apple)] group-hover:scale-[1.06]"
           />
-          <span className="absolute top-2.5 left-2.5 rounded-full bg-white/88 px-2.5 py-[3px] text-[11px] font-semibold text-ink backdrop-blur-xl">
-            {project.tag}
-          </span>
+
         </div>
 
         <div className="flex flex-col justify-between gap-2 px-5 py-4 max-sm:px-3.5 max-sm:py-3.5">

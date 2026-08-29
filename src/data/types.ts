@@ -108,7 +108,7 @@ export interface ProjectTag {
 export interface Project {
   id: string;
   size: ProjectSize;
-  tag: string;
+  tag?: string;
   meta: string;
   title: string;
   description: string;
