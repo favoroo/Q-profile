@@ -49,6 +49,7 @@
 .badgeBody {
   position: relative;
   width: 100%;
+  padding-top: 12px;
   cursor: grab;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
@@ -60,24 +61,6 @@
 .badgeBody:active,
 .badgeBody.is-dragging {
   cursor: grabbing;
-}
-
-/* 工牌金属扣夹 */
-.clipUnit {
-  position: relative;
-  width: 18px;
-  height: 18px;
-  margin: 0 auto -6px;
-  z-index: 8;
-  pointer-events: none;
-  display: flex;
-  justify-content: center;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
-}
-.clipUnit svg {
-  width: 100%;
-  height: 100%;
-  display: block;
 }
 
 /* 一体化 3D 翻转卡片（精致工牌边框与轻量质感） */
@@ -93,6 +76,38 @@
 }
 .cardInner.is-flipped {
   transform: rotateY(180deg);
+}
+
+/* 工牌金属扣夹（正面/背面，随卡片一同 3D 旋转） */
+.clipUnitFront,
+.clipUnitBack {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.clipUnitFront {
+  transform: translateX(-50%) translateZ(1px);
+}
+
+.clipUnitBack {
+  transform: translateX(-50%) rotateY(180deg) translateZ(1px);
+}
+
+.clipUnitFront svg,
+.clipUnitBack svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* 卡片正反面 */
@@ -112,6 +127,7 @@
 .faceFront {
   padding: 7px 7px 9px;
   justify-content: space-between;
+  transform: rotateY(0deg) translateZ(0.1px);
 }
 
 /* 照片区域：工牌证件照内衬视窗边框 */
@@ -162,7 +178,7 @@
 .faceBack {
   background: #fafafc;
   color: #1d1d1f;
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(0.1px);
   padding: 12px 11px 9px;
   justify-content: space-between;
 }

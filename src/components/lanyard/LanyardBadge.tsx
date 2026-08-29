@@ -50,22 +50,36 @@ export function LanyardBadge() {
 
       {/* 工牌主体 */}
       <div ref={badgeRef} className={styles.badgeBody}>
-        {/* 工牌金属扣夹 */}
-        <div className={styles.clipUnit} aria-hidden="true">
-          <svg viewBox="0 0 18 18" fill="none">
-            {/* 织带金属压箍 */}
-            <rect x="4" y="0" width="10" height="3" rx="1.2" fill="#48484a" />
-            {/* 金属连接环 */}
-            <rect x="7" y="2.5" width="4" height="5" rx="1.5" fill="none" stroke="#636366" strokeWidth="1.2" />
-            {/* 工牌金属夹片 */}
-            <rect x="3" y="7" width="12" height="10" rx="2" fill="#242426" />
-            {/* 夹片金属亮边 */}
-            <rect x="5" y="9.5" width="8" height="1.5" rx="0.75" fill="#8e8e93" />
-          </svg>
-        </div>
-
-        {/* 一体化 3D 翻转卡片（无多层套娃框） */}
+        {/* 一体化 3D 翻转卡片（扣夹随卡片一同 3D 翻转，避免分离穿模与 Z-fighting 异常） */}
         <div className={`${styles.cardInner} ${isFlipped ? styles['is-flipped'] : ''}`}>
+          {/* 正面金属扣夹 */}
+          <div className={styles.clipUnitFront} aria-hidden="true">
+            <svg viewBox="0 0 18 18" fill="none">
+              {/* 织带金属压箍 */}
+              <rect x="4" y="0" width="10" height="3" rx="1.2" fill="#48484a" />
+              {/* 金属连接环 */}
+              <rect x="7" y="2.5" width="4" height="5" rx="1.5" fill="none" stroke="#636366" strokeWidth="1.2" />
+              {/* 工牌金属夹片 */}
+              <rect x="3" y="7" width="12" height="10" rx="2" fill="#242426" />
+              {/* 夹片金属亮边 */}
+              <rect x="5" y="9.5" width="8" height="1.5" rx="0.75" fill="#8e8e93" />
+            </svg>
+          </div>
+
+          {/* 背面金属扣夹 */}
+          <div className={styles.clipUnitBack} aria-hidden="true">
+            <svg viewBox="0 0 18 18" fill="none">
+              {/* 织带金属压箍 */}
+              <rect x="4" y="0" width="10" height="3" rx="1.2" fill="#48484a" />
+              {/* 金属连接环 */}
+              <rect x="7" y="2.5" width="4" height="5" rx="1.5" fill="none" stroke="#636366" strokeWidth="1.2" />
+              {/* 工牌金属夹片背面 */}
+              <rect x="3" y="7" width="12" height="10" rx="2" fill="#242426" />
+              {/* 夹片背部暗纹 */}
+              <rect x="6" y="10" width="6" height="1.5" rx="0.75" fill="#3a3a3c" />
+            </svg>
+          </div>
+
           {/* 正面 */}
           <div className={`${styles.face} ${styles.faceFront}`}>
             <div className={styles.photoBox}>
