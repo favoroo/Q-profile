@@ -4,13 +4,21 @@ import { useLanyardPhysics } from './useLanyardPhysics';
 import styles from './LanyardBadge.module.css';
 
 /**
- * 悬吊工牌组件：拖拽晃动（钟摆阻尼）、hover 3D 倾斜、双击卡片翻转。
+ * 悬吊工牌组件：双边 V 型挂绳、拖拽晃动（钟摆阻尼）、hover 3D 倾斜、双击卡片翻转。
  * 物理状态在 useLanyardPhysics 内以 ref 管理，rAF 每帧直写 DOM。
  */
 export function LanyardBadge() {
   const reducedMotion = useReducedMotion() ?? false;
-  const { stageRef, badgeRef, strapRef, strapHighlightRef, isFlipped, toggleFlip } =
-    useLanyardPhysics(reducedMotion);
+  const {
+    stageRef,
+    badgeRef,
+    leftStrapRef,
+    rightStrapRef,
+    leftHighlightRef,
+    rightHighlightRef,
+    isFlipped,
+    toggleFlip,
+  } = useLanyardPhysics(reducedMotion);
 
   return (
     <div
@@ -22,31 +30,56 @@ export function LanyardBadge() {
         toggleFlip();
       }}
     >
-      {/* 动态工牌织带挂绳 */}
+      {/* 动态工牌 V 型双边织带挂绳 */}
       <svg className={styles.svgContainer} viewBox="0 0 320 180" aria-hidden="true">
-        {/* 主织带（深色扁平带） */}
+        <defs>
+          <filter id="strapShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#000000" floodOpacity="0.08" />
+          </filter>
+        </defs>
+
+        {/* 左侧织带（深色扁平编织带） */}
         <path
-          ref={strapRef}
+          ref={leftStrapRef}
           d=""
           fill="none"
           stroke="#262628"
-          strokeWidth="6"
+          strokeWidth="4.8"
           strokeLinecap="round"
+          filter="url(#strapShadow)"
         />
-        {/* 织带中间精细编织质感线 */}
+        {/* 左织带精细编织质感缝线 */}
         <path
-          ref={strapHighlightRef}
+          ref={leftHighlightRef}
           d=""
           fill="none"
-          stroke="rgba(255, 255, 255, 0.22)"
-          strokeWidth="1.2"
-          strokeDasharray="3 2"
+          stroke="rgba(255, 255, 255, 0.28)"
+          strokeWidth="1.1"
+          strokeDasharray="2.5 2"
+          strokeLinecap="round"
+        />
+
+        {/* 右侧织带（深色扁平编织带） */}
+        <path
+          ref={rightStrapRef}
+          d=""
+          fill="none"
+          stroke="#262628"
+          strokeWidth="4.8"
+          strokeLinecap="round"
+          filter="url(#strapShadow)"
+        />
+        {/* 右织带精细编织质感缝线 */}
+        <path
+          ref={rightHighlightRef}
+          d=""
+          fill="none"
+          stroke="rgba(255, 255, 255, 0.28)"
+          strokeWidth="1.1"
+          strokeDasharray="2.5 2"
           strokeLinecap="round"
         />
       </svg>
-
-      {/* 顶部固定端 */}
-      <div className={styles.topAnchor} aria-hidden="true" />
 
       {/* 工牌主体 */}
       <div ref={badgeRef} className={styles.badgeBody}>
@@ -54,29 +87,34 @@ export function LanyardBadge() {
         <div className={`${styles.cardInner} ${isFlipped ? styles['is-flipped'] : ''}`}>
           {/* 正面金属扣夹 */}
           <div className={styles.clipUnitFront} aria-hidden="true">
-            <svg viewBox="0 0 18 18" fill="none">
-              {/* 织带金属压箍 */}
-              <rect x="4" y="0" width="10" height="3" rx="1.2" fill="#48484a" />
-              {/* 金属连接环 */}
-              <rect x="7" y="2.5" width="4" height="5" rx="1.5" fill="none" stroke="#636366" strokeWidth="1.2" />
-              {/* 工牌金属夹片 */}
-              <rect x="3" y="7" width="12" height="10" rx="2" fill="#242426" />
-              {/* 夹片金属亮边 */}
-              <rect x="5" y="9.5" width="8" height="1.5" rx="0.75" fill="#8e8e93" />
+            <svg viewBox="0 0 20 20" fill="none">
+              {/* 双带金属束口滑块 */}
+              <rect x="4.5" y="0.5" width="11" height="3.5" rx="1.75" fill="#3a3a3c" />
+              <rect x="5.5" y="1.2" width="9" height="1" rx="0.5" fill="#636366" />
+              {/* 金属转环 */}
+              <rect x="8" y="3.5" width="4" height="4.5" rx="1.5" fill="none" stroke="#636366" strokeWidth="1.3" />
+              {/* 工牌金属夹身 */}
+              <rect x="3.5" y="7.5" width="13" height="10" rx="2.5" fill="#1c1c1e" />
+              {/* 钛金属高光倒角 */}
+              <rect x="5" y="9" width="10" height="1.2" rx="0.6" fill="#8e8e93" opacity="0.85" />
+              {/* 夹扣锁孔小圆点 */}
+              <circle cx="10" cy="13.5" r="1.2" fill="#3a3a3c" />
             </svg>
           </div>
 
           {/* 背面金属扣夹 */}
           <div className={styles.clipUnitBack} aria-hidden="true">
-            <svg viewBox="0 0 18 18" fill="none">
-              {/* 织带金属压箍 */}
-              <rect x="4" y="0" width="10" height="3" rx="1.2" fill="#48484a" />
-              {/* 金属连接环 */}
-              <rect x="7" y="2.5" width="4" height="5" rx="1.5" fill="none" stroke="#636366" strokeWidth="1.2" />
-              {/* 工牌金属夹片背面 */}
-              <rect x="3" y="7" width="12" height="10" rx="2" fill="#242426" />
-              {/* 夹片背部暗纹 */}
-              <rect x="6" y="10" width="6" height="1.5" rx="0.75" fill="#3a3a3c" />
+            <svg viewBox="0 0 20 20" fill="none">
+              {/* 双带金属束口滑块背面 */}
+              <rect x="4.5" y="0.5" width="11" height="3.5" rx="1.75" fill="#3a3a3c" />
+              <rect x="6" y="1.2" width="8" height="1" rx="0.5" fill="#2c2c2e" />
+              {/* 金属转环 */}
+              <rect x="8" y="3.5" width="4" height="4.5" rx="1.5" fill="none" stroke="#636366" strokeWidth="1.3" />
+              {/* 工牌金属夹身背面 */}
+              <rect x="3.5" y="7.5" width="13" height="10" rx="2.5" fill="#1c1c1e" />
+              {/* 背面螺丝/紧固点 */}
+              <circle cx="7" cy="12.5" r="0.9" fill="#48484a" />
+              <circle cx="13" cy="12.5" r="0.9" fill="#48484a" />
             </svg>
           </div>
 

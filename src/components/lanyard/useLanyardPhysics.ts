@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  ANCHOR_X,
+  ANCHOR_LEFT_X,
+  ANCHOR_RIGHT_X,
   ANCHOR_Y,
   DAMPING,
   DRAG_LIMIT,
@@ -85,8 +86,10 @@ function initialState(): LanyardState {
 export interface LanyardPhysics {
   stageRef: React.RefObject<HTMLDivElement | null>;
   badgeRef: React.RefObject<HTMLDivElement | null>;
-  strapRef: React.RefObject<SVGPathElement | null>;
-  strapHighlightRef: React.RefObject<SVGPathElement | null>;
+  leftStrapRef: React.RefObject<SVGPathElement | null>;
+  rightStrapRef: React.RefObject<SVGPathElement | null>;
+  leftHighlightRef: React.RefObject<SVGPathElement | null>;
+  rightHighlightRef: React.RefObject<SVGPathElement | null>;
   isFlipped: boolean;
   toggleFlip: () => void;
   /** 最近一次拖拽刚结束（250ms 内），用于抑制双击误触 */
@@ -103,8 +106,10 @@ export interface LanyardPhysics {
 export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const badgeRef = useRef<HTMLDivElement | null>(null);
-  const strapRef = useRef<SVGPathElement | null>(null);
-  const strapHighlightRef = useRef<SVGPathElement | null>(null);
+  const leftStrapRef = useRef<SVGPathElement | null>(null);
+  const rightStrapRef = useRef<SVGPathElement | null>(null);
+  const leftHighlightRef = useRef<SVGPathElement | null>(null);
+  const rightHighlightRef = useRef<SVGPathElement | null>(null);
   const stateRef = useRef<LanyardState>(initialState());
   const reducedRef = useRef(reducedMotion);
   reducedRef.current = reducedMotion;
@@ -279,20 +284,41 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
           `rotateX(${s.tiltX.toFixed(2)}deg) rotateY(${s.tiltY.toFixed(2)}deg)`;
       }
 
-      /* 挂绳贝塞尔 */
-      const ax = ANCHOR_X;
+      /* 挂绳贝塞尔：左右双边 V 型织带 */
+      const lax = ANCHOR_LEFT_X;
+      const rax = ANCHOR_RIGHT_X;
       const ay = ANCHOR_Y;
       const bx = REST_X + s.x;
       const by = REST_Y + s.y;
       const rad = (s.angle * Math.PI) / 180;
-      const cp1x = ax;
-      const cp1y = ay + (by - ay) * 0.48;
-      const cp2x = bx - Math.sin(rad) * 24;
-      const cp2y = by - Math.cos(rad) * 24;
+      const cosA = Math.cos(rad);
+      const sinA = Math.sin(rad);
 
-      const pathData = `M ${ax.toFixed(1)},${ay.toFixed(1)} C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)}`;
-      strapRef.current?.setAttribute('d', pathData);
-      strapHighlightRef.current?.setAttribute('d', pathData);
+      // 扣夹顶部的微偏移（左带接点与右带接点，保持平滑汇聚）
+      const leftEndX = bx - cosA * 2.5;
+      const leftEndY = by + sinA * 2.5;
+      const rightEndX = bx + cosA * 2.5;
+      const rightEndY = by - sinA * 2.5;
+
+      // 左带控制点（自然下垂与拉伸形变）
+      const lcp1x = lax + (bx - lax) * 0.18;
+      const lcp1y = ay + (by - ay) * 0.48;
+      const lcp2x = leftEndX - sinA * 18 - cosA * 2;
+      const lcp2y = leftEndY - cosA * 18 + sinA * 2;
+
+      // 右带控制点
+      const rcp1x = rax + (bx - rax) * 0.18;
+      const rcp1y = ay + (by - ay) * 0.48;
+      const rcp2x = rightEndX - sinA * 18 + cosA * 2;
+      const rcp2y = rightEndY - cosA * 18 - sinA * 2;
+
+      const leftPath = `M ${lax.toFixed(1)},${ay.toFixed(1)} C ${lcp1x.toFixed(1)},${lcp1y.toFixed(1)} ${lcp2x.toFixed(1)},${lcp2y.toFixed(1)} ${leftEndX.toFixed(1)},${leftEndY.toFixed(1)}`;
+      const rightPath = `M ${rax.toFixed(1)},${ay.toFixed(1)} C ${rcp1x.toFixed(1)},${rcp1y.toFixed(1)} ${rcp2x.toFixed(1)},${rcp2y.toFixed(1)} ${rightEndX.toFixed(1)},${rightEndY.toFixed(1)}`;
+
+      leftStrapRef.current?.setAttribute('d', leftPath);
+      leftHighlightRef.current?.setAttribute('d', leftPath);
+      rightStrapRef.current?.setAttribute('d', rightPath);
+      rightHighlightRef.current?.setAttribute('d', rightPath);
 
       raf = requestAnimationFrame(loop);
     };
@@ -301,5 +327,15 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  return { stageRef, badgeRef, strapRef, strapHighlightRef, isFlipped, toggleFlip, justDragged };
+  return {
+    stageRef,
+    badgeRef,
+    leftStrapRef,
+    rightStrapRef,
+    leftHighlightRef,
+    rightHighlightRef,
+    isFlipped,
+    toggleFlip,
+    justDragged,
+  };
 }
