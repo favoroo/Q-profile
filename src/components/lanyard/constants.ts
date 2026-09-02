@@ -13,9 +13,8 @@ export const DRAG_LIMIT = 180;
 export const TILT_MAX = 6;
 export const TILT_LERP = 0.12;
 
-/* 挂绳 SVG 坐标：V 型双边挂绳（左右双锚点） */
-export const ANCHOR_LEFT_X = 122;
-export const ANCHOR_RIGHT_X = 198;
+/* 挂绳 SVG 坐标：扁平宽织带（顶部中央自然垂落） */
+export const ANCHOR_X = 160;
 export const ANCHOR_Y = 0;
 export const REST_X = 160;
 export const REST_Y = 46;
