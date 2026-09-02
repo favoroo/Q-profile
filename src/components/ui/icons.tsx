@@ -71,27 +71,7 @@ const ICON_PATHS: Record<IconName, React.ReactNode> = {
       <path d="M9 17h6" />
     </>
   ),
-  flip: (
-    <>
-      <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-      <path d="M3 3v5h5" />
-      <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-      <path d="M21 21v-5h-5" />
-    </>
-  ),
-  arrow: (
-    <>
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </>
-  ),
   chevron: <path d="m9 6 6 6-6 6" />,
-  'to-top': (
-    <>
-      <path d="M12 19V5" />
-      <path d="m5 12 7-7 7 7" />
-    </>
-  ),
 };
 
 interface IconProps {

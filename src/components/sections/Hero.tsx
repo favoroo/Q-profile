@@ -42,7 +42,7 @@ export function Hero() {
               <Button
                 key={action.href}
                 href={action.href}
-                variant={action.variant as 'primary' | 'secondary'}
+                variant={action.variant}
               >
                 {action.label}
                 {action.variant === 'secondary' && (

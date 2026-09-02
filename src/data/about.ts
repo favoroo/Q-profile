@@ -20,7 +20,6 @@ export const about: About = {
   ],
   timeline: {
     title: '教育与职业经历',
-    badge: '2017 – 至今',
     items: [
       {
         period: '2017.09 – 2021.06',
@@ -36,6 +35,7 @@ export const about: About = {
         organization: '湖南道通科技',
         role: '汽车技术工程师',
         badge: '现任',
+        current: true,
         description:
           '深耕新能源高压测量全流程、四轮定位标定与VIN码解析开发；主导自研系列 AI Agent 工具推动团队流程自动化与效率革新。',
         tags: ['EV高压测量', '四轮定位', 'VIN码解析', 'AI Agent开发'],

@@ -1,5 +1,6 @@
 import { about } from '../../data';
 import { Icon } from '../ui/icons';
+import { SectionHead } from '../ui/SectionHead';
 import { Reveal } from '../motion/Reveal';
 
 export function About() {
@@ -7,17 +8,12 @@ export function About() {
     <section className="py-[60px]" id="about">
       <div className="mx-auto w-[min(1080px,calc(100%-48px))]">
         {/* 顶部标题区 */}
-        <Reveal className="mb-10 text-center">
-          <p className="mb-2 font-mono text-[12.5px] font-semibold tracking-[0.22em] text-accent uppercase">
-            {about.eyebrow}
-          </p>
-          <h2 className="m-0 text-[clamp(28px,4vw,44px)] leading-[1.1] font-bold tracking-[-0.02em]">
-            {about.title}
-          </h2>
-          <p className="mx-auto mt-2.5 max-w-[560px] text-[15px] leading-[1.65] text-ink-2">
-            {about.description}
-          </p>
-        </Reveal>
+        <SectionHead
+          className="mb-10"
+          eyebrow={about.eyebrow}
+          title={about.title}
+          description={about.description}
+        />
 
         {/* 核心双栏复合网格（等宽对齐） */}
         <div className="grid grid-cols-2 items-start gap-8 lg:gap-9 max-lg:grid-cols-1">
@@ -101,9 +97,7 @@ export function About() {
                     {/* 时间线圆点指示器 */}
                     <div className="relative z-1 mt-0.5 grid h-4.5 w-4.5 flex-none place-items-center rounded-full bg-white shadow-xs ring-2 ring-black/[0.08]">
                       <span
-                        className={`h-2 w-2 rounded-full ${
-                          item.badge === '现任' ? 'bg-accent' : 'bg-ink-3'
-                        }`}
+                        className={`h-2 w-2 rounded-full ${item.current ? 'bg-accent' : 'bg-ink-3'}`}
                       />
                     </div>
 
@@ -117,7 +111,7 @@ export function About() {
                         {item.badge && (
                           <span
                             className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold ${
-                              item.badge === '现任'
+                              item.current
                                 ? 'bg-accent/10 text-accent'
                                 : 'bg-black/[0.06] text-ink-2'
                             }`}

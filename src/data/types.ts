@@ -13,31 +13,42 @@ export type IconName =
   | 'quote'
   | 'play'
   | 'doc'
-  | 'flip'
-  | 'arrow'
   | 'chevron'
   | 'close'
-  | 'menu'
-  | 'to-top';
-
-export interface Metric {
-  value: string;
-  label: string;
-}
+  | 'menu';
 
 export interface NavLink {
   label: string;
   href: string;
 }
 
+/** 区块标题三件套（eyebrow / 标题 / 描述） */
+export interface SectionCopy {
+  eyebrow: string;
+  title: string;
+  description: string;
+}
+
+export interface HeroAction {
+  label: string;
+  href: string;
+  variant: 'primary' | 'secondary';
+}
+
+export interface Site {
+  brand: { name: string; subtitle: string };
+  navLinks: NavLink[];
+  mobileHomeLink: NavLink;
+  sections: {
+    skills: SectionCopy;
+    projects: SectionCopy;
+  };
+  heroActions: HeroAction[];
+}
+
 export interface Profile {
   name: string;
-  nameSuffix: string;
   title: string;
-  /** Hero 顶部状态徽章文案 */
-  pill: string;
-  /** 支持换行（\n 分隔两行） */
-  tagline: string;
   lead: string;
   avatar: string;
   badgeBack: {
@@ -45,7 +56,6 @@ export interface Profile {
     edu: string;
     location: string;
   };
-  metrics: Metric[];
 }
 
 export interface AboutFact {
@@ -58,9 +68,11 @@ export interface TimelineItem {
   period: string;
   organization: string;
   role: string;
+  /** 状态徽章文案 */
   badge?: string;
+  /** 是否为当前在职/在读经历（时间线圆点与徽章用强调色） */
+  current?: boolean;
   description: string;
-  highlights?: string[];
   tags?: string[];
 }
 
@@ -76,7 +88,6 @@ export interface About {
   facts: AboutFact[];
   timeline: {
     title: string;
-    badge: string;
     items: TimelineItem[];
   };
   skillsTagsTitle: string;
@@ -140,4 +151,11 @@ export interface ContactRow {
   href?: string;
   copyValue?: string;
   copyNotice?: string;
+}
+
+export interface Contact {
+  eyebrow: string;
+  title: string;
+  description: string;
+  rows: ContactRow[];
 }

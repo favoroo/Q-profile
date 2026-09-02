@@ -69,14 +69,14 @@ export function Header() {
       {menuOpen && (
         <div id="mobileMenu" className="border-t border-black/[0.08] md:hidden">
           <div className="mx-auto w-[calc(100%-36px)]">
-            {[site.mobileHomeLink, ...site.navLinks].map((l, i) => (
+            {[site.mobileHomeLink, ...site.navLinks].map((l) => (
               <a
                 key={l.href}
                 href={l.href}
                 onClick={() => setMenuOpen(false)}
                 className={`block border-b border-black/[0.08] py-[15px] text-[15px] no-underline last:border-b-0 ${
                   activeId === l.href.slice(1) ? 'font-semibold text-ink' : 'text-ink-2'
-                } ${i === 0 ? '' : ''}`}
+                }`}
               >
                 {l.label}
               </a>

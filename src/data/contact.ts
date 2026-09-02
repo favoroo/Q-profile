@@ -1,6 +1,6 @@
-import type { ContactRow } from './types';
+import type { Contact } from './types';
 
-export const contact = {
+export const contact: Contact = {
   eyebrow: 'Contact',
   title: '联系我',
   description: '无论是项目合作、职位机会，还是行业交流，都欢迎随时联系。',
@@ -14,11 +14,5 @@ export const contact = {
       copyValue: '13789130001',
       copyNotice: '微信号 (13789130001) 已复制，打开微信即可粘贴添加',
     },
-  ] as ContactRow[],
-  cta: {
-    title: '有合适的机会，\n或想聊聊技术？',
-    text: '看到这里，说明我们可能有交集。发一封邮件，我们从一次简单的沟通开始。',
-    buttonLabel: '发邮件给我',
-    href: 'mailto:favoro@qq.com',
-  },
+  ],
 };

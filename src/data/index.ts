@@ -1,7 +1,6 @@
 export * from './types';
 export { profile } from './profile';
 export { about } from './about';
-export { timeline } from './timeline';
 export { skills } from './skills';
 export { projects, COMPACT_SUBDIVIDER } from './projects';
 export { VIDEO_TABS } from './videos';

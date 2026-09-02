@@ -4,11 +4,14 @@ interface SectionHeadProps {
   eyebrow: string;
   title: string;
   description?: string;
+  /** 覆盖默认下边距（mb-9），如 About 的 mb-10 */
+  className?: string;
 }
 
-export function SectionHead({ eyebrow, title, description }: SectionHeadProps) {
+/** 区块统一标题头：eyebrow + 大标题 + 可选描述，居中排版。 */
+export function SectionHead({ eyebrow, title, description, className }: SectionHeadProps) {
   return (
-    <Reveal className="mb-9 text-center">
+    <Reveal className={`text-center ${className ?? 'mb-9'}`}>
       <p className="mb-2 font-mono text-[12.5px] font-semibold tracking-[0.22em] text-accent uppercase">
         {eyebrow}
       </p>

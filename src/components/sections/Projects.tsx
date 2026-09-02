@@ -1,6 +1,7 @@
 import { projects, site, COMPACT_SUBDIVIDER } from '../../data';
 import { ProjectCard } from '../projects/ProjectCard';
 import { ProjectCompactCard } from '../projects/ProjectCompactCard';
+import { SectionHead } from '../ui/SectionHead';
 import { Reveal } from '../motion/Reveal';
 
 export function Projects() {
@@ -11,17 +12,11 @@ export function Projects() {
   return (
     <section className="bg-bg-alt py-[60px]" id="projects">
       <div className="mx-auto w-[min(1080px,calc(100%-48px))]">
-        <Reveal className="mb-9 text-center">
-          <p className="mb-2 font-mono text-[12.5px] font-semibold tracking-[0.22em] text-accent uppercase">
-            {site.sections.projects.eyebrow}
-          </p>
-          <h2 className="m-0 text-[clamp(28px,4vw,44px)] leading-[1.1] font-bold tracking-[-0.02em]">
-            {site.sections.projects.title}
-          </h2>
-          <p className="mx-auto mt-2.5 max-w-[560px] text-[15px] leading-[1.65] text-ink-2">
-            {site.sections.projects.description}
-          </p>
-        </Reveal>
+        <SectionHead
+          eyebrow={site.sections.projects.eyebrow}
+          title={site.sections.projects.title}
+          description={site.sections.projects.description}
+        />
 
         <div className="grid grid-cols-2 gap-[18px] max-md:grid-cols-1">
           {featured.map((p) => (
