@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLightbox } from './LightboxProvider';
 import { useBodyScrollLock } from '../../lib/useBodyScrollLock';
@@ -15,22 +15,59 @@ const panelSize: Record<string, string> = {
   doc: 'w-[min(860px,94vw)] h-[max(560px,88vh)] max-sm:w-[96vw] max-sm:h-[92vh]',
 };
 
+/** 弹窗内可获取焦点的元素（用于 Tab 焦点循环） */
+const FOCUSABLE =
+  'a[href], button:not([disabled]), iframe, video[controls], [tabindex]:not([tabindex="-1"])';
+
 /**
  * 通用 Lightbox 弹窗：视频（多标签）/ iframe / 文档 三种模式。
- * Escape、遮罩点击关闭；打开时锁定页面滚动。
+ * Escape、遮罩点击关闭；打开时焦点移入并锁定 Tab 循环，关闭后还原焦点。
  */
 export function LightboxModal() {
   const { state, close } = useLightbox();
   const open = state !== null;
   useBodyScrollLock(open);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+  /* 打开前的焦点，关闭时还原 */
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!open) return;
+    restoreFocusRef.current = document.activeElement as HTMLElement | null;
+    closeBtnRef.current?.focus();
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
+      if (e.key === 'Escape') {
+        close();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      /* 简单焦点陷阱：Tab / Shift+Tab 在弹窗内循环 */
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      const focusables = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE));
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      const inside = active instanceof Node && dialog.contains(active);
+      if (e.shiftKey) {
+        if (active === first || !inside) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (active === last || !inside) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      restoreFocusRef.current?.focus();
+      restoreFocusRef.current = null;
+    };
   }, [open, close]);
 
   return (
@@ -40,6 +77,8 @@ export function LightboxModal() {
           key="lightbox"
           role="dialog"
           aria-modal="true"
+          aria-label="内容预览"
+          ref={dialogRef}
           className="fixed inset-0 z-300"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -61,6 +100,7 @@ export function LightboxModal() {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
             <button
+              ref={closeBtnRef}
               type="button"
               aria-label="关闭弹窗"
               onClick={close}

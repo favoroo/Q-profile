@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { MotionConfig } from 'framer-motion';
 import { LightboxProvider } from './components/modal/LightboxProvider';
 import { Header } from './components/layout/Header';
 import { BackToTop } from './components/layout/BackToTop';
@@ -15,19 +16,21 @@ const LightboxModal = lazy(() =>
 
 export default function App() {
   return (
-    <LightboxProvider>
-      <Header />
-      <main>
-        <Hero />
-        <About />
-        <Skills />
-        <Projects />
-        <Contact />
-      </main>
-      <BackToTop />
-      <Suspense fallback={null}>
-        <LightboxModal />
-      </Suspense>
-    </LightboxProvider>
+    <MotionConfig reducedMotion="user">
+      <LightboxProvider>
+        <Header />
+        <main>
+          <Hero />
+          <About />
+          <Skills />
+          <Projects />
+          <Contact />
+        </main>
+        <BackToTop />
+        <Suspense fallback={null}>
+          <LightboxModal />
+        </Suspense>
+      </LightboxProvider>
+    </MotionConfig>
   );
 }

@@ -82,6 +82,7 @@ export function Contact() {
                         ) : row.copyValue ? (
                           <button
                             type="button"
+                            aria-label={`复制${row.label}`}
                             onClick={() => handleCopy(row.copyValue!, row.copyNotice)}
                             className="text-left text-white transition-colors hover:text-accent cursor-pointer"
                           >
@@ -104,6 +105,8 @@ export function Contact() {
       <AnimatePresence>
         {toast && (
           <motion.div
+            role="status"
+            aria-live="polite"
             initial={{ opacity: 0, y: 24, scale: 0.94 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.94 }}

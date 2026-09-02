@@ -34,7 +34,7 @@ export function ProjectCard({ project }: { project: Project }) {
   const featured = project.size === 'featured';
   const mediaActions = (project.actions ?? [])
     .filter((a) => a.kind === 'doc' || a.kind === 'video')
-    .sort((a) => (a.kind === 'doc' ? -1 : 1));
+    .sort((a, b) => (a.kind === 'doc' ? -1 : 1) - (b.kind === 'doc' ? -1 : 1));
 
   return (
     <Reveal

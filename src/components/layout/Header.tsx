@@ -16,6 +16,16 @@ export function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  /* 移动菜单打开时支持 Escape 关闭 */
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
+
   const linkCls = (href: string) =>
     `relative py-1 text-[13px] text-ink-2 no-underline transition-colors duration-200 hover:text-ink after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[1.5px] after:rounded-full after:bg-ink after:transition-transform after:duration-300 after:ease-[var(--ease-out-apple)] hover:after:scale-x-100 after:scale-x-0 after:origin-center ${
       activeId === href.slice(1)

@@ -9,7 +9,7 @@ import styles from './LanyardBadge.module.css';
  */
 export function LanyardBadge() {
   const reducedMotion = useReducedMotion() ?? false;
-  const { stageRef, badgeRef, strapRef, isFlipped, toggleFlip } =
+  const { stageRef, badgeRef, strapRef, isFlipped, toggleFlip, justDragged } =
     useLanyardPhysics(reducedMotion);
 
   return (
@@ -17,9 +17,17 @@ export function LanyardBadge() {
       ref={stageRef}
       className={styles.stage}
       role="region"
-      aria-label={`${profile.name}的工程师工牌（支持拖拽晃动，双击可翻转查看背面）`}
+      tabIndex={0}
+      aria-label={`${profile.name}的工程师工牌（支持拖拽晃动，双击或按回车翻转查看背面）`}
       onDoubleClick={() => {
-        toggleFlip();
+        /* 拖拽释放后的双击是误触，不翻转 */
+        if (!justDragged()) toggleFlip();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleFlip();
+        }
       }}
     >
       {/* 极简扁平纯黑宽织带挂绳 */}
