@@ -3,9 +3,12 @@ import {
   ANCHOR_X,
   ANCHOR_Y,
   DAMPING,
+  DRAG_ANGLE_GAIN,
+  DRAG_ANGLE_LERP,
   DRAG_LIMIT,
   DRAG_LERP,
   FLING_GAIN,
+  REST_ANGLE_GAIN,
   REST_X,
   REST_Y,
   ROT_DAMPING,
@@ -22,6 +25,8 @@ const TAP_MOVE_MAX = 10;
 const DRAG_MOVE_MIN = 8;
 /** justDragged 冷却时间（ms） */
 const DRAG_COOLDOWN = 250;
+/** 静止判定阈值：位置/速度/角度均小于该值视为收敛 */
+const SETTLE_EPS = 0.05;
 
 interface LanyardState {
   x: number;
@@ -50,7 +55,6 @@ interface LanyardState {
   lastTapTime: number;
   lastTapX: number;
   lastTapY: number;
-  time: number;
 }
 
 function initialState(): LanyardState {
@@ -78,7 +82,6 @@ function initialState(): LanyardState {
     lastTapTime: 0,
     lastTapX: 0,
     lastTapY: 0,
-    time: 0,
   };
 }
 
@@ -98,6 +101,7 @@ export interface LanyardPhysics {
  * - Pointer Events 统一鼠标/触摸（替代旧站 mouse+touch 两套监听）
  * - 双击翻转：桌面走 React onDoubleClick，移动端由 pointerup 兜底检测
  * - 静止状态保持平稳无晃动，鼠标悬浮 3D 倾斜与拖拽甩动自然响应
+ * - 完全收敛或滚出视口后 rAF 自动停帧，交互/重新可见时唤醒
  */
 export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
   const stageRef = useRef<HTMLDivElement | null>(null);
@@ -106,6 +110,8 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
   const stateRef = useRef<LanyardState>(initialState());
   const reducedRef = useRef(reducedMotion);
   reducedRef.current = reducedMotion;
+  /* 主循环的唤醒函数，供 pointer 事件与翻转调用 */
+  const wakeRef = useRef<() => void>(() => {});
 
   const [isFlipped, setIsFlipped] = useState(false);
   const toggleFlip = useCallback(() => {
@@ -114,6 +120,7 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
     s.targetTiltX = 0;
     s.targetTiltY = 0;
     setIsFlipped((v) => !v);
+    wakeRef.current();
   }, []);
 
   const justDragged = useCallback(() => {
@@ -124,6 +131,25 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
+
+    /* hover 倾斜用的 badge 静止位置缓存：stage 本身不被 transform，
+       用 stage rect + badge 的 offset 布局值还原 badge 位置，
+       scroll/resize 时失效重取，避免每次 pointermove 强制布局 */
+    let stageRect: DOMRect | null = null;
+    const getBadgeRect = () => {
+      const badge = badgeRef.current;
+      if (!badge) return null;
+      if (!stageRect) stageRect = stage.getBoundingClientRect();
+      return {
+        left: stageRect.left + badge.offsetLeft,
+        top: stageRect.top + badge.offsetTop,
+        width: badge.offsetWidth,
+        height: badge.offsetHeight,
+      };
+    };
+    const invalidateRect = () => {
+      stageRect = null;
+    };
 
     const onPointerDown = (e: PointerEvent) => {
       const s = stateRef.current;
@@ -140,6 +166,8 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
       s.vx = 0;
       s.vy = 0;
       s.vAngle = 0;
+      invalidateRect();
+      wakeRef.current();
     };
 
     const onPointerMove = (e: PointerEvent) => {
@@ -171,12 +199,11 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
         s.x += (targetX - s.x) * DRAG_LERP;
         s.y += (targetY - s.y) * DRAG_LERP;
 
-        const dragAngle = Math.atan2(s.x, REST_Y + s.y) * (180 / Math.PI) * 0.72;
-        s.angle += (dragAngle - s.angle) * 0.28;
+        const dragAngle = Math.atan2(s.x, REST_Y + s.y) * (180 / Math.PI) * DRAG_ANGLE_GAIN;
+        s.angle += (dragAngle - s.angle) * DRAG_ANGLE_LERP;
       } else if (e.pointerType === 'mouse' && !reducedRef.current) {
-        const badge = badgeRef.current;
-        if (!badge) return;
-        const rect = badge.getBoundingClientRect();
+        const rect = getBadgeRect();
+        if (!rect) return;
         const normX = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
         const normY = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
 
@@ -187,6 +214,7 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
           s.targetTiltX = 0;
           s.targetTiltY = 0;
         }
+        wakeRef.current();
       }
     };
 
@@ -221,22 +249,69 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
+    window.addEventListener('scroll', invalidateRect, { passive: true, capture: true });
+    window.addEventListener('resize', invalidateRect);
     return () => {
       stage.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
+      window.removeEventListener('scroll', invalidateRect, true);
+      window.removeEventListener('resize', invalidateRect);
     };
   }, [toggleFlip]);
 
-  /* rAF 主循环：弹簧积分 + 挂绳贝塞尔重算 */
+  /* rAF 主循环：弹簧积分 + 挂绳贝塞尔重算；收敛静止或滚出视口后停帧 */
   useEffect(() => {
-    let raf = 0;
+    const stage = stageRef.current;
+    if (!stage) return;
     const s = stateRef.current;
+    let raf = 0;
+    let running = false;
+    let visible = true;
+
+    const render = () => {
+      const badge = badgeRef.current;
+      if (badge) {
+        badge.style.transform =
+          `translate3d(${s.x.toFixed(2)}px,${s.y.toFixed(2)}px,0) ` +
+          `rotate(${s.angle.toFixed(2)}deg) ` +
+          `rotateX(${s.tiltX.toFixed(2)}deg) rotateY(${s.tiltY.toFixed(2)}deg)`;
+      }
+
+      /* 扁平纯黑宽织带挂绳贝塞尔曲线 */
+      const bx = REST_X + s.x;
+      const by = REST_Y + s.y;
+      const rad = (s.angle * Math.PI) / 180;
+      const cp1x = ANCHOR_X;
+      const cp1y = ANCHOR_Y + (by - ANCHOR_Y) * 0.45;
+      const cp2x = bx - Math.sin(rad) * 20;
+      const cp2y = by - Math.cos(rad) * 20;
+
+      strapRef.current?.setAttribute(
+        'd',
+        `M ${ANCHOR_X.toFixed(1)},${ANCHOR_Y.toFixed(1)} C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)}`,
+      );
+    };
+
+    const stop = () => {
+      if (!running) return;
+      cancelAnimationFrame(raf);
+      running = false;
+    };
+
+    const isSettled = () =>
+      !s.isDragging &&
+      Math.abs(s.x) < SETTLE_EPS &&
+      Math.abs(s.vx) < SETTLE_EPS &&
+      Math.abs(s.y) < SETTLE_EPS &&
+      Math.abs(s.vy) < SETTLE_EPS &&
+      Math.abs(s.angle) < SETTLE_EPS &&
+      Math.abs(s.vAngle) < SETTLE_EPS &&
+      Math.abs(s.tiltX - s.targetTiltX) < SETTLE_EPS &&
+      Math.abs(s.tiltY - s.targetTiltY) < SETTLE_EPS;
 
     const loop = () => {
-      s.time += 0.024;
-
       if (!reducedRef.current) {
         if (!s.isDragging) {
           const fx = -s.x * SPRING_K;
@@ -255,7 +330,7 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
             s.vy = 0;
           }
 
-          const targetAngle = Math.atan2(s.x, REST_Y + s.y) * (180 / Math.PI) * 0.68;
+          const targetAngle = Math.atan2(s.x, REST_Y + s.y) * (180 / Math.PI) * REST_ANGLE_GAIN;
           const torque = (targetAngle - s.angle) * ROT_SPRING_K;
           s.vAngle = (s.vAngle + torque) * ROT_DAMPING;
           s.angle += s.vAngle;
@@ -269,34 +344,48 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
         s.tiltY += (s.targetTiltY - s.tiltY) * TILT_LERP;
       }
 
-      const badge = badgeRef.current;
-      if (badge) {
-        badge.style.transform =
-          `translate3d(${s.x.toFixed(2)}px,${s.y.toFixed(2)}px,0) ` +
-          `rotate(${s.angle.toFixed(2)}deg) ` +
-          `rotateX(${s.tiltX.toFixed(2)}deg) rotateY(${s.tiltY.toFixed(2)}deg)`;
+      render();
+
+      if (isSettled()) {
+        /* 收敛后吸附到目标值，写最终帧后停帧 */
+        s.x = 0;
+        s.vx = 0;
+        s.y = 0;
+        s.vy = 0;
+        s.angle = 0;
+        s.vAngle = 0;
+        s.tiltX = s.targetTiltX;
+        s.tiltY = s.targetTiltY;
+        render();
+        running = false;
+        return;
       }
-
-      /* 扁平纯黑宽织带挂绳贝塞尔曲线 */
-      const ax = ANCHOR_X;
-      const ay = ANCHOR_Y;
-      const bx = REST_X + s.x;
-      const by = REST_Y + s.y;
-      const rad = (s.angle * Math.PI) / 180;
-
-      const cp1x = ax;
-      const cp1y = ay + (by - ay) * 0.45;
-      const cp2x = bx - Math.sin(rad) * 20;
-      const cp2y = by - Math.cos(rad) * 20;
-
-      const pathData = `M ${ax.toFixed(1)},${ay.toFixed(1)} C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)}`;
-      strapRef.current?.setAttribute('d', pathData);
-
       raf = requestAnimationFrame(loop);
     };
 
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+    const wake = () => {
+      if (running || !visible || reducedRef.current) return;
+      running = true;
+      raf = requestAnimationFrame(loop);
+    };
+    wakeRef.current = wake;
+
+    /* 首帧渲染静止基线（挂绳初始路径），减动效下无物理、不启动循环 */
+    render();
+    wake();
+
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) wake();
+      else stop();
+    });
+    io.observe(stage);
+
+    return () => {
+      stop();
+      io.disconnect();
+      wakeRef.current = () => {};
+    };
   }, []);
 
   return {

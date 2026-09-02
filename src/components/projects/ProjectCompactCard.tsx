@@ -1,4 +1,5 @@
 import type { Project } from '../../data';
+import { projectImageSrcSet } from '../../lib/asset';
 import { Reveal } from '../motion/Reveal';
 
 /** 紧凑横条项目卡（四轮定位 / VIN 识别 / 专项支撑）。 */
@@ -9,10 +10,13 @@ export function ProjectCompactCard({ project, delay = 0 }: { project: Project; d
         <div className="relative h-full min-h-[135px] overflow-hidden bg-black/[0.04] max-md:aspect-16/9 max-md:h-auto max-md:min-h-0">
           <img
             src={project.image}
+            srcSet={projectImageSrcSet(project.image) || undefined}
+            sizes="(max-width: 767px) 100vw, 200px"
             alt={project.imageAlt}
-            width={1152}
-            height={864}
+            width={1376}
+            height={768}
             loading="lazy"
+            decoding="async"
             className="block h-full w-full object-cover transition-transform duration-500 ease-[var(--ease-out-apple)] group-hover:scale-[1.06]"
           />
 

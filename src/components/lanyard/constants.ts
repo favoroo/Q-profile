@@ -9,6 +9,11 @@ export const ROT_DAMPING = 0.65;
 
 /* 拖拽限位（px） */
 export const DRAG_LIMIT = 180;
+/* 拖拽时角度跟随：atan2 增益与平滑插值 */
+export const DRAG_ANGLE_GAIN = 0.72;
+export const DRAG_ANGLE_LERP = 0.28;
+/* 静止时旋转弹簧的 atan2 增益 */
+export const REST_ANGLE_GAIN = 0.68;
 /* hover 3D 倾斜 */
 export const TILT_MAX = 6;
 export const TILT_LERP = 0.12;

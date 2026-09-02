@@ -16,7 +16,7 @@ export const projects: Project[] = [
       '落地高压测量流程，保障测量数据准确、流程规范',
     ],
     result: '成果：高压测量全流程从设计到落地完整交付',
-    image: withBase('/images/project-1.jpg'),
+    image: withBase('/images/project-1.webp'),
     imageAlt: 'EV Kit 2 高压测量项目配图',
     actions: [
       {
@@ -42,7 +42,7 @@ export const projects: Project[] = [
       '覆盖翻译与规范化整改，直接服务翻译同事日常提效',
     ],
     result: '成果：翻译环节效率与规范性显著提升',
-    image: withBase('/images/project-4.jpg'),
+    image: withBase('/images/project-4.webp'),
     imageAlt: '翻译 Agent 工具配图',
     actions: [
       { kind: 'video', ariaLabel: '查看翻译 Agent 演示视频', videoKey: 'trans' },
@@ -62,7 +62,7 @@ export const projects: Project[] = [
       '梳理成可检索知识库，供 Agent 工具检索调用',
     ],
     result: '成果：资料治理为知识库，检索使用更高效',
-    image: withBase('/images/project-5.jpg'),
+    image: withBase('/images/project-5.webp'),
     imageAlt: '资料治理 Agent 项目配图',
     actions: [
       { kind: 'video', ariaLabel: '查看资料治理 Agent 演示视频', videoKey: 'docs' },
@@ -80,7 +80,7 @@ export const projects: Project[] = [
     description:
       '负责四轮定位功能中定位参数与作业流程的开发，精准定义底盘定位参数并完成标定，保障定位作业规范、数据精准且可工程化复用。',
     result: '成果：四轮定位参数与流程稳定交付',
-    image: withBase('/images/project-2.jpg'),
+    image: withBase('/images/project-2.webp'),
     imageAlt: '四轮定位项目配图',
     tags: [
       { label: '四轮定位' },
@@ -98,7 +98,7 @@ export const projects: Project[] = [
     description:
       '负责公司覆盖几十个汽车品牌的 VIN 车型识别解析规则与数据开发，把车辆底层 VIN 码准确、结构化地识别解析为具体车型与配置信息。',
     result: '成果：几十个品牌的 VIN 车型识别稳定可用',
-    image: withBase('/images/project-3.jpg'),
+    image: withBase('/images/project-3.webp'),
     imageAlt: 'VIN 车型识别项目配图',
     tags: [
       { label: 'VIN 识别' },
@@ -116,7 +116,7 @@ export const projects: Project[] = [
     description:
       '负责部门对于 TPMS（胎压监测）、IM（防盗匹配）、BT 608（电池检测）等多个项目与产品线的日常技术答疑与底层专业支撑。在海量原厂维修手册、通信协议及技术文档中具备极强的信息查找、精准检索与资料沉淀能力，能够快速定位疑难问题根因并输出标准化解答与技术支持方案。',
     result: '成果：具备极强的技术资料查找与沉淀能力，跨项目高效攻关与技术赋能',
-    image: withBase('/images/project-6.jpg'),
+    image: withBase('/images/project-6.webp'),
     imageAlt: 'TPMS / IM / BT 608 项目支撑配图',
     tags: [
       { label: 'TPMS 胎压监测' },

@@ -11,3 +11,13 @@ export function withBase(path: string): string {
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
   return `${cleanBase}${cleanPath}`;
 }
+
+/**
+ * 由项目配图的 WebP 主图路径（1376w）派生 srcset，
+ * 命名约定：同目录存在 `-800w` 小图变体。
+ */
+export function projectImageSrcSet(path: string): string {
+  const small = path.replace(/\.webp$/, '-800w.webp');
+  if (small === path) return '';
+  return `${small} 800w, ${path} 1376w`;
+}

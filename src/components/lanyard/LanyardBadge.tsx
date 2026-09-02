@@ -65,8 +65,8 @@ export function LanyardBadge() {
               <img
                 src={profile.avatar}
                 alt={`${profile.name}的个人工牌照片`}
-                width={864}
-                height={1152}
+                width={300}
+                height={360}
                 loading="eager"
                 draggable={false}
               />

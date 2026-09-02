@@ -1,4 +1,5 @@
 import type { Project, ProjectAction } from '../../data';
+import { projectImageSrcSet } from '../../lib/asset';
 import { Icon } from '../ui/icons';
 import { Button } from '../ui/Button';
 import { useLightbox } from '../modal/LightboxProvider';
@@ -53,10 +54,13 @@ export function ProjectCard({ project }: { project: Project }) {
         >
           <img
             src={project.image}
+            srcSet={projectImageSrcSet(project.image) || undefined}
+            sizes={featured ? '(max-width: 1023px) 100vw, 562px' : '(max-width: 767px) 100vw, 531px'}
             alt={project.imageAlt}
-            width={1152}
-            height={864}
+            width={1376}
+            height={768}
             loading="lazy"
+            decoding="async"
             className="block h-full w-full object-cover transition-transform duration-700 ease-[var(--ease-out-apple)] group-hover:scale-[1.04]"
           />
         </div>
