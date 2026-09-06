@@ -1,7 +1,41 @@
 import { useReducedMotion } from 'framer-motion';
+import type { CSSProperties } from 'react';
 import { profile } from '../../data';
 import { useLanyardPhysics } from './useLanyardPhysics';
 import styles from './LanyardBadge.module.css';
+
+/** 背面 emoji 表情墙：错位菱形花纹（隔行错开半格、统一微倾、间距宽松），错峰轻微浮动 */
+const BADGE_EMOJIS = (() => {
+  const pool = profile.badgeBack.emojis;
+  const spacingX = 36; // 横向间距（卡宽百分比）
+  const spacingY = spacingX / 1.36; // 卡片宽高比 1:1.36，等像素间距
+  const items: Array<{
+    emoji: string;
+    top: number;
+    left: number;
+    size: number;
+    rotate: number;
+    delay: number;
+    duration: number;
+  }> = [];
+  let row = 0;
+  for (let y = spacingY / 2; y < 100; y += spacingY, row++) {
+    const start = spacingX * 0.25 + (row % 2 === 0 ? 0 : spacingX / 2);
+    for (let x = start; x <= 100 - start + 0.01; x += spacingX) {
+      const i = items.length;
+      items.push({
+        emoji: pool[i % pool.length],
+        top: y,
+        left: x,
+        size: 26,
+        rotate: -15,
+        delay: (i % 3) * 0.4 + row * 0.25,
+        duration: 3.5 + (i % 3) * 0.6,
+      });
+    }
+  }
+  return items;
+})();
 
 /**
  * 悬吊工牌组件：极简扁平纯黑宽织带挂绳、拖拽晃动、hover 3D 倾斜、双击卡片翻转。
@@ -85,20 +119,27 @@ export function LanyardBadge() {
             </div>
           </div>
 
-          {/* 背面 */}
-          <div className={`${styles.face} ${styles.faceBack}`}>
-            <div className={styles.backHead}>
-              <div className={styles.nameCn}>{profile.name}</div>
-              <div className={styles.titleCn}>{profile.title}</div>
-            </div>
-            <ul className={styles.backList}>
-              {profile.badgeBack.skills.map((skill) => (
-                <li key={skill}>{skill}</li>
+          {/* 背面：emoji 表情墙（纯装饰，错位菱形花纹） */}
+          <div className={`${styles.face} ${styles.faceBack}`} aria-hidden="true">
+            <div className={styles.emojiField}>
+              {BADGE_EMOJIS.map((item, i) => (
+                <span
+                  key={i}
+                  className={styles.emojiItem}
+                  style={
+                    {
+                      top: `${item.top}%`,
+                      left: `${item.left}%`,
+                      fontSize: `${item.size}px`,
+                      transform: `translate(-50%, -50%) rotate(${item.rotate}deg)`,
+                      '--float-delay': `${item.delay}s`,
+                      '--float-duration': `${item.duration}s`,
+                    } as CSSProperties
+                  }
+                >
+                  {item.emoji}
+                </span>
               ))}
-            </ul>
-            <div className={styles.backFooter}>
-              <span>{profile.badgeBack.edu}</span>
-              <span>{profile.badgeBack.location}</span>
             </div>
           </div>
         </div>

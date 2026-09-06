@@ -1,6 +1,7 @@
 import { profile, site } from '../../data';
 import { LanyardBadge } from '../lanyard/LanyardBadge';
 import { Button } from '../ui/Button';
+import { EmText } from '../ui/EmText';
 import { Icon } from '../ui/icons';
 import { Reveal } from '../motion/Reveal';
 
@@ -31,7 +32,7 @@ export function Hero() {
         </Reveal>
         <Reveal delay={0.22}>
           <p className="mx-auto mb-6 max-w-[620px] text-[15.5px] leading-[1.75] text-ink-2 max-md:mb-5 max-md:text-[14px]">
-            {profile.lead}
+            <EmText text={profile.lead} />
           </p>
         </Reveal>
 

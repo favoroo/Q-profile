@@ -1,5 +1,6 @@
 import { about } from '../../data';
 import { Icon } from '../ui/icons';
+import { EmText } from '../ui/EmText';
 import { SectionHead } from '../ui/SectionHead';
 import { Reveal } from '../motion/Reveal';
 
@@ -23,13 +24,13 @@ export function About() {
             <div className="flex flex-col gap-3">
               <Reveal>
                 <p className="m-0 text-[15px] leading-[1.75] font-medium text-ink">
-                  {about.paragraphs[0]}
+                  <EmText text={about.paragraphs[0]} />
                 </p>
               </Reveal>
               {about.paragraphs[1] && (
                 <Reveal delay={0.08}>
                   <p className="m-0 text-[14.5px] leading-[1.75] text-ink-2">
-                    {about.paragraphs[1]}
+                    <EmText text={about.paragraphs[1]} />
                   </p>
                 </Reveal>
               )}

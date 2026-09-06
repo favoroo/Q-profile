@@ -1,5 +1,6 @@
 import type { Project } from '../../data';
 import { projectImageSrcSet } from '../../lib/asset';
+import { EmText } from '../ui/EmText';
 import { Reveal } from '../motion/Reveal';
 
 /** 紧凑横条项目卡（四轮定位 / VIN 识别 / 专项支撑）。 */
@@ -29,7 +30,9 @@ export function ProjectCompactCard({ project, delay = 0 }: { project: Project; d
               {project.title}
             </h3>
           </div>
-          <p className="m-0 text-[13.5px] leading-[1.65] text-ink-2">{project.description}</p>
+          <p className="m-0 text-[13.5px] leading-[1.65] text-ink-2">
+            <EmText text={project.description} />
+          </p>
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-dashed border-black/[0.08] pt-2 max-sm:flex-col max-sm:items-start max-sm:gap-1.5">
             <div className="flex flex-wrap gap-[5px]">
               {project.tags?.map((tag) => (

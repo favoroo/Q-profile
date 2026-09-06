@@ -161,67 +161,45 @@
   letter-spacing: 0.01em;
 }
 
-/* 背面：纯净浅灰 + 极简信息排列 */
+/* 背面：emoji 贴纸墙（纯装饰，撒落贴纸风） */
 .faceBack {
   background: #fafafc;
-  color: #1d1d1f;
   transform: rotateY(180deg) translateZ(0.1px);
-  padding: 12px 11px 9px;
-  justify-content: space-between;
 }
-.backHead {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  padding-bottom: 5px;
-  text-align: left;
+.emojiField {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
-.backHead .nameCn {
-  color: var(--color-ink);
-  font-size: 14px;
+.emojiItem {
+  position: absolute;
+  line-height: 1;
+  /* 居中与倾斜由内联 transform 控制（translate 动画走独立属性，互不冲突） */
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+  translate: 0 0;
+  animation: emojiFloat var(--float-duration, 4s) ease-in-out var(--float-delay, 0s)
+    infinite alternate;
 }
-.backHead .titleCn {
-  color: var(--color-accent);
-  font-size: 10.5px;
-  margin-top: 1px;
-}
-.backList {
-  list-style: none;
-  padding: 0;
-  margin: 6px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  text-align: left;
-}
-.backList li {
-  font-size: 8px;
-  line-height: 1.35;
-  color: #6e6e73;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.backList li::before {
-  content: '';
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  flex-shrink: 0;
-}
-.backFooter {
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  padding-top: 4px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 7.5px;
-  color: #86868b;
+
+/* 轻微浮动 + 微摆（translate 属性独立于 rotate，不与贴纸本身的 transform 冲突） */
+@keyframes emojiFloat {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 -3px;
+  }
 }
 
 /* 无障碍：减少动态时取消翻转过渡 */
 @media (prefers-reduced-motion: reduce) {
   .cardInner {
     transition-duration: 0.01ms;
+  }
+  .emojiItem {
+    animation: none;
   }
 }
 

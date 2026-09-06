@@ -49,12 +49,12 @@ export interface Site {
 export interface Profile {
   name: string;
   title: string;
+  /** 支持 `**关键词**` 行内强调标记（由 ui/EmText 渲染为强调色） */
   lead: string;
   avatar: string;
+  /** 工牌背面：emoji 贴纸池（组件用固定种子伪随机撒落排版，纯装饰） */
   badgeBack: {
-    skills: string[];
-    edu: string;
-    location: string;
+    emojis: string[];
   };
 }
 
@@ -80,6 +80,7 @@ export interface About {
   eyebrow: string;
   title: string;
   description: string;
+  /** 各段落支持 `**关键词**` 行内强调标记（由 ui/EmText 渲染为强调色） */
   paragraphs: string[];
   quote: {
     text: string;
@@ -109,6 +110,9 @@ export type ProjectAction =
   | { kind: 'video'; ariaLabel: string; videoKey: VideoKey }
   | { kind: 'doc'; ariaLabel: string; docKey: DocKey };
 
+/** iframe 在线体验动作（项目卡「在线体验」按钮） */
+export type ProjectIframeAction = Extract<ProjectAction, { kind: 'iframe' }>;
+
 export type ProjectSize = 'featured' | 'standard' | 'compact';
 
 export interface ProjectTag {
@@ -134,7 +138,9 @@ export interface Project {
   tag?: string;
   meta: string;
   title: string;
+  /** 支持 `**关键词**` 行内强调标记（由 ui/EmText 渲染为强调色） */
   description: string;
+  /** 同 description，支持 `**关键词**` 行内强调标记 */
   points?: string[];
   result: string;
   image: string;

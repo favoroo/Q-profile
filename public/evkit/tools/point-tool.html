@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="zh-CN" data-page-node-id="OchjSlW3m6IvsXYvU8HDkK">
+<head data-page-node-id="CTXfNw3GKCIu0EUMQ7zcFZ">
+<meta charset="UTF-8" data-page-node-id="8AHHcHHWz5D836MnYKnGE6">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="AQulzdNuEeFCes3zhMCSr9">
 <title>车辆标点工具 · 在线演示</title>
 <style>
   /* ===== 原工具样式 1:1 移植（#001Car-point_tool new.py / create_html_content）===== */
@@ -58,7 +58,7 @@
   }
   .canvas-placeholder .big { font-size: 34px; opacity: 0.5; }
   #point-marker {
-    position: absolute; width: 6px; height: 6px; background-color: var(--point-fill-color);
+    position: absolute; width: 14px; height: 14px; background-color: var(--point-fill-color);
     border: 2px solid var(--point-border-color); border-radius: 50%; pointer-events: none;
     display: none; box-shadow: 0 0 8px rgba(0,0,0,0.5); transform: translate(-50%, -50%); z-index: 5;
   }
@@ -130,46 +130,46 @@
   }
 </style>
 </head>
-<body>
+<body data-page-node-id="BBoJxHkPckOFUFcNI2R1se">
 
-<div class="main-container">
-  <div class="left-column">
-    <div class="panel annotation-panel">
-      <div class="category-buttons" id="category-buttons"></div>
-      <div class="image-name-area">
-        <span id="image-name">未选择图片</span>
-        <button id="copy-name-btn" disabled>复制</button>
+<div class="main-container" data-page-node-id="DW5YpjJDnnHzodoNmEAM00">
+  <div class="left-column" data-page-node-id="OK8sdU6hCn3ax3xUkw3PRM">
+    <div class="panel annotation-panel" data-page-node-id="eXkco6ojnzliVRnJPBEoGz">
+      <div class="category-buttons" id="category-buttons" data-page-node-id="C2rqX9sk37YYJD9SBBzY92"></div>
+      <div class="image-name-area" data-page-node-id="jZkGZlJz7unj3mVN706G9J">
+        <span id="image-name" data-page-node-id="ggez43Gvh7lyit1suKHARa">未选择图片</span>
+        <button id="copy-name-btn" disabled data-page-node-id="IpHNpsHhTIJmWigGUJ5d1Z">复制</button>
       </div>
-      <div class="canvas-container" id="canvas-container">
-        <canvas id="annotation-canvas" width="1000" height="1000"></canvas>
-        <div id="point-marker"></div>
-        <div class="canvas-placeholder" id="canvas-placeholder">
-          <span class="big">🚗</span>
-          <span>选择车型后在图上点击放置测量点</span>
+      <div class="canvas-container" id="canvas-container" data-page-node-id="00di995dUPpovDf89TM9kt">
+        <canvas id="annotation-canvas" width="1000" height="1000" data-page-node-id="ltSrDy2Ufb2jjDdLWvfsFg"></canvas>
+        <div id="point-marker" data-page-node-id="mRYqDqSX5V8pfy7wYxcGRo"></div>
+        <div class="canvas-placeholder" id="canvas-placeholder" data-page-node-id="uP1es9hYnwHvCgYEaTWMaQ">
+          <span class="big" data-page-node-id="nhvJRVYzFB1FTi6Y5XDudi">🚗</span>
+          <span data-page-node-id="Jv2hJZWcmdS92w73ORU9ZD">选择车型后在图上点击放置测量点</span>
         </div>
       </div>
-      <div class="controls">
-        <div class="control-group"><input type="text" id="xy-coords" readonly placeholder="x,y 坐标"></div>
-        <div class="control-group button-group">
-          <button id="copy-all-btn" disabled>一键复制 (Ctrl+C)</button>
-          <button id="copy-coords-btn" disabled>复制坐标</button>
+      <div class="controls" data-page-node-id="QEtJrQ1wPrBBHb0OpqjN3N">
+        <div class="control-group" data-page-node-id="LnFbH8BTE9PXaZmancYVmh"><input type="text" id="xy-coords" readonly placeholder="x,y 坐标" data-page-node-id="9KiuYi6BvxxU0Ma9BU3zMP"></div>
+        <div class="control-group button-group" data-page-node-id="iWsWgn4dt1xke5GfYmADo3">
+          <button id="copy-all-btn" disabled data-page-node-id="C8vI9bk3nFkSmtJzXmwvr2">一键复制 (Ctrl+C)</button>
+          <button id="copy-coords-btn" disabled data-page-node-id="HqPwciDp6LWkp7KqIc4WgX">复制坐标</button>
         </div>
-        <div class="control-group">
-          <input type="text" id="manual-coords" placeholder="输入坐标, e.g. 162.54,225.01">
-          <button id="show-point-btn">定位</button>
+        <div class="control-group" data-page-node-id="NiqOgz188QrkSjNHD3kAtU">
+          <input type="text" id="manual-coords" placeholder="输入坐标, e.g. 162.54,225.01" data-page-node-id="oCZcy6W5ekS7cLLPtrOC6h">
+          <button id="show-point-btn" data-page-node-id="eBRjNYJyHTcY6IjsuWDreY">定位</button>
         </div>
-        <div class="control-group">
-          <input type="text" id="image-name-input" placeholder="输入图号加载 (回车)">
-          <button id="load-image-btn">加载</button>
+        <div class="control-group" data-page-node-id="9tj4qXHvmIsDFqFSIlFFRX">
+          <input type="text" id="image-name-input" placeholder="输入图号加载 (回车)" data-page-node-id="7r49X5DwVaR3DjAEkclooG">
+          <button id="load-image-btn" data-page-node-id="8ZEOENdBLsiJ8kGsE5VYNf">加载</button>
         </div>
       </div>
     </div>
-    <div id="toast-notification"></div>
+    <div id="toast-notification" data-page-node-id="bJKCDBUCiRoiBCVp3UTQbN"></div>
   </div>
-  <div class="panel gallery-panel"><div id="image-gallery"></div></div>
+  <div class="panel gallery-panel" data-page-node-id="OMEoXNdOEIpyvuNfiBMvJc"><div id="image-gallery" data-page-node-id="wDE2DXsUzapU0fFhoS9LBZ"></div></div>
 </div>
 
-<div class="demo-chip">在线演示 · 复刻自内部工具 · 数据仅存于本页</div>
+<div class="demo-chip" data-page-node-id="aw6CpHySUpBnB9WO7mQEaR">在线演示 · 复刻自内部工具 · 数据仅存于本页</div>
 
 <script>
 (function () {
@@ -178,12 +178,10 @@
   /* ── 与原工具一致：400×400 虚拟坐标系、6 列图库 ── */
   var COORD_MAX = 400.0;
   var IMAGE_ROOT = '../02png/';
-  var CATEGORIES = ['Sedan', 'SUV', 'Pickup2', 'Pickup4'];
+  var CATEGORIES = ['Sedan', 'SUV'];
   var IMAGES = {
     Sedan: ['Sedan_01', 'Sedan_02', 'Sedan_03', 'Sedan_04', 'Sedan_05', 'Sedan_07', 'Sedan_08', 'Sedan_09', 'Sedan_10', 'Sedan_11', 'Sedan_12', 'Sedan_13', 'Sedan_14', 'Sedan_15', 'Sedan_18', 'Sedan_20', 'Sedan_23', 'Sedan_25', 'Sedan_26', 'Sedan_27', 'Sedan_28', 'Sedan_29', 'Sedan_30', 'Sedan_31'],
-    SUV: ['SUV_02', 'SUV_03', 'SUV_04', 'SUV_05', 'SUV_06', 'SUV_07', 'SUV_08', 'SUV_09', 'SUV_10', 'SUV_12', 'SUV_13', 'SUV_14', 'SUV_15', 'SUV_18', 'SUV_19', 'SUV_20', 'SUV_22', 'SUV_23', 'SUV_25', 'SUV_26', 'SUV_27', 'SUV_28', 'SUV_29', 'SUV_30', 'SUV_31'],
-    Pickup2: [],
-    Pickup4: []
+    SUV: ['SUV_02', 'SUV_03', 'SUV_04', 'SUV_05', 'SUV_06', 'SUV_07', 'SUV_08', 'SUV_09', 'SUV_10', 'SUV_12', 'SUV_13', 'SUV_14', 'SUV_15', 'SUV_18', 'SUV_19', 'SUV_20', 'SUV_22', 'SUV_23', 'SUV_25', 'SUV_26', 'SUV_27', 'SUV_28', 'SUV_29', 'SUV_30', 'SUV_31']
   };
 
   var state = { cat: 'Sedan', name: null, point: null };

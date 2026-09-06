@@ -1,11 +1,12 @@
-import type { Project, ProjectAction } from '../../data';
+import type { Project, ProjectIframeAction } from '../../data';
 import { projectImageSrcSet } from '../../lib/asset';
 import { Icon } from '../ui/icons';
 import { Button } from '../ui/Button';
+import { EmText } from '../ui/EmText';
 import { useLightbox } from '../modal/LightboxProvider';
 import { Reveal } from '../motion/Reveal';
 
-function DemoButtons({ actions }: { actions: ProjectAction[] }) {
+function DemoButtons({ actions }: { actions: ProjectIframeAction[] }) {
   const { open } = useLightbox();
   return (
     <>
@@ -36,7 +37,9 @@ export function ProjectCard({ project }: { project: Project }) {
   const mediaActions = (project.actions ?? [])
     .filter((a) => a.kind === 'doc' || a.kind === 'video')
     .sort((a, b) => (a.kind === 'doc' ? -1 : 1) - (b.kind === 'doc' ? -1 : 1));
-  const demoActions = (project.actions ?? []).filter((a) => a.kind === 'iframe');
+  const demoActions = (project.actions ?? []).filter(
+    (a): a is ProjectIframeAction => a.kind === 'iframe',
+  );
 
   return (
     <Reveal
@@ -156,7 +159,9 @@ export function ProjectCard({ project }: { project: Project }) {
             )}
           </div>
           <h3 className="m-0 text-[21px] font-bold tracking-[-0.015em]">{project.title}</h3>
-          <p className="m-0 text-[14.5px] leading-[1.7] text-ink-2">{project.description}</p>
+          <p className="m-0 text-[14.5px] leading-[1.7] text-ink-2">
+            <EmText text={project.description} />
+          </p>
           {project.points && (
             <ul className="m-0 list-none p-0">
               {project.points.map((pt) => (
@@ -164,7 +169,7 @@ export function ProjectCard({ project }: { project: Project }) {
                   key={pt}
                   className="relative pl-4 text-[13.5px] leading-[1.7] text-ink-2 [&:not(:first-child)]:mt-1 before:absolute before:top-[0.72em] before:left-0 before:h-[1.5px] before:w-[7px] before:rounded-full before:bg-accent before:content-['']"
                 >
-                  {pt}
+                  <EmText text={pt} />
                 </li>
               ))}
             </ul>

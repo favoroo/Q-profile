@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="zh-CN" data-page-node-id="Em0HYKXfTlMwFAV6gA2fpy">
+<head data-page-node-id="uGGZQ354tPWNYwgf8VqHMl">
+<meta charset="UTF-8" data-page-node-id="VArzFYIeBWJFvzbEaSGWjX">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="rcvcTD9DrXvNnwRGIACbHb">
 <title>高压连接器端子标注平台 · 在线演示</title>
 <style>
   /* ===== 原工具样式移植（qqbox/templates/index-HVC.html）· 演示版精简：去备注列、主题切换、排除框与上传导出按钮 ===== */
@@ -73,7 +73,7 @@
   }
   .canvas-placeholder .big { font-size: 32px; opacity: 0.5; }
   .marker {
-    position: absolute; width: 6px; height: 6px;
+    position: absolute; width: 14px; height: 14px;
     background-color: var(--point-fill); border: 2px solid var(--point-border);
     border-radius: 50%; pointer-events: none; display: none;
     box-shadow: 0 0 8px rgba(0,0,0,0.6); transform: translate(-50%, -50%); z-index: 5;
@@ -188,7 +188,7 @@
   }
   .anno-item img { width: 100%; height: 100%; object-fit: fill; display: block; }
   .mini-point {
-    position: absolute; width: 4px; height: 4px;
+    position: absolute; width: 8px; height: 8px;
     background: var(--point-fill); border: 1px solid var(--point-border);
     border-radius: 50%; box-shadow: 0 0 2px black; transform: translate(-50%, -50%);
   }
@@ -227,63 +227,63 @@
   }
 </style>
 </head>
-<body>
+<body data-page-node-id="ClXzaP5vzcRhcw3CeZf2ej">
 
-<div class="container">
+<div class="container" data-page-node-id="KG5RLHysuDAZEWtm55Uk5v">
   <!-- 左：标注工作区 -->
-  <div class="left-panel">
-    <div class="img-header">
-      <span class="current-img-name empty" id="display-name">请选择图片</span>
-      <button class="btn-copy-name" id="btn-copy-name" disabled>复制图号</button>
+  <div class="left-panel" data-page-node-id="8XyG7otA4mNCalBZ8RO9VW">
+    <div class="img-header" data-page-node-id="UHV4CtkoB1aUIIkKv67bcd">
+      <span class="current-img-name empty" id="display-name" data-page-node-id="7lyqZNVwDA2DymdABsqqxI">请选择图片</span>
+      <button class="btn-copy-name" id="btn-copy-name" disabled data-page-node-id="AVAyyPFH0Dr69fu3VkDPBG">复制图号</button>
     </div>
 
-    <div class="canvas-wrapper" id="canvas-wrapper">
-      <canvas id="canvas" width="1000" height="750"></canvas>
-      <div class="marker" id="point-marker"></div>
-      <div class="canvas-placeholder" id="canvas-placeholder">
-        <span class="big">⚡</span>
-        <span>在右侧选择连接器端子图后，<br>选择端子标签并点击图上位置标注</span>
+    <div class="canvas-wrapper" id="canvas-wrapper" data-page-node-id="yhti9uIYULeyJEsxYV94h2">
+      <canvas id="canvas" width="1000" height="750" data-page-node-id="xKGZNjJ1nzjORZp9MNkGCo"></canvas>
+      <div class="marker" id="point-marker" data-page-node-id="I0Ysx3wgTYARSGbDXwGhRz"></div>
+      <div class="canvas-placeholder" id="canvas-placeholder" data-page-node-id="DZFOvRE9WqVWK16BRu8FA9">
+        <span class="big" data-page-node-id="IIGlyglE4rKRyWwVz9LH4W">⚡</span>
+        <span data-page-node-id="pYx3eLYl0GMEcX9aQyjjWg">在右侧选择连接器端子图后，<br data-page-node-id="5VuwiNvTtjbHpANSATcjLI">选择端子标签并点击图上位置标注</span>
       </div>
     </div>
 
-    <div class="label-grid" id="label-container"></div>
-    <div class="hotkey-tip">快捷键：<kbd>q</kbd>/<kbd>e</kbd>=HV± · <kbd>1</kbd>-<kbd>4</kbd>=AC · <kbd>a</kbd>/<kbd>s</kbd>/<kbd>d</kbd>=UVW · <kbd>Space</kbd>=保存 · <kbd>Ctrl+Z</kbd>=撤销</div>
+    <div class="label-grid" id="label-container" data-page-node-id="Of8UZ5ocWkY7KCl8A0imjE"></div>
+    <div class="hotkey-tip" data-page-node-id="r4tTUuEzWxHANk9h1MSgP2">快捷键：<kbd data-page-node-id="5VRfZG5O7vuV0JzTsYZYQj">q</kbd>/<kbd data-page-node-id="FA6NiHTXjlRQL0Dv01L7mp">e</kbd>=HV± · <kbd data-page-node-id="YTiAqan1xmrOue4ATJZXIU">1</kbd>-<kbd data-page-node-id="BC3mVGhWrywOtIvTxF87nM">4</kbd>=AC · <kbd data-page-node-id="kJmv5ZeFWiMHxl2rYbpRSD">a</kbd>/<kbd data-page-node-id="dpkqK4mfta0IFd6In62p5E">s</kbd>/<kbd data-page-node-id="GqzvPYJEPqR7z788D53U0N">d</kbd>=UVW · <kbd data-page-node-id="VYiHJxeuV7apS82YNflX4w">Space</kbd>=保存 · <kbd data-page-node-id="06D1r96D4o1prlAsRRjgxS">Ctrl+Z</kbd>=撤销</div>
 
-    <div class="action-bar">
-      <button id="btn-complete" class="btn-complete" disabled>完成 / 保存此点</button>
+    <div class="action-bar" data-page-node-id="DWQhNJ2AE2DWgDhKkH2BA7">
+      <button id="btn-complete" class="btn-complete" disabled data-page-node-id="tctt0YxiHjXK3PMlpOKfr1">完成 / 保存此点</button>
     </div>
 
-    <div class="group-label">x,y 坐标 (验证区)</div>
-    <div class="input-group">
-      <input type="text" id="coord-input" readonly placeholder="点击图片后显示坐标" style="background:#f8f9fa; color:var(--success-color); font-weight:bold; letter-spacing:0.5px;">
-      <button id="btn-copy-coords" disabled>复制</button>
+    <div class="group-label" data-page-node-id="obTIqr01kI19KK0nTkLjED">x,y 坐标 (验证区)</div>
+    <div class="input-group" data-page-node-id="Zw0QhRUO2FYMTrVYUHy2Tr">
+      <input type="text" id="coord-input" readonly placeholder="点击图片后显示坐标" style="background:#f8f9fa; color:var(--success-color); font-weight:bold; letter-spacing:0.5px;" data-page-node-id="yuy4fCHdfoE08QxCKncu4j">
+      <button id="btn-copy-coords" disabled data-page-node-id="tOAMQDAD8nThQ6qpVIVY5X">复制</button>
     </div>
-    <div class="input-group">
-      <input type="text" id="manual-input" placeholder="输入坐标定位 (如: 259.20,343.98)">
-      <button id="btn-locate">定位</button>
+    <div class="input-group" data-page-node-id="QBmfXrNdetM65f9rdYA9Ym">
+      <input type="text" id="manual-input" placeholder="输入坐标定位 (如: 259.20,343.98)" data-page-node-id="uakmxzLCDVIPse2ndF4NEM">
+      <button id="btn-locate" data-page-node-id="SDBe4gGp10QyCrj9HZ6nGg">定位</button>
     </div>
-    <div class="input-group">
-      <input type="text" id="load-input" placeholder="输入图号加载 (回车)">
-      <button id="btn-load">加载</button>
+    <div class="input-group" data-page-node-id="bJ15mOGidUxhoYbDTAJDbA">
+      <input type="text" id="load-input" placeholder="输入图号加载 (回车)" data-page-node-id="WuUNoCMfOtwVEt3OLywxwI">
+      <button id="btn-load" data-page-node-id="cxNwTte3UO6pIxo1N69QNF">加载</button>
     </div>
   </div>
 
   <!-- 右：工具栏 + 图库 -->
-  <div class="right-panel">
-    <div class="search-toolbar">
-      <input type="text" id="search-input" class="search-input" placeholder="🔍 搜索图号...">
-      <label class="filter-group"><input type="checkbox" id="filter-unannotated"><span>未完成</span></label>
-      <button id="btn-refresh" class="btn-refresh" title="刷新列表">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+  <div class="right-panel" data-page-node-id="pBQvlCYOKf3QuPbbedBqWq">
+    <div class="search-toolbar" data-page-node-id="QsaFsPb2iEDTVwSz0JMB8r">
+      <input type="text" id="search-input" class="search-input" placeholder="🔍 搜索图号..." data-page-node-id="3csDKh2bl5KL94nfPccxr6">
+      <label class="filter-group" data-page-node-id="JjF1tethRQFTB74WYhEHMD"><input type="checkbox" id="filter-unannotated" data-page-node-id="YHjMNsXiH2VAuv6QSRZ8wn"><span data-page-node-id="s5NbnRcmLrIRQZvKSa1Yiz">未完成</span></label>
+      <button id="btn-refresh" class="btn-refresh" title="刷新列表" data-page-node-id="VBVlqfLwiPyeJowccF6qQs">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-page-node-id="w4OCCm5EIAuVsPe9cuFOU0"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" data-page-node-id="399esIqvLxI7J3lnDbPG7e"/></svg>
       </button>
-      <div class="result-count" id="result-count"></div>
-      <button id="btn-reset" class="btn-reset" title="重置演示数据">↺ 重置</button>
+      <div class="result-count" id="result-count" data-page-node-id="1MG8VaHbzbHzQo2lCC3cHK"></div>
+      <button id="btn-reset" class="btn-reset" title="重置演示数据" data-page-node-id="aFbOtIPirKXBa0jpiG4QH4">↺ 重置</button>
     </div>
-    <div id="gallery-container"><div style="text-align:center; color:#999; margin-top:50px;">正在加载数据...</div></div>
+    <div id="gallery-container" data-page-node-id="QgsUTDbLiIE2s9rfCxlEdM"><div style="text-align:center; color:#999; margin-top:50px;" data-page-node-id="jGcwm0juB3J1wECCQEDFqk">正在加载数据...</div></div>
   </div>
 </div>
 
-<div id="toast-container"><div id="toast" class="toast">提示信息</div></div>
+<div id="toast-container" data-page-node-id="ZQyzEvil0hZXEV1dYnzRv9"><div id="toast" class="toast" data-page-node-id="pZUCuGDH8JL1zdap2lbzB3">提示信息</div></div>
 
 <script>
 (function () {

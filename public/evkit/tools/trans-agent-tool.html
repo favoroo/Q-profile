@@ -162,10 +162,6 @@
   button.pill-group:hover { border-color: #c9d6ee; color: var(--text); }
   .pill-item { display: inline-flex; align-items: center; gap: 5px; }
   .pdiv { width: 1px; height: 12px; background: var(--line); }
-  .v-ok { color: var(--green); font-weight: 600; font-style: normal; }
-  .v-busy { color: var(--orange); font-weight: 600; font-style: normal; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
-  .dot.idle { background: var(--muted-2); }
   .icon-round {
     width: 32px; height: 32px;
     border-radius: 50%;
@@ -250,8 +246,8 @@
   }
   .tc-x:hover { background: var(--red-soft); color: var(--red); }
   .tc-sub { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
-  .tc-bar { height: 3px; border-radius: 2px; background: var(--track); margin-top: 8px; overflow: hidden; }
-  .tc-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--blue), var(--blue3)); border-radius: 2px; transition: width .4s var(--ease); }
+  .tc-track { height: 3px; border-radius: 2px; background: var(--track); margin-top: 8px; overflow: hidden; }
+  .tc-track i { display: block; height: 100%; width: 0; min-width: 6px; background: linear-gradient(90deg, var(--blue), var(--blue3)); border-radius: 2px; transition: width .4s var(--ease); }
   .side-empty { font-size: 12.5px; color: var(--muted-2); padding: 10px 4px; }
   .side-note {
     font-size: 12px; color: var(--muted);
@@ -382,6 +378,8 @@
   .mode-desc.translate_only { background: var(--green-soft); border-color: #c8e9dc; }
   .mode-desc .md-head { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; color: var(--blue); }
   .mode-desc.translate_only .md-head { color: var(--green); }
+  .mode-desc-lang { font-size: 13px; font-weight: 600; color: var(--blue); margin-top: 5px; }
+  .mode-desc.translate_only .mode-desc-lang { color: var(--green); }
   .mode-desc .md-body { font-size: 12.5px; color: var(--muted); margin-top: 5px; }
   .mode-desc .md-body code {
     font-family: var(--mono); font-size: 11.5px;
@@ -506,22 +504,19 @@
   .file-strip .fs-actions { margin-left: auto; display: flex; gap: 8px; }
   .file-strip .fs-actions .mini-btn { padding: 5px 14px; font-size: 12px; }
 
-  .token-card { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .token-card { border: 1px solid var(--line); border-radius: var(--radius-l); overflow: hidden; background: var(--panel); }
   .token-head {
     display: flex; align-items: center; gap: 8px;
-    padding: 9px 14px;
-    background: var(--track);
-    border-bottom: 1px solid var(--line);
-    font-size: 13px; font-weight: 600;
+    padding: 12px 16px;
+    font-size: 13.5px; font-weight: 700;
+    color: var(--text);
   }
-  .token-head .chip { margin-left: auto; }
-  .token-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
-  .token-cell { padding: 12px 14px; border-right: 1px solid var(--line); }
-  .token-cell:last-child { border-right: none; }
-  .token-cell .tc-label { font-size: 11.5px; color: var(--muted); display: block; }
-  .token-cell .tc-val { font-size: 15px; font-weight: 700; font-family: var(--mono); }
-  .token-cell .tc-val.accent { color: var(--blue); }
-  .token-disc { font-size: 11.5px; color: var(--muted-2); padding: 8px 14px; background: var(--track); border-top: 1px solid var(--line); }
+  .token-head .th-ico { color: var(--blue); display: inline-flex; }
+  .token-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 16px 14px; }
+  .token-cell { padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+  .token-cell .tc-label { font-size: 11.5px; color: var(--muted); display: block; margin-bottom: 3px; }
+  .token-cell .tc-val { font-size: 19px; font-weight: 700; font-family: var(--mono); color: var(--blue); letter-spacing: -.3px; }
+  .token-disc { font-size: 11.5px; color: var(--muted-2); padding: 9px 16px; background: var(--track); border-top: 1px solid var(--line); }
 
   .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
   .combo-field { display: flex; flex-direction: column; gap: 6px; }
@@ -621,18 +616,38 @@
   .chip.mode.full, .chip.mode.rewrite_only { color: var(--blue); }
   .chip.mode.translate_only { color: var(--green); }
   .p-meta { font-size: 12px; color: var(--muted-2); }
-  .progress-block { margin: 0 20px; padding: 16px 18px; }
-  .progress-title { display: flex; align-items: center; gap: 10px; }
-  .progress-title strong { font-size: 13.5px; }
+  .chip.brand { background: var(--purple-soft); border-color: rgba(124, 92, 214, .25); color: var(--purple); }
+  .chip.scope { background: rgba(13, 148, 136, .1); border-color: rgba(13, 148, 136, .28); color: #0d9488; }
+  html[data-theme="dark"] .chip.scope { color: #2dd4bf; }
+  .head-actions { margin-left: auto; display: flex; gap: 8px; flex: none; }
+  .head-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: border-color .2s, color .2s, transform .15s;
+  }
+  .head-btn:hover { border-color: #c9d6ee; color: var(--blue); transform: translateY(-1px); }
+  .head-btn.danger { color: var(--red); border-color: rgba(239, 68, 68, .35); }
+  .head-btn.danger:hover { border-color: var(--red); background: var(--red-soft); color: var(--red); }
+  .process-head .head-row { display: flex; align-items: flex-start; gap: 12px; }
+  .overall-row {
+    display: flex; align-items: center; gap: 10px;
+    border-top: 1px solid var(--line);
+    margin-top: 14px;
+    padding-top: 14px;
+  }
+  .overall-row strong { font-size: 13.5px; }
   .progress-tip { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); min-width: 0; }
   .progress-tip .tip-dot { color: var(--orange); font-size: 12px; }
-  .pct { margin-left: auto; font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--blue); }
+  .pct { margin-left: auto; font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--blue); line-height: 1; }
   .progress-bar {
-    height: 8px;
+    height: 6px;
     background: var(--track);
-    border: 1px solid var(--line);
     border-radius: 999px;
-    margin: 10px 0 8px;
+    margin-top: 10px;
     overflow: hidden;
   }
   .progress-bar i {
@@ -641,57 +656,80 @@
     border-radius: 999px;
     transition: width .5s var(--ease);
   }
-  .stats-row { display: flex; gap: 24px; font-size: 12.5px; color: var(--muted); }
-  .stats-row b { color: var(--text); font-family: var(--mono); font-weight: 600; margin-left: 4px; }
+  .stats-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .stat-card { padding: 16px 18px; position: relative; }
+  .stat-card .st-label { font-size: 12.5px; color: var(--muted); display: block; }
+  .stat-card .st-value { font-size: 24px; font-weight: 700; font-family: var(--mono); margin-top: 4px; line-height: 1.2; }
+  .stat-card .st-value.txt { font-size: 20px; font-family: inherit; }
+  .stat-card .st-spin {
+    position: absolute; right: 20px; top: 50%;
+    transform: translateY(-50%);
+    width: 30px; height: 30px;
+    border: 3px solid var(--chip-ico-bg);
+    border-top-color: var(--muted-2);
+    border-radius: 50%;
+    animation: rot .9s linear infinite;
+  }
   .stage-cards {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
-    gap: 8px;
-    margin-top: 14px;
+    gap: 12px;
     overflow-x: auto;
     padding-bottom: 2px;
   }
   .stage-card {
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 10px 12px;
+    position: relative;
+    text-align: center;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 12px 14px;
+    background: var(--panel);
+    min-width: 130px;
+    transition: border-color .3s, background .3s;
+  }
+  .sc-num {
+    position: absolute; top: 9px; left: 10px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
     background: var(--track);
-    min-width: 118px;
-    transition: border-color .3s, background .3s, box-shadow .3s;
-  }
-  .stage-card .sc-top { display: flex; align-items: center; gap: 7px; }
-  .sc-ico {
-    width: 20px; height: 20px; flex: none;
-    border-radius: 50%;
-    font-size: 11px;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--chip-ico-bg);
     color: var(--muted-2);
-    font-weight: 700;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
   }
-  .stage-card.active { background: var(--panel); border-color: var(--blue3); box-shadow: 0 0 0 1px var(--blue3), var(--shadow); }
-  .stage-card.active .sc-ico { background: var(--blue-soft); color: var(--blue); }
-  .stage-card.active .sc-ico .spin {
-    width: 12px; height: 12px;
-    border: 2px solid #c8d9f8;
-    border-top-color: var(--blue3);
+  .sc-icon {
+    height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 6px;
+    color: var(--muted-2);
+    opacity: .38;
+  }
+  .sc-icon svg { width: 22px; height: 22px; }
+  .stage-card.active { border-color: var(--blue3); background: var(--blue-soft); }
+  .stage-card.active .sc-num { background: var(--blue3); color: #fff; }
+  .stage-card.active .sc-icon { color: var(--blue3); opacity: 1; }
+  .sc-icon .spin, .stat-spin .spin {
+    width: 22px; height: 22px;
+    border: 2.5px solid transparent;
+    border-top-color: currentColor;
+    border-right-color: currentColor;
     border-radius: 50%;
-    animation: rot .8s linear infinite;
+    animation: rot .85s linear infinite;
     display: block;
+    margin: 0 auto;
   }
   @keyframes rot { to { transform: rotate(360deg); } }
-  .stage-card.done { background: var(--green-soft); border-color: #c8e9dc; }
-  .stage-card.done .sc-ico { background: var(--green); color: #fff; }
-  .sc-label { font-size: 12px; font-weight: 600; line-height: 1.35; }
+  .stage-card.done { border-color: rgba(15, 159, 110, .4); background: var(--green-soft); }
+  .stage-card.done .sc-num { background: var(--green); color: #fff; }
+  .stage-card.done .sc-icon { color: var(--green); opacity: 1; }
+  .sc-label { font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--text); }
   .stage-card.done .sc-label { color: var(--green); }
   .stage-card.active .sc-label { color: var(--blue); }
-  .sc-sub { font-size: 10.5px; color: var(--muted-2); margin-top: 3px; }
-  .stage-card.done .sc-sub { color: var(--green); opacity: .8; }
+  .sc-sub { font-size: 11px; color: var(--muted-2); margin-top: 3px; }
+  .stage-card.done .sc-sub { color: var(--green); opacity: .85; }
   .stage-card.active .sc-sub { color: var(--blue3); }
 
   .pause-card {
-    margin: 0 20px;
     border: 1px solid rgba(245, 158, 11, .35);
     background: var(--orange-soft);
     border-radius: var(--radius-l);
@@ -721,138 +759,42 @@
   }
   .pause-card .count-btn:hover { transform: translateY(-1px); }
 
-  .current-card { margin: 0 20px; overflow: hidden; }
-  .cc-head {
-    display: flex; align-items: center; gap: 10px;
-    padding: 11px 16px;
-    background: var(--track);
-    border-bottom: 1px solid var(--line);
-    font-size: 13px; font-weight: 600;
-  }
-  .cc-badge {
-    font-size: 11px; font-weight: 700;
-    color: var(--purple);
-    background: var(--purple-soft);
-    border-radius: 999px;
-    padding: 2px 10px;
-  }
-  .cc-badge.translate { color: var(--blue); background: var(--blue-soft); }
-  .cc-head .cc-idx { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: 500; }
-  .cc-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
-  .cc-src-row { display: flex; gap: 10px; align-items: flex-start; }
-  .lbl {
-    flex: none;
-    font-size: 11px; font-weight: 700;
-    color: var(--muted);
-    background: var(--track);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 2px 8px;
-    margin-top: 1px;
-    letter-spacing: .3px;
-  }
-  .cc-src-row p { font-size: 13.5px; font-weight: 600; word-break: break-all; }
-  .lang-badge {
-    flex: none;
-    font-size: 10.5px; font-weight: 700;
-    border-radius: 5px; padding: 1px 7px;
-    background: var(--orange-soft); color: var(--orange);
-    margin-top: 2px;
-  }
-  .cc-terms { display: flex; flex-wrap: wrap; gap: 6px; }
-  .term-chip {
-    font-size: 11px;
-    border-radius: 999px;
-    padding: 3px 10px;
-    border: 1px solid var(--line);
-    background: var(--track);
-    color: var(--muted);
-  }
-  .term-chip b { font-family: var(--mono); font-weight: 700; }
-  .term-chip.hit { border-color: #c8e9dc; background: var(--green-soft); color: var(--green); }
-  .term-chip.plain { border-style: dashed; color: var(--muted-2); }
-  .cc-out { display: flex; flex-direction: column; gap: 10px; }
-  .cc-field { display: flex; gap: 10px; align-items: flex-start; }
-  .cc-field p { font-family: var(--mono); font-size: 12.5px; line-height: 1.65; word-break: break-all; min-height: 20px; }
-  .cc-field p .caret { display: inline-block; width: 7px; height: 14px; background: var(--blue3); vertical-align: -2px; animation: blink .8s step-end infinite; }
-  .cc-review { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-  .review-chip {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 11px; font-weight: 600;
-    border-radius: 999px; padding: 3px 10px;
-  }
-  .review-chip.pass { background: var(--green-soft); color: var(--green); border: 1px solid #c8e9dc; }
-  .review-chip.fail { background: var(--red-soft); color: var(--red); border: 1px solid rgba(239, 68, 68, .25); }
-  .review-chip.wait { background: var(--track); color: var(--muted-2); border: 1px dashed var(--line); }
-  .review-note { font-size: 11.5px; color: var(--muted); }
-  .sim-badge {
-    font-size: 10.5px; font-weight: 700;
-    border-radius: 5px;
-    padding: 1px 7px;
-    background: var(--orange-soft);
-    color: var(--orange);
-    margin-left: 8px;
-  }
-
-  .log-panel { margin: 0 20px; overflow: hidden; }
+  .log-panel { margin: 0; overflow: hidden; background: #1f242e; border: none; }
   .log-head {
     display: flex; align-items: center; gap: 8px;
-    padding: 10px 16px;
-    background: var(--track);
-    border-bottom: 1px solid var(--line);
+    padding: 11px 16px;
+    background: #262c38;
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
     font-size: 13px; font-weight: 600;
+    color: #d7dde8;
   }
-  .log-head i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: blink 1.4s infinite; }
-  .log-head span { margin-left: auto; font-size: 11.5px; color: var(--muted-2); font-weight: 400; }
+  .log-head i { width: 7px; height: 7px; border-radius: 50%; background: #4a90ff; animation: blink 1.4s infinite; }
+  .log-head span { margin-left: auto; font-size: 11.5px; color: #8b93a5; font-weight: 400; }
   #logText {
     font-family: var(--mono);
     font-size: 11.5px;
-    line-height: 1.85;
-    padding: 12px 16px;
-    height: 168px;
+    line-height: 1.9;
+    padding: 14px 16px;
+    height: 240px;
     overflow-y: auto;
     white-space: pre-wrap;
     word-break: break-all;
-    color: var(--log-ink);
-    background: var(--log-bg);
+    color: #dfe6f0;
+    background: transparent;
   }
-  #logText .lg-time { color: var(--muted-2); }
-  #logText .lg-ok { color: var(--green); }
-  #logText .lg-warn { color: var(--orange); }
-  #logText .lg-err { color: var(--red); }
-  #logText .lg-agent { color: var(--blue); font-weight: 600; }
+  #logText .lg-time { color: #7d879b; }
+  #logText .lg-ok { color: #4ade80; }
+  #logText .lg-warn { color: #fbbf24; }
+  #logText .lg-err { color: #f87171; }
+  #logText .lg-agent { color: #7cb1ff; font-weight: 600; }
 
-  .results-block { margin: 0 20px; overflow: hidden; }
-  .res-head {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 16px;
-    background: var(--track);
-    border-bottom: 1px solid var(--line);
-    font-size: 13px; font-weight: 600;
-  }
-  .res-head .res-actions { margin-left: auto; display: flex; gap: 8px; }
-  .res-head .ghost-btn { padding: 5px 14px; font-size: 12px; }
-  .results-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; max-height: 460px; overflow-y: auto; }
-  .result-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; background: var(--panel); animation: fadeInUp .3s var(--ease) both; }
-  .result-card .rc-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .rc-idx { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--muted-2); }
-  .rc-flow { display: grid; gap: 6px; }
-  .rc-row { display: flex; gap: 10px; align-items: flex-start; }
-  .rc-row p { font-size: 13px; word-break: break-all; }
-  .rc-row p.out { font-family: var(--mono); font-size: 12.5px; color: var(--blue); }
-  .rc-row p.out.rewrite { color: var(--green); }
-  .rc-note { font-size: 12px; color: var(--muted); background: var(--track); border-left: 3px solid #d8e2f5; border-radius: 0 8px 8px 0; padding: 6px 10px; }
-  .rc-badges { display: flex; gap: 6px; flex-wrap: wrap; }
-  .rc-badge { font-size: 10.5px; font-weight: 600; border-radius: 999px; padding: 2px 9px; }
-  .rc-badge.ok { background: var(--green-soft); color: var(--green); }
-  .rc-badge.info { background: var(--blue-soft); color: var(--blue); }
-  .rc-badge.sim { background: var(--orange-soft); color: var(--orange); }
+  .results-block { overflow: hidden; }
+  .results-block.hidden { display: none !important; }
 
-  .process-footer { display: flex; gap: 10px; margin: 0 20px; flex-wrap: wrap; }
+  .process-footer { display: flex; gap: 10px; flex-wrap: wrap; }
   .process-footer .ghost-btn, .process-footer .warn-btn { font-size: 12px; padding: 7px 16px; }
   .warn-btn { background: var(--orange-soft); border: 1px solid rgba(245, 158, 11, .3); color: var(--orange); font-weight: 600; }
   .export-bar {
-    margin: 0 20px;
     display: flex; align-items: center; gap: 12px;
     border: 1px solid var(--line);
     background: var(--panel);
@@ -981,12 +923,14 @@
   .modal .m-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
   .toast {
     position: fixed;
-    left: 50%; bottom: 28px;
-    transform: translateX(-50%) translateY(20px);
-    background: rgba(16, 24, 40, .92);
-    color: #fff;
+    left: 50%; top: 72px;
+    transform: translateX(-50%) translateY(-12px);
+    background: #e2f6ea;
+    color: #157347;
+    border: 1px solid #b5e4c8;
     font-size: 13px;
-    border-radius: 999px;
+    font-weight: 600;
+    border-radius: 10px;
     padding: 9px 22px;
     opacity: 0;
     pointer-events: none;
@@ -994,7 +938,9 @@
     z-index: 120;
     max-width: 86vw;
     text-align: center;
+    box-shadow: 0 6px 20px -6px rgba(21, 115, 71, .25);
   }
+  .toast.warn { background: #fdf3e0; color: #9a6a08; border-color: #f0dcae; box-shadow: 0 6px 20px -6px rgba(154, 106, 8, .2); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .demo-chip {
     position: fixed;
@@ -1035,11 +981,12 @@
     .topbar { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
     .nav-slider { margin: 0; order: 3; width: 100%; justify-content: space-between; }
     .stage-cards { grid-auto-flow: row; grid-template-columns: 1fr 1fr; grid-auto-columns: unset; }
+    .stats-duo { grid-template-columns: 1fr; }
     .paste-actions, .rare-actions { flex-direction: column; align-items: stretch; }
     .rare-actions .primary-btn { width: 100%; }
     .pause-card { flex-wrap: wrap; }
     .pause-card .count-btn { margin-left: 0; width: 100%; }
-    .process-head, .progress-block, .current-card, .log-panel, .results-block, .export-bar, .process-footer { margin-left: 8px; margin-right: 8px; }
+    .process-wrap > * { margin-left: 0; margin-right: 0; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -1069,17 +1016,6 @@
       小工具</button>
   </nav>
   <div class="status-pills">
-    <span class="pill-group hideable">
-      <span class="pill-item">CPU <i class="v-ok">空闲</i></span>
-      <span class="pdiv"></span>
-      <span class="pill-item">GPU <i class="v-busy">繁忙</i></span>
-      <span class="pdiv"></span>
-      <span class="pill-item">当前AGENT限速 0.6s/个</span>
-    </span>
-    <button type="button" class="pill-group hideable" data-demo-toast="演示环境：全局任务监视器未开放">
-      <span class="dot"></span>当前无其他任务运行
-      <svg class="ico" style="width:12px;height:12px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-    </button>
     <button type="button" class="pill-group" data-demo-toast="演示环境：Token 统计仅在内部工具中提供">
       <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
       Token统计
@@ -1093,11 +1029,6 @@
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/></svg>
         H21078（黄谦）
       </span>
-      <span class="pdiv"></span>
-      <button type="button" class="pill-item" data-demo-toast="演示环境无需登录" style="color:var(--muted)">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        退出登录
-      </button>
     </span>
   </div>
 </header>
@@ -1146,22 +1077,22 @@
     <div class="view hidden" id="viewSetup">
       <div class="setup-wrap">
         <div class="setup-title">
-          <h1>新建翻译任务<span class="mode-badge rewrite_only" id="setupModeBadge">仅整改</span></h1>
-          <p>上传您的 Excel 文档开始AGENT翻译流程。（演示环境可直接粘贴文本）</p>
+          <h1>新建翻译任务<span class="mode-badge full" id="setupModeBadge">整改+翻译</span></h1>
+          <p>上传您的 Excel 文档开始AGENT翻译流程。（演示任务已预填好文本，直接点「开始处理」即可）</p>
         </div>
         <div class="panel-card setup-card">
           <div class="setup-top-row">
             <label class="name-field">
               <span class="field-label">任务名称（必填）</span>
-              <input class="text-input" id="taskName" placeholder="例如：EV-Q1升级翻译需求">
+              <input class="text-input" id="taskName" placeholder="例如：EV-Q1升级翻译需求" value="测试文本1">
             </label>
             <div class="mode-field">
               <span class="field-label">处理模式</span>
               <div class="mode-slider" id="modeSlider">
                 <span class="mode-ind" id="modeInd"></span>
-                <button type="button" class="mode-btn active" data-mode="rewrite_only">仅整改</button>
+                <button type="button" class="mode-btn" data-mode="rewrite_only">仅整改</button>
                 <button type="button" class="mode-btn" data-mode="translate_only">仅翻译</button>
-                <button type="button" class="mode-btn" data-mode="full">整改+翻译</button>
+                <button type="button" class="mode-btn active" data-mode="full">整改+翻译</button>
               </div>
             </div>
           </div>
@@ -1225,14 +1156,16 @@
 
           <div class="token-card hidden" id="tokenCard">
             <div class="token-head">
-              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2m6.4.6-1.4 1.4M20 10h2M2 10h2m2.6-5.4L5.2 3.2M7 17a5 5 0 0 1 10 0M7 17h10M9 21h6"/></svg>
-              预估 Token 与费用<span class="chip mode rewrite_only" id="tokenModeChip">仅整改</span>
+              <span class="th-ico">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>
+              </span>
+              预估 Token 与费用
             </div>
             <div class="token-grid">
               <div class="token-cell"><span class="tc-label">预估输入 Token</span><span class="tc-val" id="tokIn">-</span></div>
               <div class="token-cell"><span class="tc-label">预估输出 Token</span><span class="tc-val" id="tokOut">-</span></div>
               <div class="token-cell"><span class="tc-label">预估总 Token</span><span class="tc-val" id="tokTotal">-</span></div>
-              <div class="token-cell"><span class="tc-label">预估费用</span><span class="tc-val accent" id="tokCost">-</span></div>
+              <div class="token-cell"><span class="tc-label">预估费用</span><span class="tc-val" id="tokCost">-</span></div>
             </div>
             <div class="token-disc" id="tokDisc"></div>
           </div>
@@ -1272,36 +1205,52 @@
     <!-- 进度页 -->
     <div class="view hidden" id="viewProcess">
       <div class="process-wrap">
-        <div class="panel-card">
-          <div class="process-head">
+        <div class="panel-card process-head">
+          <div class="head-row">
             <div class="ph-icon">
               <svg class="ico" style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
             </div>
             <div style="min-width:0;flex:1">
               <h1 id="pTitle">任务</h1>
               <div class="chips">
-                <span class="chip status-running" id="pStatus">处理中</span>
+                <span class="chip status-running" id="pStatus">运行中</span>
                 <span class="chip mode rewrite_only" id="pMode">仅整改</span>
-                <span class="chip" id="pBrand">不限</span>
-                <span class="chip" id="pScope">不限</span>
+                <span class="chip brand" id="pBrand">不限</span>
+                <span class="chip scope" id="pScope">不限</span>
                 <span class="p-meta" id="pMeta">启动于 --</span>
+                <span class="p-meta hidden" id="pTokens"></span>
               </div>
             </div>
+            <div class="head-actions">
+              <button type="button" class="head-btn" id="pauseBtn" aria-label="暂停任务" title="暂停任务">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5v14M15 5v14"/></svg>
+              </button>
+              <button type="button" class="head-btn danger" id="deleteBtn" aria-label="删除任务" title="删除任务">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a1 1 0 0 0 1 .9h8a1 1 0 0 0 1-.9l1-13M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </div>
           </div>
-          <div class="panel-card progress-block">
-            <div class="progress-title">
-              <strong>总体进度</strong>
-              <span class="progress-tip"><span class="tip-dot">💡</span><span id="pTip">即将开始…</span></span>
-              <span class="pct" id="pPct">0%</span>
-            </div>
-            <div class="progress-bar"><i id="pFill"></i></div>
-            <div class="stats-row">
-              <div>已处理<b id="pItems">0 / 0</b></div>
-              <div>预计剩余<b id="pRemain">约 --</b></div>
-            </div>
-            <div class="stage-cards" id="stageCards"></div>
+          <div class="overall-row">
+            <strong>总体进度</strong>
+            <span class="progress-tip"><span class="tip-dot">💡</span><span id="pTip">即将开始…</span></span>
+            <span class="pct" id="pPct">0%</span>
+          </div>
+          <div class="progress-bar"><i id="pFill"></i></div>
+        </div>
+
+        <div class="stats-duo">
+          <div class="panel-card stat-card">
+            <span class="st-label">已处理</span>
+            <span class="st-value" id="pItems">0 / 0</span>
+            <span class="st-spin" id="itemsSpin"></span>
+          </div>
+          <div class="panel-card stat-card">
+            <span class="st-label">预计剩余</span>
+            <span class="st-value txt" id="pRemain">预处理中</span>
           </div>
         </div>
+
+        <div class="stage-cards" id="stageCards"></div>
 
         <div class="pause-card hidden" id="pauseCard">
           <div class="pc-ico">⏸</div>
@@ -1318,43 +1267,8 @@
           <span class="eb-pct" id="ebPct">0%</span>
         </div>
 
-        <div class="panel-card current-card hidden" id="currentCard">
-          <div class="cc-head">
-            <span class="cc-badge" id="ccBadge">AGENT 上下文</span>
-            <span id="ccStageTitle">构建任务上下文</span>
-            <span class="cc-idx" id="ccIdx">第 1 / 5 条</span>
-          </div>
-          <div class="cc-body">
-            <div class="cc-src-row">
-              <span class="lbl">源文本</span>
-              <p id="ccSrc" style="flex:1"></p>
-              <span class="lang-badge" id="ccLang">中文</span>
-            </div>
-            <div class="cc-terms" id="ccTerms"></div>
-            <div class="cc-out">
-              <div class="cc-field"><span class="lbl">缩写裁决</span><div class="cc-terms" id="ccRuling" style="flex:1"></div></div>
-              <div class="cc-field"><span class="lbl">说 明</span><p id="ccNote" style="flex:1"></p></div>
-              <div class="cc-field"><span class="lbl" id="ccOut1Lbl">整改文本</span><p id="ccOut1" style="flex:1"></p></div>
-              <div class="cc-field hidden" id="ccOut2Row"><span class="lbl">翻译文本</span><p id="ccOut2" style="flex:1"></p></div>
-            </div>
-            <div class="cc-review" id="ccReview"></div>
-          </div>
-        </div>
-
-        <div class="results-block panel-card hidden" id="resultsBlock">
-          <div class="res-head">
-            <strong id="resTitle">结果预览</strong>
-            <span class="p-meta" id="resCount"></span>
-            <div class="res-actions">
-              <button type="button" class="ghost-btn" id="copyResBtn">复制全部结果</button>
-              <button type="button" class="ghost-btn" id="exportResBtn">导出 Excel</button>
-            </div>
-          </div>
-          <div class="results-list" id="resultsList"></div>
-        </div>
-
         <div class="panel-card log-panel">
-          <div class="log-head"><i></i>实时处理日志<span>自动刷新中</span></div>
+          <div class="log-head"><i></i>实时处理日志<span id="logCount">自动刷新中（0 条）</span></div>
           <pre id="logText"></pre>
         </div>
 
@@ -1522,12 +1436,17 @@
   function nowStr() { var d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); }
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   var toastTimer = null;
-  function toast(msg) {
+  function toast(msg, type) {
     var t = $('toast');
     t.textContent = msg;
-    t.classList.add('show');
+    t.className = 'toast show' + (type === 'warn' ? ' warn' : '');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2400);
+  }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function fullStr(d) {
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' +
+      pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds());
   }
 
   /* ================= 数据：术语表（摘自内部真实术语库） ================= */
@@ -1567,43 +1486,25 @@
   var TERM_MAP = {};
   TERM_DB.forEach(function (t) { TERM_MAP[t.a] = t; });
 
-  /* ================= 数据：演示行（含精确结果与审核脚本） ================= */
+  /* ================= 数据：演示行（截图 Excel 三列：en_src / 整改后文本 / 翻译结果） ================= */
   var DEMO_LINES = [
-    {
-      src: '防盗匹配', lang: 'zh', sim: false,
-      terms: [], history: 2, rules: '短菜单风格',
-      rewrite: '防盗匹配', rewriteNote: '短菜单文本保持短语，未补充“系统”。',
-      trans: 'Anti-theft matching', transNote: '按短菜单风格保持短语，防增义。',
-      reviewFail: null
-    },
-    {
-      src: 'VCU防盗', lang: 'zh', sim: false,
-      terms: ['VCU'], history: 1, rules: '缩写展开',
-      rewrite: '整车控制器（VCU）防盗', rewriteNote: 'VCU 非常见，术语表命中整车控制器，按非常见缩写规则展开。',
-      trans: 'Vehicle Control Unit (VCU) anti-theft', transNote: '缩写镜像：英文展开为 Vehicle Control Unit (VCU)。',
-      reviewFail: { round: 1, note: '翻译文本未按镜像规则展开 VCU' }
-    },
-    {
-      src: '整车ECU防盗', lang: 'zh', sim: false,
-      terms: ['ECU'], history: 3, rules: '常见缩写保留',
-      rewrite: '整车ECU防盗', rewriteNote: 'ECU 为常见缩写，句中保留缩写，不展开。',
-      trans: 'Vehicle ECU anti-theft', transNote: '常见缩写保留 bare；与上条 VCU 展开形成对照。',
-      reviewFail: null
-    },
-    {
-      src: 'Press Next to proceed after input is complete.', lang: 'en', sim: false,
-      terms: [], history: 0, rules: '按钮名保留',
-      rewrite: 'Press Next to proceed after input is complete.', rewriteNote: 'Next 为界面按钮名，保留写法；原句 sentence-case 已合规。',
-      trans: '输入完成后，按 Next 继续。', transNote: '按钮名 Next 保留，不译。',
-      reviewFail: null
-    },
-    {
-      src: 'CCU check failed, rear mode motor actual Position out of range, please check DTC and fix it, then try again!', lang: 'en', sim: false,
-      terms: ['CCU', 'DTC'], history: 1, rules: '大小写与句式修正',
-      rewrite: 'Climate Control Unit (CCU) check failed due to rear mode motor actual position out of range. Check DTC and fix it, and then try again.', rewriteNote: '按规则展开 CCU、保留 DTC；Position 修正为小写，拆分句子并补句号。',
-      trans: '空调控制单元（CCU）检查失败，原因是后模式电机实际位置超出范围。检查故障码并进行修复，然后重试。', transNote: '缩写镜像：中文侧同样展开 CCU；历史库相似度 1.0 仅作印证。',
-      reviewFail: null
-    }
+    { src: 'E-latch Emergency LED Output', rewrite: 'E-latch emergency LED output', trans: '电子门锁紧急发光二极管输出', rules: 'sentence-case 修正' },
+    { src: 'Door Latch Lock Output', rewrite: 'Door latch lock output', trans: '车门锁闩锁输出', rules: 'sentence-case 修正' },
+    { src: 'Door Latch Unlock Output', rewrite: 'Door latch unlock output', trans: '车门锁闩开锁输出', rules: 'sentence-case 修正' },
+    { src: 'EHL Open Output', rewrite: 'EHL open output', trans: 'EHL 开路输出', rules: 'sentence-case 修正' },
+    { src: '500 ms', rewrite: '500 ms', trans: '500 毫秒', rules: '单位规范' },
+    { src: 'Rear Console SW ILLOutput', rewrite: 'Rear console SW Interior Light output', trans: '后控制台开关（SW）室内灯输出', rules: '分词补全', rulings: [{ a: 'SW', expand: false, why: 'SW 常见缩写，保留。' }] },
+    { src: 'Rear Door Curtain MTR Up Output', rewrite: 'Rear door curtain MTR up output', trans: '后车门窗帘马达上升输出', rules: 'sentence-case 修正' },
+    { src: 'Rear Door Curtain MTR Down Output', rewrite: 'Rear door curtain MTR down output', trans: '后车门窗帘马达下降输出', rules: 'sentence-case 修正' },
+    { src: 'MR MTR FWD Output', rewrite: 'MR MTR FWD output', trans: 'MR 马达前进输出', rules: 'sentence-case 修正' },
+    { src: 'MR MTR BWD Output', rewrite: 'MR MTR BWD output', trans: 'MR 马达后退输出', rules: 'sentence-case 修正' },
+    { src: 'V2L Discharging Test', rewrite: 'Vehicle to Load (V2L) Discharging Test', trans: '车辆对外负载（V2L）放电测试', rules: '缩写展开', rulings: [{ a: 'V2L', expand: true, why: 'V2L 未命中术语表，按上下文展开为 Vehicle to Load。' }] },
+    { src: 'EVNT Forced Operation', rewrite: 'EVNT forced operation', trans: 'EVNT 强制运行', rules: 'sentence-case 修正' },
+    { src: 'Pocket Lamp ON', rewrite: 'Pocket lamp ON', trans: '手灯灯开启', rules: 'sentence-case 修正' },
+    { src: 'Outside Touch ON', rewrite: 'Outside touch ON', trans: '外部触摸开启', rules: 'sentence-case 修正' },
+    { src: 'Inside Touch ON', rewrite: 'Inside touch ON', trans: '内部触摸开启', rules: 'sentence-case 修正' },
+    { src: 'Engine Stop, IGN ON', rewrite: 'Engine Stop, ignition ON', trans: '发动机停止，点火开启', rules: '大小写与点火档位' },
+    { src: 'Coda Type', rewrite: 'Coda type', trans: '后轴类型', rules: 'sentence-case 修正' }
   ];
 
   /* ================= 数据：小语种 ================= */
@@ -1837,7 +1738,7 @@
   });
   requestAnimationFrame(function () { moveNavInd(navBtns[0]); });
   document.querySelectorAll('[data-demo-toast]').forEach(function (b) {
-    b.addEventListener('click', function () { toast(b.dataset.demoToast); });
+    b.addEventListener('click', function () { toast(b.dataset.demoToast, 'warn'); });
   });
 
   /* ================= 中英：模式 ================= */
@@ -1870,14 +1771,24 @@
     var badge = $('setupModeBadge');
     badge.textContent = MODES[mode].badge;
     badge.className = 'mode-badge ' + mode;
-    var desc = $('modeDesc');
-    desc.className = 'mode-desc ' + mode;
-    desc.innerHTML = '<div class="md-head"><span>' + MODES[mode].icon + '</span><span>' + MODES[mode].title + '</span></div><p class="md-body">' + MODES[mode].hint + '</p>';
-    var tc = $('tokenModeChip');
-    tc.textContent = MODES[mode].badge;
-    tc.className = 'chip mode ' + mode;
+    renderModeDesc();
     updateTokenCard();
     updateDraftCard();
+  }
+  function majorityLangLabel() {
+    if (!parsedItems || !parsedItems.length) return null;
+    var zh = 0, en = 0;
+    parsedItems.forEach(function (i) { if (i.lang === 'en') en++; else zh++; });
+    if (zh && en) return '中文 / 英文混合';
+    return zh ? '中文' : '英文';
+  }
+  function renderModeDesc() {
+    var desc = $('modeDesc');
+    desc.className = 'mode-desc ' + currentMode;
+    var langLabel = majorityLangLabel();
+    var langHtml = langLabel ? '<p class="mode-desc-lang">已识别语种为：' + langLabel + '</p>' : '';
+    desc.innerHTML = '<div class="md-head"><span>' + MODES[currentMode].icon + '</span><span>' + MODES[currentMode].title + '</span></div>' +
+      langHtml + '<p class="md-body">' + MODES[currentMode].hint + '</p>';
   }
   modeSlider.addEventListener('click', function (e) {
     var btn = e.target.closest('.mode-btn');
@@ -1895,10 +1806,12 @@
   }
   function estTokens(items, mode) {
     var chars = items.reduce(function (n, it) { return n + it.src.length; }, 0);
-    var inTok = Math.round(chars * 1.9 + items.length * 640);
-    var outMul = mode === 'full' ? 2.4 : 1.25;
-    var outTok = Math.round(items.length * 420 * outMul + chars * 0.9);
-    return { inTok: inTok, outTok: outTok, total: inTok + outTok, cost: (inTok + outTok) * 0.000022 };
+    var mul = mode === 'full' ? 2 : 1;
+    var inTok = Math.round(items.length * 5800 * mul + chars * 20);
+    var outTok = Math.round(items.length * 74 * mul + chars * 4);
+    var total = inTok + outTok;
+    var usd = total * 5.85e-7;
+    return { inTok: inTok, outTok: outTok, total: total, usd: usd, cny: usd * 7.2 };
   }
   function updateTokenCard() {
     if (!parsedItems || !parsedItems.length) { $('tokenCard').classList.add('hidden'); return; }
@@ -1906,8 +1819,9 @@
     $('tokIn').textContent = est.inTok.toLocaleString();
     $('tokOut').textContent = est.outTok.toLocaleString();
     $('tokTotal').textContent = est.total.toLocaleString();
-    $('tokCost').textContent = '¥ ' + est.cost.toFixed(2);
-    $('tokDisc').textContent = '按 ' + parsedItems.length + ' 条 × 上下文/审核开销估算，演示口径仅供参考；实际以任务统计为准。';
+    $('tokCost').textContent = '$' + est.usd.toFixed(2) + ' / ¥' + est.cny.toFixed(2);
+    var n = Math.max(3, Math.min(parsedItems.length, 9));
+    $('tokDisc').textContent = '基于 ' + n + ' 条历史任务估算（' + n + ' 条规模相近），仅供参考';
     $('tokenCard').classList.remove('hidden');
   }
   function updateGutter() {
@@ -1928,13 +1842,11 @@
   }
   $('uploadTab').addEventListener('click', function () { switchInputTab('upload'); });
   $('textTab').addEventListener('click', function () { switchInputTab('text'); });
-  $('uploadBox').addEventListener('click', function () { toast('演示环境不支持文件上传，请使用「复制文本」'); });
+  $('uploadBox').addEventListener('click', function () { toast('演示环境不支持文件上传，请使用「复制文本」', 'warn'); });
 
   $('fillSampleBtn').addEventListener('click', function () {
-    $('pasteArea').value = DEMO_LINES.map(function (d) { return d.src; }).join('\n');
-    updateGutter();
-    toast('已填入 5 条示例文本：防增义 / 缩写展开 / 常见缩写保留 / 按钮名 / 大小写修正');
-    confirmText(true);
+    prefillDraft();
+    toast('已填入 17 条示例文本（en_src 信号表）');
   });
   function resetTextInput() {
     parsedItems = null;
@@ -1961,24 +1873,29 @@
   });
   function confirmText(silent) {
     var items = parseLines($('pasteArea').value);
-    if (!items.length) { if (!silent) toast('请先粘贴或填入文本'); return false; }
+    if (!items.length) { if (!silent) toast('请先粘贴或填入文本', 'warn'); return false; }
     parsedItems = items;
     var zh = items.filter(function (i) { return i.lang === 'zh'; }).length;
     var en = items.filter(function (i) { return i.lang === 'en'; }).length;
-    var langPart = zh && en ? '中文 / 英文混合' : zh ? '中文' : '英文';
+    var col = zh && en ? 'cn_src / en_src' : en ? 'en_src' : 'cn_src';
     $('fileSummary').textContent = '已录入粘贴文本（共 ' + items.length + ' 条，' +
-      items.reduce(function (n, i) { return n + i.src.length; }, 0) + ' 字，已识别语种：' + langPart + '，源列自动映射 cn_src / en_src）';
+      items.reduce(function (n, i) { return n + i.src.length; }, 0) + ' 字，识别源文本列为：' + col + '）';
     $('textPanel').classList.add('hidden');
     $('fileStrip').classList.remove('hidden');
     $('runBtn').disabled = false;
+    renderModeDesc();
     updateTokenCard();
-    if (!silent) toast('已解析 ' + items.length + ' 条文本');
+    if (!silent) toast('文本保存成功');
     return true;
   }
   $('confirmTextBtn').addEventListener('click', function () { confirmText(false); });
   $('pasteArea').addEventListener('input', function () {
     updateGutter();
     if (parsedItems) resetTextInput();
+  });
+  // 行号列随文本区滚动同步
+  $('pasteArea').addEventListener('scroll', function () {
+    $('pgGutter').scrollTop = this.scrollTop;
   });
 
   /* ================= 品牌 / 业务范围组合框 ================= */
@@ -2031,19 +1948,20 @@
   var taskSeq = 1;
   var draftExists = false;
   var PRESET_TASK = {
-    id: 'preset', title: '示例：短菜单与故障句翻译', mode: 'full', status: 'done', preset: true,
-    brand: 'Hyundai', scope: '诊断仪交互', createdAt: '昨日 17:42', pct: 100,
+    id: 'preset', title: '示例：测试文本1', mode: 'full', status: 'done', preset: true,
+    brand: 'Hyundai', scope: '诊断仪交互', createdAt: '2026-09-05 17:42:10', pct: 100,
     items: null
   };
 
   function taskCardHtml(t) {
-    var st = t.status === 'done' ? '已完成' : (t.status === 'running' ? '处理中' : '未开始');
+    var st = t.status === 'done' ? '已完成' : (t.status === 'running' ? '运行中' : '未开始');
     var pct = t.status === 'done' ? 100 : (t.pct || 0);
     var pctCls = t.status === 'done' ? 'tc-pct done' : 'tc-pct';
     var xBtn = '<button type="button" class="tc-x" data-x="' + t.id + '" aria-label="删除任务">×</button>';
-    var bar = t.status === 'running' ? '<div class="tc-bar"><i style="width:' + pct + '%"></i></div>' : '';
+    var sub = st + (t.scope ? ' · ' + esc(t.scope) : '') + ' · ' + (MODES[t.mode] ? MODES[t.mode].badge : '');
+    var bar = t.status === 'running' ? '<div class="tc-track"><i style="width:' + pct + '%"></i></div>' : '';
     return '<div class="tc-row"><b>' + esc(t.title) + '</b><span class="' + pctCls + '">' + pct + '%</span>' + xBtn + '</div>' +
-      '<div class="tc-sub">' + st + ' · ' + (MODES[t.mode] ? MODES[t.mode].badge : '') + '</div>' + bar;
+      '<div class="tc-sub">' + sub + '</div>' + bar;
   }
   function renderSidebar() {
     var runBox = $('listRunning'), doneBox = $('listDone');
@@ -2125,10 +2043,22 @@
     }
   }
   $('newTaskBtn').addEventListener('click', openDraft);
+  function prefillDraft() {
+    var raw = DEMO_LINES.map(function (d) { return d.src; }).join('\n');
+    $('pasteArea').value = raw;
+    updateGutter();
+    parsedItems = parseLines(raw);
+    $('fileStrip').classList.add('hidden');
+    $('textPanel').classList.remove('hidden');
+    $('runBtn').disabled = false;
+    renderModeDesc();
+    updateTokenCard();
+  }
   function openDraft() {
-    if (running) { toast('当前有任务正在处理，请稍候'); return; }
+    if (running) { toast('当前有任务正在处理，请稍候', 'warn'); return; }
     draftExists = true;
     activeTaskId = 'draft';
+    prefillDraft();
     renderSidebar();
     showView('viewSetup');
   }
@@ -2145,13 +2075,12 @@
       $('pPct').textContent = '100%';
       $('pTip').textContent = '任务完成';
       $('pItems').textContent = t.items.length + ' / ' + t.items.length;
-      $('pRemain').textContent = '约 0 分钟';
+      setRemain('约 0 分钟');
       $('pauseCard').classList.add('hidden');
       $('exportBar').classList.add('hidden');
-      $('currentCard').classList.add('hidden');
-      $('logText').innerHTML = '';
-      appendLog('任务已完成，可查看下方结果预览。', 'lg-ok');
-      renderResults(t, true);
+      $('itemsSpin').style.display = 'none';
+      clearLog();
+      appendLog('任务已完成。', 'lg-ok');
       showView('viewProcess');
     } else if (t.status === 'running') {
       showView('viewProcess');
@@ -2180,22 +2109,34 @@
     translate_only: [[2, 30], [30, 92], [92, 100]]
   };
 
+  var logCounter = 0;
+  function clearLog() {
+    $('logText').innerHTML = '';
+    logCounter = 0;
+    $('logCount').textContent = '自动刷新中（0 条）';
+  }
   function appendLog(msg, cls) {
     var pre = $('logText');
     var span = document.createElement('span');
     span.className = cls || '';
-    span.innerHTML = '<span class="lg-time">[' + nowStr() + ']</span> ' + esc(msg) + '\n';
+    span.innerHTML = '<span class="lg-time">[' + fullStr(new Date()) + ']</span> ' + esc(msg) + '\n';
     pre.appendChild(span);
     pre.scrollTop = pre.scrollHeight;
+    logCounter++;
+    $('logCount').textContent = '自动刷新中（' + logCounter + ' 条）';
   }
   function bindProcessHeader(t) {
     $('pTitle').textContent = t.title;
     $('pMode').textContent = MODES[t.mode].badge;
     $('pMode').className = 'chip mode ' + t.mode;
     $('pBrand').textContent = t.brand;
+    $('pBrand').className = 'chip brand';
     $('pScope').textContent = t.scope;
-    $('pMeta').textContent = '启动于 ' + t.createdAt + '（演示 10 倍速）';
+    $('pScope').className = 'chip scope';
+    $('pMeta').textContent = '启动于 ' + t.createdAt;
   }
+  var SYNC_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/></svg>';
+  var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.4 12.3 2.4 2.4 4.8-5"/></svg>';
   function renderStages(t, allDone) {
     var steps = STEPS[t.mode], ranges = STAGE_RANGE[t.mode];
     var box = $('stageCards');
@@ -2204,8 +2145,9 @@
       var el = document.createElement('div');
       el.className = 'stage-card' + (allDone ? ' done' : '');
       el.id = 'stage-' + i;
-      el.innerHTML = '<div class="sc-top"><span class="sc-ico">' + (allDone ? '✓' : (i + 1)) + '</span>' +
-        '<span class="sc-label">' + label + '</span></div><div class="sc-sub">' + (allDone ? '已完成' : '等待中') + '</div>';
+      el.innerHTML = '<span class="sc-num">' + (allDone ? '✓' : (i + 1)) + '</span>' +
+        '<div class="sc-icon">' + (allDone ? CHECK_SVG : SYNC_SVG) + '</div>' +
+        '<div class="sc-label">' + label + '</div><div class="sc-sub">' + (allDone ? '已完成' : '等待中') + '</div>';
       el.dataset.range = ranges[i][0] + ',' + ranges[i][1];
       box.appendChild(el);
     });
@@ -2215,11 +2157,9 @@
     if (!el) return;
     el.classList.remove('active', 'done');
     if (state) el.classList.add(state);
-    var ico = el.querySelector('.sc-ico');
-    if (state === 'done') ico.innerHTML = '✓';
-    else if (state === 'active') ico.innerHTML = '<span class="spin"></span>';
-    else ico.innerHTML = String(idx + 1);
-    el.querySelector('.sc-sub').textContent = sub || (state === 'done' ? '已完成' : state === 'active' ? '处理中…' : '等待中');
+    el.querySelector('.sc-num').textContent = state === 'done' ? '✓' : String(idx + 1);
+    el.querySelector('.sc-icon').innerHTML = state === 'done' ? CHECK_SVG : (state === 'active' ? '<span class="spin"></span>' : SYNC_SVG);
+    el.querySelector('.sc-sub').textContent = sub || (state === 'done' ? '已完成' : state === 'active' ? '处理中 …' : '等待中');
   }
   var currentRunTask = null;
   function setProgress(pct, tip) {
@@ -2231,42 +2171,31 @@
       currentRunTask.pct = pct;
       var el = document.querySelector('.task-card[data-task="' + currentRunTask.id + '"] .tc-pct');
       if (el) el.textContent = pct + '%';
-      var bar = document.querySelector('.task-card[data-task="' + currentRunTask.id + '"] .tc-bar i');
+      var bar = document.querySelector('.task-card[data-task="' + currentRunTask.id + '"] .tc-track i');
       if (bar) bar.style.width = pct + '%';
     }
   }
   function setItems(done, total) {
     $('pItems').textContent = done + ' / ' + total;
-    var remainMin = Math.max(0, Math.ceil((total - done) * 0.7));
-    $('pRemain').textContent = remainMin > 0 ? '约 ' + remainMin + ' 分钟' : '即将完成';
+  }
+  function setRemain(txt) {
+    $('pRemain').textContent = txt;
+  }
+  function remainMinutes(done, total) {
+    var sec = Math.max(0, Math.round((total - done) * 1.3));
+    return sec < 60 ? '不到 1 分钟' : '约 ' + Math.ceil(sec / 60) + ' 分钟';
+  }
+  function updateTokenStat(t, done, total) {
+    var est = estTokens(t.items, t.mode);
+    var inT = Math.round(est.inTok * done / total);
+    var outT = Math.round(est.outTok * done / total);
+    var tot = inT + outT;
+    var usd = tot * 5.85e-7;
+    $('pTokens').textContent = '消耗Token统计 - 输入:' + inT + ' / 输出:' + outT + ' / 总:' + tot +
+      ' · 费用 $' + usd.toFixed(2) + ' / ¥' + (usd * 7.2).toFixed(2);
+    $('pTokens').classList.remove('hidden');
   }
 
-  function termChipsHtml(item, rulings) {
-    var html = '';
-    var hitAbbrs = (item.terms || []);
-    hitAbbrs.forEach(function (a) {
-      var t = TERM_MAP[a];
-      if (!t) return;
-      html += '<span class="term-chip hit"><b>' + a + '</b> · ' + esc(t.en) + ' · ' + esc(t.zh) +
-        ' · 频次 ' + t.freq.toLocaleString() + ' · ' + (t.common ? '常见' : '非常见') + '</span>';
-    });
-    (rulings || []).forEach(function (r) {
-      if (r.why.indexOf('未命中术语表') > -1) html += '<span class="term-chip"><b>' + esc(r.a) + '</b> · 未命中 · 缺失缩写</span>';
-    });
-    if (!html) html = '<span class="term-chip plain">缩写候选：无</span>';
-    html += '<span class="term-chip plain">历史参考 ' + (item.history || 0) + ' 条</span>';
-    html += '<span class="term-chip plain">规则命中：' + esc(item.rules || '通用规范') + '</span>';
-    return html;
-  }
-  function rulingChipsHtml(rulings) {
-    if (!rulings || !rulings.length) return '<span class="term-chip plain">无缩写，无需裁决</span>';
-    return rulings.map(function (r) {
-      var t = TERM_MAP[r.a];
-      var full = t ? (r.expand ? t.en + ' / ' + t.zh : '') : '';
-      return '<span class="term-chip' + (r.expand ? ' hit' : '') + '"><b>' + esc(r.a) + '</b> → ' +
-        (r.expand ? '展开' + (full ? '（' + esc(full) + '）' : '') : '保留 bare') + '</span>';
-    }).join('');
-  }
   function typewrite(el, text, speed) {
     return new Promise(function (resolve) {
       if (REDUCED || !speed) { el.textContent = text; resolve(); return; }
@@ -2285,12 +2214,6 @@
       }, speed);
     });
   }
-  function reviewChips(round, fail, done) {
-    if (!fail && !done) return '<span class="review-chip wait">审核 ' + round + ' / 3 轮 · 进行中…</span>';
-    if (!fail && done) return '<span class="review-chip pass">审核 ' + round + ' / 3 轮 · 通过 ✓</span>';
-    if (!done) return '<span class="review-chip fail">第 ' + fail.round + ' 轮未通过 · ' + esc(fail.note) + '</span><span class="review-note">带意见重新翻译…</span>';
-    return '<span class="review-chip fail">第 ' + fail.round + ' 轮未通过</span><span class="review-chip pass">第 ' + (fail.round + 1) + ' 轮通过 ✓</span>';
-  }
 
   /* 组装任务 item 的模拟结果（预设走精确数据，自由输入走词典模拟） */
   function buildItem(line) {
@@ -2305,11 +2228,11 @@
       rewrite: '', rewriteNote: '', trans: '', transNote: ''
     };
     if (preset) {
-      it.terms = preset.terms; it.history = preset.history; it.rules = preset.rules;
-      it.rewrite = preset.rewrite; it.rewriteNote = preset.rewriteNote;
-      it.trans = preset.trans; it.transNote = preset.transNote;
-      it.reviewFail = preset.reviewFail;
-      it._rulings = buildRuling(preset.src, preset.lang);
+      it.rules = preset.rules || '通用规范';
+      it.rewrite = preset.rewrite;
+      it.rewriteNote = '整改说明: []';
+      it.trans = preset.trans;
+      it.transNote = '整改说明: []';
       return it;
     }
     // —— 自由输入：词典模拟 ——
@@ -2331,26 +2254,6 @@
     return it;
   }
 
-  function showCurrentCard(item, idx, total, stage) {
-    $('currentCard').classList.remove('hidden');
-    $('ccBadge').textContent = stage === 'translate' ? '翻译 AGENT' : '整改 AGENT';
-    $('ccBadge').className = 'cc-badge' + (stage === 'translate' ? ' translate' : '');
-    $('ccStageTitle').textContent = stage === 'context' ? '构建任务上下文（术语 / 历史 / 规则检索）'
-      : stage === 'rewrite' ? '整改输出（先说明后结果）'
-      : '翻译输出（镜像缩写与风格）';
-    $('ccIdx').textContent = '第 ' + idx + ' / ' + total + ' 条';
-    $('ccSrc').textContent = item.src;
-    $('ccLang').textContent = item.langLabel;
-    $('ccTerms').innerHTML = termChipsHtml(item, item._rulings);
-    $('ccRuling').innerHTML = rulingChipsHtml(item._rulings);
-    $('ccNote').textContent = '';
-    $('ccOut1').textContent = '';
-    $('ccOut1Lbl').textContent = stage === 'translate' ? '翻译文本' : '整改文本';
-    $('ccOut2Row').classList.toggle('hidden', stage !== 'translate');
-    $('ccOut2').textContent = '';
-    $('ccReview').innerHTML = '';
-  }
-
   async function runTask(t) {
     running = true;
     t.status = 'running';
@@ -2358,17 +2261,19 @@
     currentRunTask = t;
     renderSidebar();
     bindProcessHeader(t);
-    $('pStatus').textContent = '处理中';
+    $('pStatus').textContent = '运行中';
     $('pStatus').className = 'chip status-running';
-    $('logText').innerHTML = '';
-    $('resultsBlock').classList.add('hidden');
-    $('resultsList').innerHTML = '';
+    $('itemsSpin').style.display = '';
+    setRemain('预处理中');
+    $('pTokens').textContent = '消耗Token统计 - 输入:0 / 输出:0 / 总:0 · 费用 $0.00 / ¥0.00';
+    $('pTokens').classList.remove('hidden');
+    clearLog();
+    appendLog('任务开始运行');
     $('pauseCard').classList.add('hidden');
     $('exportBar').classList.add('hidden');
-    $('currentCard').classList.add('hidden');
     renderStages(t, false);
     setItems(0, t.items.length);
-    setProgress(1, '即将开始…');
+    setProgress(3, '检索对应术语…');
     showView('viewProcess');
 
     var items = t.items;
@@ -2376,83 +2281,44 @@
     var isFull = t.mode === 'full';
     var rewriteDone = t.mode !== 'translate_only';
 
-    appendLog('排队完成，准备处理', 'lg-ok');
-    await sleep(500);
-
     setStage(0, 'active');
-    appendLog('生成任务上下文中…');
-    setProgress(6, '构建 AGENT 上下文中…');
-    await sleep(900);
-    appendLog('构建AGENT上下文... 30%', 'lg-agent');
-    appendLog('检索术语表（' + TERM_DB.length + '+ 词条） · 历史库 · 业务规则：' + t.scope, 'lg-agent');
-    setProgress(30, '构建 AGENT 上下文中…');
-    await sleep(800);
+    await sleep(REDUCED ? 200 : 1500);
     setStage(0, 'done');
-    setItems(0, N);
 
     if (rewriteDone) {
       setStage(1, 'active');
-      appendLog('连接整改翻译模型', 'lg-agent');
-      await sleep(500);
-      appendLog('开始处理 ' + N + ' 条整改任务…', 'lg-agent');
+      setRemain(remainMinutes(0, N));
+      appendLog('开始处理 ' + N + ' 条 ...');
       var r0 = parseFloat($('stage-1').dataset.range.split(',')[0]);
       var r1 = parseFloat($('stage-1').dataset.range.split(',')[1]);
       for (var i = 0; i < N; i++) {
         var it = items[i];
-        it._rulings = buildRuling(it.src, it.lang);
-        showCurrentCard(it, i + 1, N, 'rewrite');
-        appendLog('第 ' + (i + 1) + '/' + N + ' 条 · ' + it.langLabel + '源：' + it.src);
-        await sleep(420);
-        await typewrite($('ccNote'), it.rewriteNote, 16);
-        await typewrite($('ccOut1'), it.rewrite, 14);
-        var fail = it.reviewFail;
-        $('ccReview').innerHTML = reviewChips(1, null, false);
-        appendLog('审核第 1/3 轮 …', 'lg-agent');
-        await sleep(700);
-        if (fail) {
-          $('ccReview').innerHTML = reviewChips(fail.round, fail, false);
-          appendLog('审核未通过，带意见重新翻译（' + fail.note + '）', 'lg-err');
-          await sleep(600);
-          $('ccReview').innerHTML = reviewChips(fail.round, fail, true);
-          appendLog('审核第 2/3 轮 …', 'lg-agent');
-          await sleep(600);
-          appendLog('审核通过（第 2 轮）', 'lg-ok');
-        } else {
-          $('ccReview').innerHTML = reviewChips(1, null, true);
-          appendLog('审核通过（第 1 轮）', 'lg-ok');
-        }
+        await sleep(REDUCED ? 120 : 700);
+        appendLog('✓ ' + (i + 1) + '/' + N + ' | 原文: ' + it.src + ' | 整改后: ' + it.rewrite);
         var pct = r0 + (r1 - r0) * ((i + 1) / N);
-        setProgress(pct, '整改 AGENT 处理中…');
+        setProgress(pct, '检索对应术语…');
         setItems(i + 1, N);
-        appendLog('第 ' + (i + 1) + '/' + N + ' 条整改完成', 'lg-ok');
-        await sleep(280);
+        setRemain(remainMinutes(i + 1, N));
+        updateTokenStat(t, i + 1, N);
       }
-      $('currentCard').classList.add('hidden');
       setStage(1, 'done');
-    } else {
-      appendLog('输入为已整改文本，跳过整改阶段', 'lg-warn');
     }
 
     if (isFull) {
       setStage(2, 'active', '导出中…');
       showExportBar('正在导出整改文件', 'rewrite_output.xlsx（演示）');
-      await sleep(900);
+      await sleep(REDUCED ? 150 : 900);
       hideExportBar();
       setStage(2, 'done');
-      appendLog('整改进度 100%，已暂停等待确认（演示加速为 5 秒）', 'lg-warn');
       await pauseCountdown();
       setStage(3, 'active');
-      appendLog('已确认继续，导入整改文件', 'lg-ok');
-      setProgress(64, '整改后文件预处理中…');
-      await sleep(700);
-      appendLog('构建AGENT上下文... 30%', 'lg-agent');
-      setProgress(66, '构建 AGENT 上下文中…');
-      await sleep(600);
+      setProgress(64, '检索对应术语…');
+      await sleep(REDUCED ? 150 : 800);
       setStage(3, 'done');
     } else if (t.mode === 'rewrite_only') {
       setStage(2, 'active', '导出中…');
       showExportBar('正在导出整改文件', 'rewrite_output.xlsx（演示）');
-      await sleep(900);
+      await sleep(REDUCED ? 150 : 900);
       hideExportBar();
       setStage(2, 'done');
     }
@@ -2461,44 +2327,40 @@
     var exportStepIdx = isFull ? 5 : 2;
     if (t.mode !== 'rewrite_only') {
       setStage(transStepIdx, 'active');
-      appendLog('连接翻译模型', 'lg-agent');
-      await sleep(500);
-      appendLog('开始处理 ' + N + ' 条翻译任务…', 'lg-agent');
+      var doneCount = isFull ? N : 0;
+      var totalCount = isFull ? N * 2 : N;
+      setRemain(remainMinutes(doneCount, totalCount));
+      appendLog('开始处理 ' + N + ' 条 ...');
       var r0t = parseFloat($('stage-' + transStepIdx).dataset.range.split(',')[0]);
       var r1t = parseFloat($('stage-' + transStepIdx).dataset.range.split(',')[1]);
       for (var j = 0; j < N; j++) {
         var it2 = items[j];
-        showCurrentCard(it2, j + 1, N, 'translate');
-        $('ccNote').textContent = it2.transNote;
-        await sleep(320);
-        await typewrite($('ccOut2'), it2.trans, 13);
-        $('ccReview').innerHTML = reviewChips(1, null, true);
-        appendLog('第 ' + (j + 1) + '/' + N + ' 条翻译完成（审核 1 轮通过）', 'lg-ok');
+        await sleep(REDUCED ? 110 : 650);
+        appendLog('✓ ' + (j + 1) + '/' + N + ' | 原文: ' + it2.rewrite + ' | 翻译: ' + it2.trans);
         var pct2 = r0t + (r1t - r0t) * ((j + 1) / N);
-        setProgress(pct2, '翻译 AGENT 处理中…');
-        setItems(t.mode === 'full' ? N + j + 1 : j + 1, t.mode === 'full' ? N * 2 : N);
-        await sleep(240);
+        setProgress(pct2, '检索对应术语…');
+        doneCount = isFull ? N + j + 1 : j + 1;
+        setItems(doneCount, totalCount);
+        setRemain(remainMinutes(doneCount, totalCount));
+        updateTokenStat(t, doneCount, totalCount);
       }
-      $('currentCard').classList.add('hidden');
       setStage(transStepIdx, 'done');
       setStage(exportStepIdx, 'active', '导出中…');
       showExportBar('正在导出结果文件', 'translate_result.xlsx（演示）');
-      await sleep(900);
+      await sleep(REDUCED ? 150 : 900);
       hideExportBar();
       setStage(exportStepIdx, 'done');
     }
 
     setProgress(100, '任务完成');
     setItems(isFull ? N * 2 : N, isFull ? N * 2 : N);
-    $('pRemain').textContent = '约 0 分钟';
+    setRemain('约 0 分钟');
+    updateTokenStat(t, isFull ? N * 2 : N, isFull ? N * 2 : N);
     $('pStatus').textContent = '已完成';
     $('pStatus').className = 'chip status-done';
-    appendLog('校验结果', 'lg-ok');
-    appendLog('导出Excel（演示环境不提供真实文件下载）', 'lg-ok');
-    appendLog('完成', 'lg-ok');
+    $('itemsSpin').style.display = 'none';
     t.status = 'done';
     renderSidebar();
-    renderResults(t, false);
     running = false;
     currentRunTask = null;
     toast('任务完成，共处理 ' + N + ' 条文本');
@@ -2545,64 +2407,6 @@
     });
   }
 
-  /* ================= 结果渲染 ================= */
-  function renderResults(t, instant) {
-    var box = $('resultsList');
-    box.innerHTML = '';
-    var showRewrite = t.mode !== 'translate_only';
-    var showTrans = t.mode !== 'rewrite_only';
-    $('resTitle').textContent = '结果预览（' + (t.mode === 'full' ? '整改 + 翻译' : MODES[t.mode].badge) + '）';
-    $('resCount').textContent = '共 ' + t.items.length + ' 条 · 源列 ' + (t.items.some(function (i) { return i.lang === 'en'; }) ? 'cn_src / en_src' : 'cn_src');
-    t.items.forEach(function (it, idx) {
-      var card = document.createElement('div');
-      card.className = 'result-card';
-      card.style.animationDelay = instant ? '0ms' : (idx * 60) + 'ms';
-      var badges = '<span class="rc-badge ok">审核 ' + (it.reviewFail ? '2 轮' : '1 轮') + '通过</span>';
-      if (it._rulings && it._rulings.length) {
-        badges += '<span class="rc-badge info">缩写裁决 ' + it._rulings.length + ' 项</span>';
-      }
-      if (it.sim) badges += '<span class="rc-badge sim">模拟输出</span>';
-      var rows = '<div class="rc-row"><span class="lbl">源文本</span><p>' + esc(it.src) + '</p></div>';
-      if (showRewrite) rows += '<div class="rc-row"><span class="lbl">整改</span><p class="out rewrite">' + esc(it.rewrite) + '</p></div>';
-      if (showTrans) rows += '<div class="rc-row"><span class="lbl">翻译</span><p class="out">' + esc(it.trans) + '</p></div>';
-      var note = showTrans ? (it.rewriteNote + (it.transNote ? ' / ' + it.transNote : '')) : it.rewriteNote;
-      card.innerHTML = '<div class="rc-top"><span class="rc-idx">#' + (idx + 1) + '</span>' +
-        '<span class="lang-badge">' + esc(it.langLabel) + '</span>' + badges + '</div>' +
-        '<div class="rc-flow">' + rows + '</div>' +
-        '<div class="rc-note">' + esc(note) + '</div>';
-      box.appendChild(card);
-    });
-    $('resultsBlock').classList.remove('hidden');
-  }
-  $('copyResBtn').addEventListener('click', function () {
-    var t = activeTaskId === 'preset' ? PRESET_TASK : taskById(activeTaskId);
-    if (!t) return;
-    var showTrans = t.mode !== 'rewrite_only';
-    var lines = ['源文本\t整改文本\t翻译文本\t说明'];
-    t.items.forEach(function (it) {
-      lines.push([it.src, it.rewrite, showTrans ? it.trans : '', it.rewriteNote].join('\t'));
-    });
-    copyText(lines.join('\n'), '结果已复制到剪贴板（TSV，可直接粘贴回 Excel）');
-  });
-  $('exportResBtn').addEventListener('click', function () {
-    toast('演示环境不提供文件导出，请使用「复制全部结果」');
-  });
-  function copyText(text, okMsg) {
-    function fallback() {
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); toast(okMsg); } catch (e) { toast('复制失败，请手动选择文本'); }
-      ta.remove();
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function () { toast(okMsg); }, fallback);
-    } else fallback();
-  }
-
   /* ================= 开始处理入口 ================= */
   var confirmCtx = null;
   $('runBtn').addEventListener('click', function () {
@@ -2636,7 +2440,7 @@
       items: confirmCtx.items,
       status: 'running',
       pct: 0,
-      createdAt: nowStr()
+      createdAt: fullStr(new Date())
     };
     tasks.push(t);
     draftExists = false;
@@ -2646,7 +2450,21 @@
     if (e.key === 'Escape') $('confirmMask').classList.add('hidden');
   });
   document.querySelectorAll('[data-demo]').forEach(function (b) {
-    b.addEventListener('click', function () { toast('演示环境不支持该操作'); });
+    b.addEventListener('click', function () { toast('演示环境不支持该操作', 'warn'); });
+  });
+  $('pauseBtn').addEventListener('click', function () {
+    toast('演示环境不支持暂停，任务将一次性运行完成', 'warn');
+  });
+  $('deleteBtn').addEventListener('click', function () {
+    var t = currentRunTask || (activeTaskId === 'preset' ? PRESET_TASK : taskById(activeTaskId));
+    if (!t) { toast('请先选择一个任务', 'warn'); return; }
+    if (t.status === 'running') { toast('任务运行中，暂不能删除', 'warn'); return; }
+    if (t.preset) { toast('示例任务不可删除', 'warn'); return; }
+    tasks = tasks.filter(function (x) { return x.id !== t.id; });
+    activeTaskId = null;
+    renderSidebar();
+    showView('viewEmpty');
+    toast('任务已删除');
   });
 
   /* ================= 小语种：子 Tab ================= */
@@ -2821,12 +2639,12 @@
 
   /* ================= 初始化 ================= */
   PRESET_TASK.items = DEMO_LINES.map(buildItem);
-  setMode('rewrite_only');
+  setMode('full');
   updateLangCount();
   updateDeepTip();
   updateGutter();
   renderSidebar();
-  showView('viewEmpty');
+  openDraft(); // 打开即有预填好的新建任务，无需手动新增
 })();
 </script>
 </body>
