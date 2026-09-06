@@ -461,6 +461,23 @@
     background: #f8fafc; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
   }
 
+  /* ── 双击放大灯箱 ── */
+  .lightbox-overlay {
+    position: fixed; inset: 0; z-index: 80; display: none;
+    align-items: center; justify-content: center; flex-direction: column; gap: 12px;
+    background: rgba(10, 14, 20, 0.82); backdrop-filter: blur(6px);
+    padding: 28px; cursor: zoom-out;
+  }
+  .lightbox-overlay.show { display: flex; }
+  .lightbox-overlay img {
+    max-width: min(1100px, 92vw); max-height: 84vh;
+    width: auto; height: auto; object-fit: contain;
+    border-radius: 12px; background: #fff;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+    animation: rise 0.25s ease;
+  }
+  .lightbox-caption { color: rgba(255, 255, 255, 0.85); font-size: 12.5px; font-weight: 600; letter-spacing: 0.2px; }
+
   /* ── toast ── */
   #toast {
     position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(16px);
@@ -538,6 +555,7 @@
   <symbol id="i-card-image" viewBox="0 0 16 16"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/><path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54L1 12.5v-9a.5.5 0 0 1 .5-.5z"/></symbol>
   <symbol id="i-aspect" viewBox="0 0 16 16"><path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/><path d="M2 4.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H3v2.5a.5.5 0 0 1-1 0zm12 7a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1H13V8.5a.5.5 0 0 1 1 0z"/></symbol>
   <symbol id="i-display" viewBox="0 0 16 16"><path d="M0 4s0-2 2-2h12s2 0 2 2v6s0 2-2 2h-4q0 1 .25 1.5H11a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1h.75Q6 13 6 12H2s-2 0-2-2zm1.398-.855a.76.76 0 0 0-.254.302A1.5 1.5 0 0 0 1 4.01V10c0 .325.078.502.145.602q.105.156.302.254a1.5 1.5 0 0 0 .538.143L2.01 11H14c.325 0 .502-.078.602-.145a.76.76 0 0 0 .254-.302 1.5 1.5 0 0 0 .143-.538L15 9.99V4c0-.325-.078-.502-.145-.602a.76.76 0 0 0-.302-.254A1.5 1.5 0 0 0 13.99 3H2c-.325 0-.502.078-.602.145"/></symbol>
+  <symbol id="i-split" viewBox="0 0 16 16"><path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm8.5-1v12H14a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm-1 0H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h5.5z"/></symbol>
   <symbol id="i-x" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/></symbol>
 </svg>
 
@@ -720,6 +738,12 @@
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
+
+<!-- 双击图片放大预览灯箱 -->
+<div class="lightbox-overlay" id="lightbox" aria-hidden="true">
+  <img id="lightboxImg" alt="放大预览">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
 
 <script>
 (function () {
@@ -1029,6 +1053,7 @@
     var actions = document.createElement('div');
     actions.className = 'card-actions';
     [
+      ['i-split', '对比原图', function () { openPreview(idx); }],
       ['i-dl', '下载', function () { downloadOne(idx); }],
       ['i-trash', '删除', function () {
         card.remove();
@@ -1050,10 +1075,13 @@
     var zoom = document.createElement('button');
     zoom.type = 'button';
     zoom.className = 'zoom-btn';
-    zoom.title = '预览';
-    zoom.setAttribute('aria-label', '预览');
+    zoom.title = '放大预览（或双击图片）';
+    zoom.setAttribute('aria-label', '放大预览');
     zoom.innerHTML = '<svg class="bi"><use href="#i-expand"/></svg>';
-    zoom.addEventListener('click', function (e) { e.stopPropagation(); openPreview(idx); });
+    zoom.addEventListener('click', function (e) {
+      e.stopPropagation();
+      openLightbox(pair.after, pair.name + ' · 处理后');
+    });
     card.appendChild(zoom);
 
     var badge = document.createElement('span');
@@ -1132,7 +1160,35 @@
   function closeModal() { $('overlay').classList.remove('show'); }
   $('modalClose').addEventListener('click', closeModal);
   $('overlay').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { closeModal(); closeLightbox(); }
+  });
+
+  /* ── 双击图片放大预览（与原工具一致的灯箱） ── */
+  function openLightbox(src, caption) {
+    $('lightboxImg').src = src;
+    $('lightboxCaption').textContent = caption || '';
+    $('lightbox').classList.add('show');
+    $('lightbox').setAttribute('aria-hidden', 'false');
+  }
+  function closeLightbox() {
+    $('lightbox').classList.remove('show');
+    $('lightbox').setAttribute('aria-hidden', 'true');
+  }
+  $('lightbox').addEventListener('click', closeLightbox);
+  document.addEventListener('dblclick', function (e) {
+    var card = e.target && e.target.closest ? e.target.closest('.img-card') : null;
+    if (!card) return;
+    e.preventDefault();
+    var idx = parseInt(card.dataset.idx, 10);
+    var pair = PAIRS[idx];
+    if (!pair) return;
+    var isOutput = card.closest('#outputGallery') !== null;
+    openLightbox(
+      isOutput ? pair.after : pair.before,
+      pair.name + (isOutput ? ' · 处理后' : ' · 处理前')
+    );
+  });
 
   function openPreview(idx) {
     var pair = PAIRS[idx];
