@@ -121,6 +121,38 @@
   .workspace { flex: 1; min-height: 0; display: flex; }
   .pane { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; min-height: 0; }
   .pane-input { border-right: 1px solid var(--line); }
+  .pane-output { position: relative; }
+
+  /* ── 处理中：输出面板流光边框（还原原工具处理特效） ── */
+  @property --flow-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+  .pane-output.processing::after {
+    content: ""; position: absolute; inset: 0; z-index: 6; pointer-events: none;
+    padding: 2.5px;
+    background: conic-gradient(from var(--flow-angle),
+      rgba(26, 115, 232, 0) 0deg, rgba(26, 115, 232, 0) 245deg,
+      rgba(26, 115, 232, 0.55) 300deg, #1a73e8 330deg, #8db9ff 350deg,
+      rgba(26, 115, 232, 0) 360deg);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: flow-spin 2.2s linear infinite;
+  }
+  @keyframes flow-spin { to { --flow-angle: 360deg; } }
+
+  /* ── 生成中占位卡 ── */
+  .img-card.skeleton { border: 2px dashed var(--line-hover); box-shadow: none; }
+  .img-card.skeleton:hover { transform: none; box-shadow: none; }
+  .img-card.skeleton .img-wrap {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px;
+  }
+  .sk-spinner {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 3px solid #dbe3ec; border-top-color: var(--primary);
+    animation: sk-spin 0.9s linear infinite;
+  }
+  .sk-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+  @keyframes sk-spin { to { transform: rotate(360deg); } }
   .pane-head {
     flex: none; min-height: 50px;
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -938,6 +970,8 @@
     state.running = false;
     setRunBtn('run');
     $('progressArea').classList.remove('show');
+    document.querySelectorAll('#outputGallery .img-card.skeleton').forEach(function (s) { s.remove(); });
+    document.querySelector('.pane-output').classList.remove('processing');
     setProgress(0, '');
     if (!silent) toast('已停止处理');
   }
@@ -981,45 +1015,35 @@
 
     state.running = true;
     setRunBtn('stop');
+    document.querySelector('.pane-output').classList.add('processing');
     $('progressArea').classList.add('show');
     document.querySelectorAll('#outputGallery .new-badge').forEach(function (b) { b.remove(); });
     var t0 = Date.now();
     var total = targets.length;
 
     setProgress(6, '提交任务…');
-    state.timers.push(setTimeout(function () { setProgress(16, '上传图片 0/' + total + ' …'); }, 420));
     state.timers.push(setTimeout(function () {
-      /* 生成阶段：setInterval 缓动爬升（后台标签页也能完成） */
-      var genStart = Date.now();
-      var genMs = 2400 + total * 140;
-      var apiSel = $('apiSelect');
-      var model = (apiSel.options[apiSel.selectedIndex].text.split('API_')[1] || 'Nano Banana').replace(/ \(.*\)$/, '');
-      var iv = setInterval(function () {
-        if (!state.running) { clearInterval(iv); return; }
-        var k = Math.min((Date.now() - genStart) / genMs, 1);
-        var eased = 1 - Math.pow(1 - k, 2.2);
-        setProgress(16 + eased * 74, model + ' 生成中 … ' + Math.round(eased * 100) + '%');
-        if (k >= 1) {
-          clearInterval(iv);
-          setProgress(92, '模型返回结果，解码图片…');
-          state.timers.push(setTimeout(function () { emitResults(targets, t0, 0); }, 360));
-        }
-      }, 60);
-    }, 900));
-  }
+      setProgress(12, '上传图片 0/' + total + ' …');
+      spawnSkeletons(targets);
+    }, 420));
 
-  /* 解码阶段：逐张挂载结果卡片，模拟批量返回 */
-  function emitResults(targets, t0, n) {
-    if (n >= targets.length) {
-      var secs = ((Date.now() - t0) / 1000).toFixed(1);
-      setProgress(100, '完成');
-      state.timers.push(setTimeout(function () { stopRun(true); }, 500));
-      toast('批量处理完成 · ' + targets.length + ' 张 · 用时 ' + secs + 's', true);
-      return;
-    }
-    addResultCard(targets[n]);
-    setProgress(92 + ((n + 1) / targets.length) * 8, '解码图片 ' + (n + 1) + '/' + targets.length + ' …');
-    state.timers.push(setTimeout(function () { emitResults(targets, t0, n + 1); }, 110));
+    /* 生成阶段：一张一张完成，占位卡逐个替换为结果（后台标签页也能跑完） */
+    var STEP = 620;
+    var apiSel = $('apiSelect');
+    var model = (apiSel.options[apiSel.selectedIndex].text.split('API_')[1] || 'Nano Banana').replace(/ \(.*\)$/, '');
+    targets.forEach(function (idx, k) {
+      state.timers.push(setTimeout(function () {
+        if (!state.running) return;
+        completeCard(idx);
+        setProgress(12 + ((k + 1) / total) * 84, model + ' 生成中 ' + (k + 1) + '/' + total + ' …');
+        if (k === total - 1) {
+          var secs = ((Date.now() - t0) / 1000).toFixed(1);
+          setProgress(100, '完成');
+          state.timers.push(setTimeout(function () { stopRun(true); }, 500));
+          toast('批量处理完成 · ' + total + ' 张 · 用时 ' + secs + 's', true);
+        }
+      }, 900 + k * STEP));
+    });
   }
 
   function buildCard(opts) {
@@ -1044,7 +1068,7 @@
     return card;
   }
 
-  function addResultCard(idx) {
+  function buildResultCard(idx) {
     var pair = PAIRS[idx];
     var card = buildCard({ src: pair.after, alt: '处理后：' + pair.name, name: pair.name });
     card.dataset.idx = String(idx);
@@ -1089,12 +1113,33 @@
     badge.textContent = '新生成';
     card.appendChild(badge);
 
-    $('outputGallery').appendChild(card);
+    return card;
+  }
+
+  /* 生成中占位卡：随生成进度逐个替换为结果卡 */
+  function spawnSkeletons(targets) {
+    var gallery = $('outputGallery');
+    targets.forEach(function (idx) {
+      var sk = document.createElement('div');
+      sk.className = 'img-card skeleton';
+      sk.dataset.targetIdx = String(idx);
+      sk.innerHTML = '<div class="img-wrap"><span class="sk-spinner" aria-hidden="true"></span>'
+        + '<span class="sk-label">生成中…</span></div>'
+        + '<div class="file-name">' + PAIRS[idx].name + '</div>';
+      gallery.appendChild(sk);
+    });
+  }
+
+  function completeCard(idx) {
+    var sk = document.querySelector('#outputGallery .img-card.skeleton[data-target-idx="' + idx + '"]');
+    var card = buildResultCard(idx);
+    if (sk) sk.replaceWith(card);
+    else $('outputGallery').appendChild(card);
     refreshOutputs();
   }
 
   function refreshOutputs() {
-    var cards = document.querySelectorAll('#outputGallery .img-card');
+    var cards = document.querySelectorAll('#outputGallery .img-card:not(.skeleton)');
     var has = cards.length > 0;
     $('outputCount').textContent = String(cards.length);
     $('outputGallery').classList.toggle('is-empty', !has);
