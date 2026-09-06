@@ -97,7 +97,7 @@ export const projects: Project[] = [
     imageAlt: '资料治理 Agent 项目配图',
     actions: [
       { kind: 'video', ariaLabel: '查看资料治理 Agent 演示视频', videoKey: 'docs' },
-      { kind: 'doc', ariaLabel: '查看资料问答 Agent 开发手册', docKey: 'docs-doc' },
+      { kind: 'doc', ariaLabel: '查看资料治理 Agent 开发手册', docKey: 'docs-doc' },
     ],
   },
 

@@ -13,13 +13,10 @@ export const site: Site = {
     skills: {
       eyebrow: 'Expertise',
       title: '专业能力',
-      description:
-        '围绕维修资料、数据开发、AI 提效与新能源高压测量，介绍我的核心能力。',
     },
     projects: {
       eyebrow: 'Projects',
       title: '项目经历',
-      description: '每个项目写清楚三件事：做了什么、我负责什么、结果如何。',
     },
   },
   heroActions: [

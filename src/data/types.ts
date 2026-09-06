@@ -26,7 +26,7 @@ export interface NavLink {
 export interface SectionCopy {
   eyebrow: string;
   title: string;
-  description: string;
+  description?: string;
 }
 
 export interface HeroAction {
