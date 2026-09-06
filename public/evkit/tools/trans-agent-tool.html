@@ -1,0 +1,2833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>翻译AGENT平台 · 在线演示</title>
+<style>
+  /* ===== Design Tokens（复刻自内部工具 app.css，浅色 + OLED 暗色双主题） ===== */
+  :root {
+    --blue: #0757d8;
+    --blue3: #2563eb;
+    --blue-soft: #e8f0fe;
+    --green: #0f9f6e;
+    --green-soft: #e6f6f0;
+    --orange: #f59e0b;
+    --orange-soft: #fef3e0;
+    --red: #ef4444;
+    --red-soft: #fdecec;
+    --purple: #7c5cd6;
+    --purple-soft: #f0ebfb;
+    --bg: #f5f7fa;
+    --panel: #ffffff;
+    --line: #e5e8ef;
+    --track: #eef1f5;
+    --text: #101828;
+    --muted: #667085;
+    --muted-2: #98a2b3;
+    --code-bg: rgba(255, 255, 255, .72);
+    --log-bg: #fbfcfe;
+    --log-ink: #33415c;
+    --scroll-thumb: rgba(16, 24, 40, .18);
+    --chip-ico-bg: #eceff4;
+    --radius-s: 6px;
+    --radius: 10px;
+    --radius-l: 16px;
+    --radius-xl: 22px;
+    --shadow: 0 1px 3px rgba(16, 24, 40, .06), 0 8px 24px -12px rgba(16, 24, 40, .1);
+    --shadow-lift: 0 4px 12px rgba(7, 87, 216, .16);
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  html[data-theme="dark"] {
+    --blue: #3b82f6;
+    --blue3: #60a5fa;
+    --blue-soft: rgba(59, 130, 246, .16);
+    --green: #34d399;
+    --green-soft: rgba(52, 211, 153, .13);
+    --orange: #fbbf24;
+    --orange-soft: rgba(251, 191, 36, .12);
+    --red: #f87171;
+    --red-soft: rgba(248, 113, 113, .12);
+    --purple: #a78bfa;
+    --purple-soft: rgba(167, 139, 250, .14);
+    --bg: #000000;
+    --panel: #0d0d10;
+    --line: #222228;
+    --track: #17171c;
+    --text: #f1f5f9;
+    --muted: #8b93a5;
+    --muted-2: #5f6673;
+    --code-bg: rgba(255, 255, 255, .07);
+    --log-bg: #0a0a0c;
+    --log-ink: #b9c2d0;
+    --scroll-thumb: rgba(255, 255, 255, .22);
+    --chip-ico-bg: #1c1c22;
+    --shadow: 0 1px 3px rgba(0, 0, 0, .5);
+    --shadow-lift: 0 4px 14px rgba(59, 130, 246, .22);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--blue3);
+    outline-offset: 2px;
+  }
+  .hidden { display: none !important; }
+  .ico { width: 15px; height: 15px; flex: none; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--blue3); }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* ===== 顶栏 ===== */
+  .topbar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 22px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    z-index: 20;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .brand-logo {
+    background: #2246d3;
+    color: #fff;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: .4px;
+    font-style: italic;
+    border-radius: 8px;
+    padding: 4px 10px;
+    box-shadow: 0 2px 8px rgba(34, 70, 211, .3);
+  }
+  .brand-name { font-size: 15.5px; font-weight: 700; white-space: nowrap; }
+  .nav-slider {
+    position: relative;
+    display: flex;
+    background: var(--track);
+    border-radius: 999px;
+    padding: 3px;
+    margin: 0 auto;
+  }
+  .nav-indicator {
+    position: absolute;
+    top: 3px; bottom: 3px;
+    border-radius: 999px;
+    background: var(--panel);
+    box-shadow: 0 1px 4px rgba(16, 24, 40, .14);
+    transition: left .28s var(--ease), width .28s var(--ease);
+    z-index: 0;
+  }
+  .nav-btn {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: color .2s;
+    white-space: nowrap;
+  }
+  .nav-btn.active { color: var(--blue); font-weight: 600; }
+  .status-pills { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .pill-group {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 13px;
+  }
+  button.pill-group { cursor: pointer; transition: border-color .2s, color .2s; }
+  button.pill-group:hover { border-color: #c9d6ee; color: var(--text); }
+  .pill-item { display: inline-flex; align-items: center; gap: 5px; }
+  .pdiv { width: 1px; height: 12px; background: var(--line); }
+  .v-ok { color: var(--green); font-weight: 600; font-style: normal; }
+  .v-busy { color: var(--orange); font-weight: 600; font-style: normal; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+  .dot.idle { background: var(--muted-2); }
+  .icon-round {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: border-color .2s, color .2s, transform .3s var(--ease);
+  }
+  .icon-round:hover { border-color: #c9d6ee; color: var(--blue); }
+
+  /* ===== 布局骨架 ===== */
+  .shell { flex: 1; display: flex; min-height: 0; padding: 18px 22px; gap: 18px; }
+  .sidebar {
+    width: 264px; flex: none;
+    display: flex; flex-direction: column; gap: 14px;
+    min-height: 0;
+  }
+  .new-task-btn {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 12px 16px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--blue3), var(--blue));
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: var(--shadow-lift);
+    transition: transform .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  .new-task-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(7, 87, 216, .28); }
+  .new-task-btn:active { transform: translateY(0); }
+  .side-group { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+  .side-head {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 13px; font-weight: 600;
+    padding: 2px 4px;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 8px;
+  }
+  .side-head:hover { background: var(--track); }
+  .side-head .chev { color: var(--muted-2); transition: transform .25s var(--ease); display: inline-flex; }
+  .side-group.collapsed .chev { transform: rotate(-90deg); }
+  .side-group.collapsed .side-body { display: none; }
+  .side-head .sh-title { flex: 1; }
+  .side-head.tint .sh-title, .side-head.tint .ico { color: var(--blue); }
+  .count-badge {
+    font-size: 11px; font-weight: 700;
+    color: var(--blue);
+    background: var(--blue-soft);
+    border-radius: 999px;
+    padding: 0 8px;
+    line-height: 18px;
+    min-width: 20px;
+    text-align: center;
+  }
+  .side-body { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; min-height: 0; }
+  .task-card {
+    position: relative;
+    text-align: left;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 12px;
+    transition: border-color .2s, box-shadow .2s;
+    display: block;
+    width: 100%;
+  }
+  .task-card:hover { border-color: #c9d6ee; box-shadow: var(--shadow); }
+  .task-card.active { border-color: var(--blue3); box-shadow: 0 0 0 1px var(--blue3), var(--shadow); }
+  .tc-row { display: flex; align-items: center; gap: 8px; }
+  .tc-row b { flex: 1; font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tc-pct { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+  .tc-pct.done { color: var(--green); }
+  .tc-x {
+    width: 18px; height: 18px; flex: none;
+    border-radius: 50%;
+    color: var(--muted-2);
+    font-size: 13px;
+    line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .tc-x:hover { background: var(--red-soft); color: var(--red); }
+  .tc-sub { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .tc-bar { height: 3px; border-radius: 2px; background: var(--track); margin-top: 8px; overflow: hidden; }
+  .tc-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--blue), var(--blue3)); border-radius: 2px; transition: width .4s var(--ease); }
+  .side-empty { font-size: 12.5px; color: var(--muted-2); padding: 10px 4px; }
+  .side-note {
+    font-size: 12px; color: var(--muted);
+    background: var(--panel);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    line-height: 1.7;
+  }
+  .side-note span { color: var(--muted-2); }
+
+  .workspace { flex: 1; min-width: 0; overflow-y: auto; padding: 2px; }
+  .view { animation: fadeInUp .32s var(--ease) both; }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .panel-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow);
+  }
+
+  /* ===== 空状态 / 占位页 ===== */
+  #viewEmpty, .ph-view {
+    height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; color: var(--muted); text-align: center; padding: 40px;
+  }
+  #viewEmpty .empty-ring, .ph-view .empty-ring {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--blue-soft);
+    color: var(--blue3);
+    font-size: 30px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 8px;
+  }
+  #viewEmpty h2, .ph-view h2 { font-size: 17px; color: var(--text); }
+  #viewEmpty p, .ph-view p { font-size: 13px; max-width: 460px; }
+  .ph-tags { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+  .ph-tag {
+    font-size: 12px; font-weight: 600;
+    color: var(--blue);
+    background: var(--blue-soft);
+    border: 1px solid rgba(37, 99, 235, .18);
+    border-radius: 999px;
+    padding: 5px 14px;
+  }
+  .hub-card { text-align: left; padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+  .hub-card .hub-ico {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: var(--blue-soft);
+    color: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hub-card b { font-size: 15px; }
+  .hub-card p { font-size: 12.5px; color: var(--muted); }
+  .hub-card .hub-warn { font-size: 11.5px; color: #c47d08; background: var(--orange-soft); border: 1px solid rgba(245, 158, 11, .25); border-radius: 8px; padding: 6px 10px; }
+  .hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; max-width: 860px; }
+
+  /* ===== 设置页 ===== */
+  .setup-wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px; }
+  .setup-title h1 { font-size: 22px; }
+  .setup-title p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .mode-badge {
+    display: inline-flex; align-items: center;
+    font-size: 12px; font-weight: 600;
+    border-radius: 999px; padding: 3px 13px;
+    vertical-align: 4px;
+    margin-left: 8px;
+  }
+  .mode-badge.full { background: var(--blue-soft); color: var(--blue); }
+  .mode-badge.rewrite_only { background: var(--blue-soft); color: var(--blue); }
+  .mode-badge.translate_only { background: var(--green-soft); color: var(--green); }
+  .setup-card { padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+  .setup-top-row { display: flex; gap: 22px; flex-wrap: wrap; }
+  .setup-top-row > .name-field { flex: 3; min-width: 260px; }
+  .setup-top-row > .mode-field { flex: 1.35; min-width: 300px; }
+  .field-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; }
+  .text-input, select {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--panel);
+    color: var(--text);
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .text-input::placeholder, textarea::placeholder { color: var(--muted-2); }
+  .text-input:focus, select:focus { border-color: var(--blue3); box-shadow: 0 0 0 3px rgba(37, 99, 235, .12); outline: none; }
+  .mode-slider {
+    position: relative;
+    display: flex;
+    background: var(--track);
+    border-radius: 999px;
+    padding: 3px;
+    margin-top: 2px;
+  }
+  .mode-ind {
+    position: absolute; top: 3px; bottom: 3px;
+    border-radius: 999px;
+    background: var(--panel);
+    border: 1px solid #d8e2f5;
+    box-shadow: 0 1px 4px rgba(16, 24, 40, .12);
+    transition: left .28s var(--ease), width .28s var(--ease);
+  }
+  html[data-theme="dark"] .mode-ind { border-color: #2c2c34; }
+  .mode-btn {
+    position: relative; z-index: 1;
+    flex: 1;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: color .2s;
+  }
+  .mode-btn.active { color: var(--blue); font-weight: 700; }
+  .mode-desc {
+    border-radius: var(--radius);
+    padding: 13px 16px;
+    border: 1px solid #d3e2fb;
+    background: var(--blue-soft);
+    transition: border-color .25s, background .25s;
+  }
+  .mode-desc.rewrite_only { background: var(--blue-soft); border-color: #d3e2fb; }
+  .mode-desc.translate_only { background: var(--green-soft); border-color: #c8e9dc; }
+  .mode-desc .md-head { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; color: var(--blue); }
+  .mode-desc.translate_only .md-head { color: var(--green); }
+  .mode-desc .md-body { font-size: 12.5px; color: var(--muted); margin-top: 5px; }
+  .mode-desc .md-body code {
+    font-family: var(--mono); font-size: 11.5px;
+    background: var(--code-bg);
+    border: 1px solid rgba(16, 24, 40, .08);
+    border-radius: 4px; padding: 0 4px;
+  }
+
+  /* 上传 / 粘贴文本 Tab（下划线式） */
+  .stabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+  .stab {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 18px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--muted);
+    border-radius: 8px 8px 0 0;
+  }
+  .stab:hover { color: var(--text); }
+  .stab.active { color: var(--blue); }
+  .stab.active::after {
+    content: "";
+    position: absolute; left: 12px; right: 12px; bottom: -1px;
+    height: 2.5px; border-radius: 2px;
+    background: var(--blue);
+  }
+  .upload-box {
+    border: 1.5px dashed #c9d2e0;
+    border-radius: var(--radius-l);
+    padding: 34px 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    text-align: center;
+  }
+  .upload-box:hover { border-color: var(--blue3); background: var(--blue-soft); }
+  .upload-box .up-ico { font-size: 30px; color: var(--blue3); line-height: 1; }
+  .upload-box strong { font-size: 14px; color: var(--text); }
+  .upload-box span { font-size: 12px; }
+  .upload-box .decrypt-tip { color: #c47d08; background: var(--orange-soft); border-radius: 999px; padding: 2px 12px; margin-top: 6px; }
+
+  /* 待处理文本粘贴网格（带表头与行号） */
+  .paste-grid { border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--panel); }
+  .paste-grid:focus-within { border-color: var(--blue3); box-shadow: 0 0 0 3px rgba(37, 99, 235, .12); }
+  .pg-head {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px;
+    background: var(--track);
+    border-bottom: 1px solid var(--line);
+    font-size: 12.5px; font-weight: 600; color: var(--muted);
+  }
+  .pg-head .pg-fill { margin-left: auto; }
+  .mini-btn {
+    font-size: 11.5px;
+    border-radius: 999px;
+    padding: 3px 12px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+    font-weight: 500;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .mini-btn:hover { color: var(--blue); border-color: #c9d6ee; }
+  .pg-body { display: flex; min-height: 176px; max-height: 300px; }
+  .pg-gutter {
+    flex: none; width: 40px;
+    background: var(--track);
+    border-right: 1px solid var(--line);
+    padding: 10px 0;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted-2);
+    overflow: hidden;
+  }
+  .pg-gutter span { display: block; height: 22px; line-height: 22px; }
+  #pasteArea {
+    flex: 1;
+    border: none; resize: none; outline: none;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 22px;
+    font-family: inherit;
+    color: var(--text);
+    background: transparent;
+  }
+  .paste-actions { display: flex; gap: 10px; margin-top: 12px; }
+  .primary-btn, .ghost-btn, .warn-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 22px;
+    transition: transform .15s var(--ease), box-shadow .2s, background .2s, opacity .2s;
+  }
+  .primary-btn { background: linear-gradient(135deg, var(--blue3), var(--blue)); color: #fff; box-shadow: var(--shadow-lift); }
+  .primary-btn:hover { transform: translateY(-1px); }
+  .primary-btn:disabled, .ghost-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  .ghost-btn { background: var(--panel); border: 1px solid var(--line); color: var(--muted); }
+  .ghost-btn:hover:not(:disabled) { border-color: #c9d6ee; color: var(--blue); }
+
+  .file-strip {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--blue-soft);
+    border: 1px solid #d3e2fb;
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  .file-strip .fs-icon {
+    width: 32px; height: 32px; flex: none;
+    border-radius: 8px;
+    background: var(--panel);
+    color: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .file-strip b { font-weight: 600; }
+  .file-strip .fs-sub { color: var(--muted); font-size: 12px; }
+  .file-strip .fs-actions { margin-left: auto; display: flex; gap: 8px; }
+  .file-strip .fs-actions .mini-btn { padding: 5px 14px; font-size: 12px; }
+
+  .token-card { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .token-head {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 14px;
+    background: var(--track);
+    border-bottom: 1px solid var(--line);
+    font-size: 13px; font-weight: 600;
+  }
+  .token-head .chip { margin-left: auto; }
+  .token-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .token-cell { padding: 12px 14px; border-right: 1px solid var(--line); }
+  .token-cell:last-child { border-right: none; }
+  .token-cell .tc-label { font-size: 11.5px; color: var(--muted); display: block; }
+  .token-cell .tc-val { font-size: 15px; font-weight: 700; font-family: var(--mono); }
+  .token-cell .tc-val.accent { color: var(--blue); }
+  .token-disc { font-size: 11.5px; color: var(--muted-2); padding: 8px 14px; background: var(--track); border-top: 1px solid var(--line); }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+  .combo-field { display: flex; flex-direction: column; gap: 6px; }
+  .combo { position: relative; display: block; }
+  .combo .text-input { padding-right: 34px; }
+  .combo .combo-arrow {
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted-2);
+    pointer-events: none;
+    display: inline-flex;
+  }
+  .combo-dropdown {
+    position: absolute; left: 0; right: 0; top: calc(100% + 4px);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 32px -8px rgba(16, 24, 40, .22);
+    list-style: none;
+    z-index: 30;
+    max-height: 210px;
+    overflow-y: auto;
+    padding: 4px;
+  }
+  .combo-dropdown li {
+    padding: 8px 12px;
+    border-radius: 7px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .combo-dropdown li:hover, .combo-dropdown li.hl { background: var(--blue-soft); color: var(--blue); }
+  .combo-hint { font-size: 12px; color: var(--muted-2); font-style: normal; }
+  .combo-hint.on { color: var(--blue); }
+
+  .mark-toggle { display: flex; align-items: center; gap: 9px; font-size: 13.5px; cursor: pointer; user-select: none; }
+  .mark-toggle .hint { font-size: 12.5px; color: var(--muted-2); }
+  .round-checkbox {
+    appearance: none;
+    width: 17px; height: 17px;
+    border-radius: 50%;
+    border: 1.5px solid #c2cbda;
+    background: var(--panel);
+    cursor: pointer;
+    flex: none;
+    transition: border-color .2s, background .2s;
+  }
+  .round-checkbox:checked {
+    border-color: var(--blue3);
+    background: radial-gradient(circle, var(--blue3) 0 42%, transparent 48%);
+  }
+  .start-btn {
+    width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: linear-gradient(135deg, var(--blue3), var(--blue));
+    color: #fff;
+    font-size: 14.5px; font-weight: 700;
+    padding: 13px 30px;
+    border-radius: 14px;
+    box-shadow: var(--shadow-lift);
+    transition: transform .2s var(--ease), box-shadow .2s, background .3s, color .3s;
+  }
+  .start-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(7, 87, 216, .3); }
+  .start-btn:disabled {
+    background: var(--track);
+    color: var(--muted-2);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .start-btn .bolt { font-size: 15px; }
+
+  /* ===== 进度页 ===== */
+  .process-wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px; }
+  .process-head { display: flex; align-items: flex-start; gap: 12px; padding: 18px 20px 14px; }
+  .ph-icon {
+    width: 42px; height: 42px; flex: none;
+    border-radius: 12px;
+    background: var(--blue-soft);
+    color: var(--blue);
+    font-size: 19px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .process-head h1 { font-size: 17px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .chips { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11.5px; font-weight: 500;
+    border-radius: 999px;
+    padding: 2px 10px;
+    background: var(--track);
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+  .chip.status-running { background: var(--blue-soft); border-color: #d3e2fb; color: var(--blue); font-weight: 600; }
+  .chip.status-done { background: var(--green-soft); border-color: #c8e9dc; color: var(--green); font-weight: 600; }
+  .chip.mode { font-weight: 600; }
+  .chip.mode.full, .chip.mode.rewrite_only { color: var(--blue); }
+  .chip.mode.translate_only { color: var(--green); }
+  .p-meta { font-size: 12px; color: var(--muted-2); }
+  .progress-block { margin: 0 20px; padding: 16px 18px; }
+  .progress-title { display: flex; align-items: center; gap: 10px; }
+  .progress-title strong { font-size: 13.5px; }
+  .progress-tip { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); min-width: 0; }
+  .progress-tip .tip-dot { color: var(--orange); font-size: 12px; }
+  .pct { margin-left: auto; font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--blue); }
+  .progress-bar {
+    height: 8px;
+    background: var(--track);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    margin: 10px 0 8px;
+    overflow: hidden;
+  }
+  .progress-bar i {
+    display: block; height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--blue), var(--blue3));
+    border-radius: 999px;
+    transition: width .5s var(--ease);
+  }
+  .stats-row { display: flex; gap: 24px; font-size: 12.5px; color: var(--muted); }
+  .stats-row b { color: var(--text); font-family: var(--mono); font-weight: 600; margin-left: 4px; }
+  .stage-cards {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 8px;
+    margin-top: 14px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .stage-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    background: var(--track);
+    min-width: 118px;
+    transition: border-color .3s, background .3s, box-shadow .3s;
+  }
+  .stage-card .sc-top { display: flex; align-items: center; gap: 7px; }
+  .sc-ico {
+    width: 20px; height: 20px; flex: none;
+    border-radius: 50%;
+    font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--chip-ico-bg);
+    color: var(--muted-2);
+    font-weight: 700;
+  }
+  .stage-card.active { background: var(--panel); border-color: var(--blue3); box-shadow: 0 0 0 1px var(--blue3), var(--shadow); }
+  .stage-card.active .sc-ico { background: var(--blue-soft); color: var(--blue); }
+  .stage-card.active .sc-ico .spin {
+    width: 12px; height: 12px;
+    border: 2px solid #c8d9f8;
+    border-top-color: var(--blue3);
+    border-radius: 50%;
+    animation: rot .8s linear infinite;
+    display: block;
+  }
+  @keyframes rot { to { transform: rotate(360deg); } }
+  .stage-card.done { background: var(--green-soft); border-color: #c8e9dc; }
+  .stage-card.done .sc-ico { background: var(--green); color: #fff; }
+  .sc-label { font-size: 12px; font-weight: 600; line-height: 1.35; }
+  .stage-card.done .sc-label { color: var(--green); }
+  .stage-card.active .sc-label { color: var(--blue); }
+  .sc-sub { font-size: 10.5px; color: var(--muted-2); margin-top: 3px; }
+  .stage-card.done .sc-sub { color: var(--green); opacity: .8; }
+  .stage-card.active .sc-sub { color: var(--blue3); }
+
+  .pause-card {
+    margin: 0 20px;
+    border: 1px solid rgba(245, 158, 11, .35);
+    background: var(--orange-soft);
+    border-radius: var(--radius-l);
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px;
+    animation: fadeInUp .3s var(--ease) both;
+  }
+  .pause-card .pc-ico {
+    width: 34px; height: 34px; flex: none;
+    border-radius: 50%;
+    background: var(--panel);
+    color: var(--orange);
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pause-card b { font-size: 13.5px; color: var(--orange); display: block; }
+  .pause-card p { font-size: 12px; color: var(--muted); }
+  .pause-card .count-btn {
+    margin-left: auto; flex: none;
+    background: var(--panel);
+    border: 1px solid rgba(245, 158, 11, .35);
+    color: var(--orange);
+    font-weight: 700; font-size: 12.5px;
+    border-radius: 999px;
+    padding: 8px 16px;
+    transition: transform .15s;
+  }
+  .pause-card .count-btn:hover { transform: translateY(-1px); }
+
+  .current-card { margin: 0 20px; overflow: hidden; }
+  .cc-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px;
+    background: var(--track);
+    border-bottom: 1px solid var(--line);
+    font-size: 13px; font-weight: 600;
+  }
+  .cc-badge {
+    font-size: 11px; font-weight: 700;
+    color: var(--purple);
+    background: var(--purple-soft);
+    border-radius: 999px;
+    padding: 2px 10px;
+  }
+  .cc-badge.translate { color: var(--blue); background: var(--blue-soft); }
+  .cc-head .cc-idx { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: 500; }
+  .cc-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .cc-src-row { display: flex; gap: 10px; align-items: flex-start; }
+  .lbl {
+    flex: none;
+    font-size: 11px; font-weight: 700;
+    color: var(--muted);
+    background: var(--track);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 2px 8px;
+    margin-top: 1px;
+    letter-spacing: .3px;
+  }
+  .cc-src-row p { font-size: 13.5px; font-weight: 600; word-break: break-all; }
+  .lang-badge {
+    flex: none;
+    font-size: 10.5px; font-weight: 700;
+    border-radius: 5px; padding: 1px 7px;
+    background: var(--orange-soft); color: var(--orange);
+    margin-top: 2px;
+  }
+  .cc-terms { display: flex; flex-wrap: wrap; gap: 6px; }
+  .term-chip {
+    font-size: 11px;
+    border-radius: 999px;
+    padding: 3px 10px;
+    border: 1px solid var(--line);
+    background: var(--track);
+    color: var(--muted);
+  }
+  .term-chip b { font-family: var(--mono); font-weight: 700; }
+  .term-chip.hit { border-color: #c8e9dc; background: var(--green-soft); color: var(--green); }
+  .term-chip.plain { border-style: dashed; color: var(--muted-2); }
+  .cc-out { display: flex; flex-direction: column; gap: 10px; }
+  .cc-field { display: flex; gap: 10px; align-items: flex-start; }
+  .cc-field p { font-family: var(--mono); font-size: 12.5px; line-height: 1.65; word-break: break-all; min-height: 20px; }
+  .cc-field p .caret { display: inline-block; width: 7px; height: 14px; background: var(--blue3); vertical-align: -2px; animation: blink .8s step-end infinite; }
+  .cc-review { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .review-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600;
+    border-radius: 999px; padding: 3px 10px;
+  }
+  .review-chip.pass { background: var(--green-soft); color: var(--green); border: 1px solid #c8e9dc; }
+  .review-chip.fail { background: var(--red-soft); color: var(--red); border: 1px solid rgba(239, 68, 68, .25); }
+  .review-chip.wait { background: var(--track); color: var(--muted-2); border: 1px dashed var(--line); }
+  .review-note { font-size: 11.5px; color: var(--muted); }
+  .sim-badge {
+    font-size: 10.5px; font-weight: 700;
+    border-radius: 5px;
+    padding: 1px 7px;
+    background: var(--orange-soft);
+    color: var(--orange);
+    margin-left: 8px;
+  }
+
+  .log-panel { margin: 0 20px; overflow: hidden; }
+  .log-head {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px;
+    background: var(--track);
+    border-bottom: 1px solid var(--line);
+    font-size: 13px; font-weight: 600;
+  }
+  .log-head i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: blink 1.4s infinite; }
+  .log-head span { margin-left: auto; font-size: 11.5px; color: var(--muted-2); font-weight: 400; }
+  #logText {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.85;
+    padding: 12px 16px;
+    height: 168px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--log-ink);
+    background: var(--log-bg);
+  }
+  #logText .lg-time { color: var(--muted-2); }
+  #logText .lg-ok { color: var(--green); }
+  #logText .lg-warn { color: var(--orange); }
+  #logText .lg-err { color: var(--red); }
+  #logText .lg-agent { color: var(--blue); font-weight: 600; }
+
+  .results-block { margin: 0 20px; overflow: hidden; }
+  .res-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    background: var(--track);
+    border-bottom: 1px solid var(--line);
+    font-size: 13px; font-weight: 600;
+  }
+  .res-head .res-actions { margin-left: auto; display: flex; gap: 8px; }
+  .res-head .ghost-btn { padding: 5px 14px; font-size: 12px; }
+  .results-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; max-height: 460px; overflow-y: auto; }
+  .result-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; background: var(--panel); animation: fadeInUp .3s var(--ease) both; }
+  .result-card .rc-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .rc-idx { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--muted-2); }
+  .rc-flow { display: grid; gap: 6px; }
+  .rc-row { display: flex; gap: 10px; align-items: flex-start; }
+  .rc-row p { font-size: 13px; word-break: break-all; }
+  .rc-row p.out { font-family: var(--mono); font-size: 12.5px; color: var(--blue); }
+  .rc-row p.out.rewrite { color: var(--green); }
+  .rc-note { font-size: 12px; color: var(--muted); background: var(--track); border-left: 3px solid #d8e2f5; border-radius: 0 8px 8px 0; padding: 6px 10px; }
+  .rc-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .rc-badge { font-size: 10.5px; font-weight: 600; border-radius: 999px; padding: 2px 9px; }
+  .rc-badge.ok { background: var(--green-soft); color: var(--green); }
+  .rc-badge.info { background: var(--blue-soft); color: var(--blue); }
+  .rc-badge.sim { background: var(--orange-soft); color: var(--orange); }
+
+  .process-footer { display: flex; gap: 10px; margin: 0 20px; flex-wrap: wrap; }
+  .process-footer .ghost-btn, .process-footer .warn-btn { font-size: 12px; padding: 7px 16px; }
+  .warn-btn { background: var(--orange-soft); border: 1px solid rgba(245, 158, 11, .3); color: var(--orange); font-weight: 600; }
+  .export-bar {
+    margin: 0 20px;
+    display: flex; align-items: center; gap: 12px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: var(--radius-l);
+    padding: 12px 16px;
+    box-shadow: var(--shadow);
+  }
+  .export-bar .eb-ico {
+    width: 32px; height: 32px; flex: none;
+    border-radius: 50%;
+    background: var(--blue-soft); color: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .export-bar .eb-ico .spin { width: 14px; height: 14px; border: 2px solid #c8d9f8; border-top-color: var(--blue3); border-radius: 50%; animation: rot .8s linear infinite; display: block; }
+  .export-bar b { font-size: 13px; display: block; }
+  .export-bar p { font-size: 11.5px; color: var(--muted); }
+  .export-bar .eb-pct { margin-left: auto; font-family: var(--mono); font-weight: 700; color: var(--blue); }
+
+  /* ===== 小语种 ===== */
+  .rare-wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px; }
+  .rare-head-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .rare-head-row h1 { font-size: 22px; }
+  .rare-head-row .sub { font-size: 13px; color: var(--muted); }
+  .engine-slider {
+    display: flex;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 3px;
+    width: fit-content;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .engine-btn {
+    padding: 7px 15px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: background .2s, color .2s, box-shadow .2s;
+  }
+  .engine-btn.active { background: linear-gradient(135deg, var(--blue3), var(--blue)); color: #fff; font-weight: 600; box-shadow: var(--shadow-lift); }
+  .rare-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
+  .rare-box { display: flex; flex-direction: column; min-height: 380px; overflow: hidden; }
+  .box-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--track);
+    border-bottom: 1px solid var(--line);
+    font-size: 13px; font-weight: 600;
+    flex-wrap: wrap;
+  }
+  .box-head .spacer { margin-left: auto; }
+  .detected-badge {
+    font-size: 11px; font-weight: 600;
+    border-radius: 999px;
+    padding: 2px 10px;
+    background: var(--blue-soft); color: var(--blue);
+  }
+  .detected-badge.unknown { background: var(--track); color: var(--muted-2); }
+  #rareSource {
+    flex: 1;
+    border: none; resize: none;
+    padding: 14px;
+    font-size: 13.5px; line-height: 1.7;
+    font-family: inherit;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+  }
+  .rare-output { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .rare-output .ph { color: var(--muted-2); font-size: 13px; padding-top: 4px; }
+  .lang-row { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 12px; animation: fadeInUp .28s var(--ease) both; }
+  .lang-row .lr-head { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700; color: var(--muted); }
+  .lang-row .lr-state { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 600; }
+  .lr-state .spin { width: 10px; height: 10px; border: 2px solid #c8d9f8; border-top-color: var(--blue3); border-radius: 50%; animation: rot .8s linear infinite; }
+  .lr-state .ok-ico { color: var(--green); font-weight: 700; }
+  .lang-row p { font-size: 13px; line-height: 1.7; margin-top: 4px; word-break: break-all; min-height: 18px; }
+  .lang-row p.mt { font-size: 12.5px; color: var(--orange); }
+  .lang-row.engine-fallback { border-color: rgba(245, 158, 11, .4); background: var(--orange-soft); }
+  .lang-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .lang-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12.5px; font-weight: 500;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 14px;
+    background: var(--panel);
+    color: var(--muted);
+    transition: all .2s var(--ease);
+  }
+  .lang-chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--chip-ico-bg); transition: background .2s; }
+  .lang-chip.on { border-color: var(--blue3); color: var(--blue); background: var(--blue-soft); font-weight: 600; }
+  .lang-chip.on::before { background: var(--blue3); }
+  .rare-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .rare-actions label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); cursor: pointer; }
+  .rare-actions label .hint { font-size: 11.5px; color: var(--muted-2); }
+  .rare-tip { font-size: 12px; color: var(--orange); background: var(--orange-soft); border: 1px solid rgba(245, 158, 11, .3); border-radius: var(--radius); padding: 8px 14px; }
+  .rare-tip.hidden { display: none; }
+  .rare-meta-note { font-size: 12px; color: var(--muted-2); line-height: 1.7; }
+
+  /* ===== 弹窗 / Toast / 角标 ===== */
+  .modal-mask {
+    position: fixed; inset: 0;
+    background: rgba(16, 24, 40, .44);
+    backdrop-filter: blur(2px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    padding: 20px;
+    animation: fadeIn .2s both;
+  }
+  @keyframes fadeIn { from { opacity: 0; } }
+  .modal {
+    width: min(440px, 100%);
+    background: var(--panel);
+    border-radius: var(--radius-l);
+    box-shadow: 0 24px 64px -12px rgba(16, 24, 40, .32);
+    padding: 22px;
+    animation: fadeInUp .28s var(--ease) both;
+  }
+  .modal h3 { font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .modal h3 .m-ico { color: var(--blue3); }
+  .modal .m-body { font-size: 13px; color: var(--muted); margin: 10px 0 4px; line-height: 1.8; }
+  .modal .m-body b { color: var(--text); }
+  .modal .m-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+  .toast {
+    position: fixed;
+    left: 50%; bottom: 28px;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(16, 24, 40, .92);
+    color: #fff;
+    font-size: 13px;
+    border-radius: 999px;
+    padding: 9px 22px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s, transform .25s var(--ease);
+    z-index: 120;
+    max-width: 86vw;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .demo-chip {
+    position: fixed;
+    right: 14px; bottom: 14px;
+    z-index: 60;
+    font-size: 11px;
+    color: var(--muted);
+    background: color-mix(in srgb, var(--panel) 88%, transparent);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 13px;
+    box-shadow: var(--shadow);
+    pointer-events: none;
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 1180px) {
+    .status-pills .hideable { display: none; }
+  }
+  @media (max-width: 980px) {
+    .status-pills { display: none; }
+    .rare-boxes { grid-template-columns: 1fr; }
+    .rare-box { min-height: 300px; }
+  }
+  @media (max-width: 760px) {
+    .shell { padding: 10px; gap: 10px; }
+    .sidebar { display: none; }
+    .token-grid { grid-template-columns: 1fr 1fr; }
+    .token-cell:nth-child(2) { border-right: none; }
+    .info-grid { grid-template-columns: 1fr; gap: 14px; }
+    .nav-btn { padding: 6px 11px; font-size: 12px; }
+    .nav-btn .ico { width: 13px; height: 13px; }
+    .brand-name { display: none; }
+    .setup-top-row > .mode-field { min-width: 100%; }
+  }
+  @media (max-width: 560px) {
+    .topbar { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+    .nav-slider { margin: 0; order: 3; width: 100%; justify-content: space-between; }
+    .stage-cards { grid-auto-flow: row; grid-template-columns: 1fr 1fr; grid-auto-columns: unset; }
+    .paste-actions, .rare-actions { flex-direction: column; align-items: stretch; }
+    .rare-actions .primary-btn { width: 100%; }
+    .pause-card { flex-wrap: wrap; }
+    .pause-card .count-btn { margin-left: 0; width: 100%; }
+    .process-head, .progress-block, .current-card, .log-panel, .results-block, .export-bar, .process-footer { margin-left: 8px; margin-right: 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-logo">AUTEL</span>
+    <b class="brand-name">翻译AGENT平台</b>
+  </div>
+  <nav class="nav-slider" id="topNav" aria-label="板块切换">
+    <span class="nav-indicator" id="navInd"></span>
+    <button type="button" class="nav-btn active" data-panel="zhEn">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7M7.5 3v2m2.5 2c-.8 3.6-3.4 6.8-7 8.5M5 8.5c1.4 2.9 3.9 5.3 7 6.5"/><path d="m13.5 21 4-9 4 9m-6.6-2.8h5.2"/></svg>
+      中英整改翻译</button>
+    <button type="button" class="nav-btn" data-panel="rare">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.9 5.7 3.9 9s-1.4 6.4-3.9 9c-2.5-2.6-3.9-5.7-3.9-9S9.5 5.6 12 3z"/></svg>
+      小语种翻译</button>
+    <button type="button" class="nav-btn" data-panel="review">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5"/><path d="m8.8 12.5 2 2 4.2-4.3M9 17h6"/></svg>
+      翻译审校</button>
+    <button type="button" class="nav-btn" data-panel="tools">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4.5 4.5 0 0 0-6 5.6L3 17.6V21h3.4l5.7-5.7a4.5 4.5 0 0 0 5.6-6L14.6 12l-2.5-2.5 2.6-3.2z"/></svg>
+      小工具</button>
+  </nav>
+  <div class="status-pills">
+    <span class="pill-group hideable">
+      <span class="pill-item">CPU <i class="v-ok">空闲</i></span>
+      <span class="pdiv"></span>
+      <span class="pill-item">GPU <i class="v-busy">繁忙</i></span>
+      <span class="pdiv"></span>
+      <span class="pill-item">当前AGENT限速 0.6s/个</span>
+    </span>
+    <button type="button" class="pill-group hideable" data-demo-toast="演示环境：全局任务监视器未开放">
+      <span class="dot"></span>当前无其他任务运行
+      <svg class="ico" style="width:12px;height:12px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <button type="button" class="pill-group" data-demo-toast="演示环境：Token 统计仅在内部工具中提供">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      Token统计
+    </button>
+    <button type="button" class="icon-round" id="themeBtn" aria-label="切换主题" title="切换亮 / 暗主题">
+      <svg class="ico" id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.6 6.6 0 0 0 21 12.8z"/></svg>
+      <svg class="ico hidden" id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <span class="pill-group hideable">
+      <span class="pill-item">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/></svg>
+        H21078（黄谦）
+      </span>
+      <span class="pdiv"></span>
+      <button type="button" class="pill-item" data-demo-toast="演示环境无需登录" style="color:var(--muted)">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        退出登录
+      </button>
+    </span>
+  </div>
+</header>
+
+<!-- ============ 面板一：中英整改翻译 ============ -->
+<main class="shell" id="panelZhEn">
+  <aside class="sidebar">
+    <button type="button" class="new-task-btn" id="newTaskBtn">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      新增任务</button>
+    <div class="side-group" id="groupRunning">
+      <div class="side-head tint" id="headRunning">
+        <span class="chev"><svg class="ico" style="width:13px;height:13px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+        <span class="sh-title">处理中</span>
+        <span class="count-badge" id="countRunning">0</span>
+      </div>
+      <div class="side-body" id="listRunning"></div>
+    </div>
+    <div class="side-group" id="groupDone">
+      <div class="side-head" id="headDone">
+        <span class="chev"><svg class="ico" style="width:13px;height:13px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.2 2.3 2.3 4.7-4.9"/></svg>
+        <span class="sh-title">已完成</span>
+        <span class="count-badge" id="countDone">0</span>
+      </div>
+      <div class="side-body" id="listDone"></div>
+    </div>
+    <div class="side-note">
+      每个任务窗口对应一份 Excel 文件。任务运行后，即使关闭页面也会继续处理。<br>
+      <span>演示环境：流程在本页内以 10 倍速模拟回放。</span>
+    </div>
+  </aside>
+
+  <section class="workspace" id="workspace">
+    <!-- 空状态 -->
+    <div class="view" id="viewEmpty">
+      <div class="empty-ring">
+        <svg class="ico" style="width:30px;height:30px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7M7.5 3v2m2.5 2c-.8 3.6-3.4 6.8-7 8.5M5 8.5c1.4 2.9 3.9 5.3 7 6.5"/><path d="m13.5 21 4-9 4 9m-6.6-2.8h5.2"/></svg>
+      </div>
+      <h2>新建或选择一个任务</h2>
+      <p>粘贴一段文本即可体验 AGENT 的整改翻译全流程：术语检索 → 整改 → 程序校验 → 审核循环 → 结果导出。</p>
+    </div>
+
+    <!-- 设置页 -->
+    <div class="view hidden" id="viewSetup">
+      <div class="setup-wrap">
+        <div class="setup-title">
+          <h1>新建翻译任务<span class="mode-badge rewrite_only" id="setupModeBadge">仅整改</span></h1>
+          <p>上传您的 Excel 文档开始AGENT翻译流程。（演示环境可直接粘贴文本）</p>
+        </div>
+        <div class="panel-card setup-card">
+          <div class="setup-top-row">
+            <label class="name-field">
+              <span class="field-label">任务名称（必填）</span>
+              <input class="text-input" id="taskName" placeholder="例如：EV-Q1升级翻译需求">
+            </label>
+            <div class="mode-field">
+              <span class="field-label">处理模式</span>
+              <div class="mode-slider" id="modeSlider">
+                <span class="mode-ind" id="modeInd"></span>
+                <button type="button" class="mode-btn active" data-mode="rewrite_only">仅整改</button>
+                <button type="button" class="mode-btn" data-mode="translate_only">仅翻译</button>
+                <button type="button" class="mode-btn" data-mode="full">整改+翻译</button>
+              </div>
+            </div>
+          </div>
+          <div class="mode-desc rewrite_only" id="modeDesc"></div>
+
+          <div class="stabs">
+            <button type="button" class="stab" id="uploadTab">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.4 8.3M12 12v9"/><path d="m8.5 15.5 3.5-3.5 3.5 3.5"/></svg>
+              上传文件</button>
+            <button type="button" class="stab active" id="textTab">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+              复制文本</button>
+          </div>
+
+          <div id="uploadPanel" class="hidden">
+            <div class="upload-box" id="uploadBox" role="button" tabindex="0" aria-label="上传文件（演示环境不可用）">
+              <span class="up-ico">
+                <svg class="ico" style="width:34px;height:34px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.4 8.3"/><path d="M12 12v9"/><path d="m8.5 15.5 3.5-3.5 3.5 3.5"/></svg>
+              </span>
+              <strong>拖拽文件到此处或点击上传</strong>
+              <span>支持 .xlsx / .xls 格式</span>
+              <span class="decrypt-tip">上传文件前，请先解密</span>
+            </div>
+          </div>
+
+          <div id="textPanel">
+            <div class="paste-grid">
+              <div class="pg-head">
+                <svg class="ico" style="width:13px;height:13px" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
+                待处理文本
+                <span class="pg-fill">
+                  <button type="button" class="mini-btn" id="fillSampleBtn">填入示例文本</button>
+                </span>
+              </div>
+              <div class="pg-body">
+                <div class="pg-gutter" id="pgGutter"><span>1</span></div>
+                <textarea id="pasteArea" spellcheck="false" placeholder="从 Excel 复制后在此粘贴。仅整改/仅翻译模式下单列可每行一条、无需表头；多列时第一行须为表头（如 cn_src、type 等）…"></textarea>
+              </div>
+            </div>
+            <div class="paste-actions">
+              <button type="button" class="primary-btn" id="confirmTextBtn">确认文本</button>
+              <button type="button" class="ghost-btn" id="reuploadBtn">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.3"/><path d="M3 4v5h5"/></svg>
+                重新上传</button>
+            </div>
+          </div>
+
+          <div class="file-strip hidden" id="fileStrip">
+            <span class="fs-icon">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+            </span>
+            <div>
+              <b>粘贴文本.txt</b>
+              <div class="fs-sub" id="fileSummary"></div>
+            </div>
+            <div class="fs-actions">
+              <button type="button" class="mini-btn" id="previewFileBtn">预览内容</button>
+              <button type="button" class="mini-btn" id="replaceFileBtn">重新上传</button>
+            </div>
+          </div>
+
+          <div class="token-card hidden" id="tokenCard">
+            <div class="token-head">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2m6.4.6-1.4 1.4M20 10h2M2 10h2m2.6-5.4L5.2 3.2M7 17a5 5 0 0 1 10 0M7 17h10M9 21h6"/></svg>
+              预估 Token 与费用<span class="chip mode rewrite_only" id="tokenModeChip">仅整改</span>
+            </div>
+            <div class="token-grid">
+              <div class="token-cell"><span class="tc-label">预估输入 Token</span><span class="tc-val" id="tokIn">-</span></div>
+              <div class="token-cell"><span class="tc-label">预估输出 Token</span><span class="tc-val" id="tokOut">-</span></div>
+              <div class="token-cell"><span class="tc-label">预估总 Token</span><span class="tc-val" id="tokTotal">-</span></div>
+              <div class="token-cell"><span class="tc-label">预估费用</span><span class="tc-val accent" id="tokCost">-</span></div>
+            </div>
+            <div class="token-disc" id="tokDisc"></div>
+          </div>
+
+          <div class="info-grid">
+            <div class="combo-field">
+              <span class="field-label">品牌（匹配术语,当前术语表仍有很多品牌缺失）</span>
+              <div class="combo">
+                <input class="text-input" id="brandInput" placeholder="输入或选择品牌" autocomplete="off">
+                <span class="combo-arrow"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+                <ul class="combo-dropdown hidden" id="brandDrop"></ul>
+              </div>
+              <i class="combo-hint" id="brandHint">未识别到品牌时，将按照无品牌处理</i>
+            </div>
+            <div class="combo-field">
+              <span class="field-label">业务范围（匹配规则和专有名词）</span>
+              <div class="combo">
+                <input class="text-input" id="scopeInput" placeholder="输入或选择业务范围" autocomplete="off">
+                <span class="combo-arrow"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+                <ul class="combo-dropdown hidden" id="scopeDrop"></ul>
+              </div>
+              <i class="combo-hint" id="scopeHint">请选择业务范围</i>
+            </div>
+          </div>
+
+          <label class="mark-toggle">
+            <input type="checkbox" class="round-checkbox" id="markSensitive">
+            标记敏感词<span class="hint">（默认关闭；开启后导出会标红并追加「敏感词标记」列）</span>
+          </label>
+
+          <button type="button" class="start-btn" id="runBtn" disabled><span class="bolt">
+            <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4.9 12.5H11L9.5 22l8.6-11H12z"/></svg></span>开始处理</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 进度页 -->
+    <div class="view hidden" id="viewProcess">
+      <div class="process-wrap">
+        <div class="panel-card">
+          <div class="process-head">
+            <div class="ph-icon">
+              <svg class="ico" style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+            </div>
+            <div style="min-width:0;flex:1">
+              <h1 id="pTitle">任务</h1>
+              <div class="chips">
+                <span class="chip status-running" id="pStatus">处理中</span>
+                <span class="chip mode rewrite_only" id="pMode">仅整改</span>
+                <span class="chip" id="pBrand">不限</span>
+                <span class="chip" id="pScope">不限</span>
+                <span class="p-meta" id="pMeta">启动于 --</span>
+              </div>
+            </div>
+          </div>
+          <div class="panel-card progress-block">
+            <div class="progress-title">
+              <strong>总体进度</strong>
+              <span class="progress-tip"><span class="tip-dot">💡</span><span id="pTip">即将开始…</span></span>
+              <span class="pct" id="pPct">0%</span>
+            </div>
+            <div class="progress-bar"><i id="pFill"></i></div>
+            <div class="stats-row">
+              <div>已处理<b id="pItems">0 / 0</b></div>
+              <div>预计剩余<b id="pRemain">约 --</b></div>
+            </div>
+            <div class="stage-cards" id="stageCards"></div>
+          </div>
+        </div>
+
+        <div class="pause-card hidden" id="pauseCard">
+          <div class="pc-ico">⏸</div>
+          <div>
+            <b>整改进度 100%，已暂停等待确认</b>
+            <p>整改文件已导出。真实环境中可在 60 秒内人工修改后导入，超时自动续跑；演示环境 5 秒后自动继续。</p>
+          </div>
+          <button type="button" class="count-btn" id="continueBtn">立即继续（5s）</button>
+        </div>
+
+        <div class="export-bar hidden" id="exportBar">
+          <div class="eb-ico"><span class="spin"></span></div>
+          <div><b id="ebTitle">正在导出 Excel</b><p id="ebSub">准备导出…</p></div>
+          <span class="eb-pct" id="ebPct">0%</span>
+        </div>
+
+        <div class="panel-card current-card hidden" id="currentCard">
+          <div class="cc-head">
+            <span class="cc-badge" id="ccBadge">AGENT 上下文</span>
+            <span id="ccStageTitle">构建任务上下文</span>
+            <span class="cc-idx" id="ccIdx">第 1 / 5 条</span>
+          </div>
+          <div class="cc-body">
+            <div class="cc-src-row">
+              <span class="lbl">源文本</span>
+              <p id="ccSrc" style="flex:1"></p>
+              <span class="lang-badge" id="ccLang">中文</span>
+            </div>
+            <div class="cc-terms" id="ccTerms"></div>
+            <div class="cc-out">
+              <div class="cc-field"><span class="lbl">缩写裁决</span><div class="cc-terms" id="ccRuling" style="flex:1"></div></div>
+              <div class="cc-field"><span class="lbl">说 明</span><p id="ccNote" style="flex:1"></p></div>
+              <div class="cc-field"><span class="lbl" id="ccOut1Lbl">整改文本</span><p id="ccOut1" style="flex:1"></p></div>
+              <div class="cc-field hidden" id="ccOut2Row"><span class="lbl">翻译文本</span><p id="ccOut2" style="flex:1"></p></div>
+            </div>
+            <div class="cc-review" id="ccReview"></div>
+          </div>
+        </div>
+
+        <div class="results-block panel-card hidden" id="resultsBlock">
+          <div class="res-head">
+            <strong id="resTitle">结果预览</strong>
+            <span class="p-meta" id="resCount"></span>
+            <div class="res-actions">
+              <button type="button" class="ghost-btn" id="copyResBtn">复制全部结果</button>
+              <button type="button" class="ghost-btn" id="exportResBtn">导出 Excel</button>
+            </div>
+          </div>
+          <div class="results-list" id="resultsList"></div>
+        </div>
+
+        <div class="panel-card log-panel">
+          <div class="log-head"><i></i>实时处理日志<span>自动刷新中</span></div>
+          <pre id="logText"></pre>
+        </div>
+
+        <div class="process-footer">
+          <button type="button" class="warn-btn" data-demo>申请不排队</button>
+          <button type="button" class="ghost-btn" data-demo>追加数据</button>
+          <button type="button" class="ghost-btn" data-demo>重试未处理数据</button>
+          <button type="button" class="ghost-btn" data-demo>清除不合理数据后重跑</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ 面板二：小语种翻译 ============ -->
+<main class="shell hidden" id="panelRare">
+  <aside class="sidebar">
+    <button type="button" class="new-task-btn hidden" aria-hidden="true" tabindex="-1" style="pointer-events:none">&nbsp;</button>
+    <div class="side-group">
+      <button type="button" class="task-card active" id="rareTextTab">
+        <b>文本翻译</b>
+        <div class="tc-sub">粘贴即译 · 逐语种精修</div>
+      </button>
+      <button type="button" class="task-card" id="rareDocTab">
+        <b>文档翻译</b>
+        <div class="tc-sub">整份 Excel · 多语种任务</div>
+      </button>
+    </div>
+    <div class="side-note">
+      小语种任务没有「整改」阶段。<br>
+      AGENT 为每个目标语种单独精修：注入不译项、专用名词与已译上下文。<br>
+      <span>真实工具支持 37 种目标语种。</span>
+    </div>
+  </aside>
+
+  <section class="workspace">
+    <!-- 文本翻译 -->
+    <div id="rareTextView">
+      <div class="rare-wrap">
+        <div class="rare-head-row">
+          <h1>文本翻译<span class="mode-badge full" id="rareEngineBadge">AGENT + 谷歌</span></h1>
+        </div>
+        <div class="engine-slider" id="engineSlider">
+          <button type="button" class="engine-btn active" data-engine="agent_google">AGENT + 谷歌</button>
+          <button type="button" class="engine-btn" data-engine="agent_deepl">AGENT + DeepL</button>
+          <button type="button" class="engine-btn" data-engine="only_agent">仅 AGENT</button>
+          <button type="button" class="engine-btn" data-engine="only_google">仅谷歌</button>
+          <button type="button" class="engine-btn" data-engine="only_deepl">仅 DeepL</button>
+        </div>
+
+        <div class="rare-boxes">
+          <div class="panel-card rare-box">
+            <div class="box-head">
+              <span>源语种：<span style="color:var(--blue)">自动识别</span></span>
+              <span class="detected-badge unknown hidden" id="detectedBadge">未识别到语种</span>
+              <span class="spacer"></span>
+              <button type="button" class="mini-btn" id="rareSampleBtn">填入示例文本</button>
+              <button type="button" class="mini-btn" id="rareClearBtn">清空</button>
+            </div>
+            <textarea id="rareSource" spellcheck="false" placeholder="请输入要翻译的文本...&#10;&#10;AGENT 会为每个目标语种单独精修：统一术语、保留不译项、避免翻译腔。"></textarea>
+          </div>
+          <div class="panel-card rare-box">
+            <div class="box-head">
+              <span>目标语种：<span id="langPickCount" style="color:var(--blue)">已选 0 种</span></span>
+              <span class="spacer"></span>
+              <button type="button" class="mini-btn" id="langAllBtn">全选</button>
+              <button type="button" class="mini-btn" id="langNoneBtn">清空</button>
+            </div>
+            <div style="padding:12px 14px;border-bottom:1px dashed var(--line)">
+              <div class="lang-chips" id="langChips"></div>
+            </div>
+            <div class="rare-output" id="rareOutput"><p class="ph">翻译结果将在此显示…</p></div>
+          </div>
+        </div>
+
+        <div class="rare-tip hidden" id="deepTip"></div>
+
+        <div class="rare-actions">
+          <label><input type="checkbox" class="round-checkbox" id="noTransChk" checked>启用不译项<span class="hint">（内置 644 条：品牌车型、ABS 等裸缩写、GND/P0101 等代码、kW/Nm 等单位…）</span></label>
+          <button type="button" class="primary-btn" id="rareRunBtn">⇆ 开始翻译</button>
+        </div>
+        <div class="rare-meta-note">
+          演示环境内置了 3 条示例文本在 8 种目标语种下的精修译文；其他输入将显示模拟输出。真实工具导出 Excel 含「AGENT翻译」与「谷歌/DeepL翻译」双 Sheet 对照。
+        </div>
+      </div>
+    </div>
+
+    <!-- 文档翻译（占位） -->
+    <div id="rareDocView" class="hidden">
+      <div class="ph-view">
+        <div class="empty-ring">📄</div>
+        <h2>文档翻译</h2>
+        <p>上传 Excel 后选择目标语种（可拖拽排序），即可像「中英整改翻译」一样创建多语种任务：进度条、各语种完成徽章、三种导出（完整 / 无标记 / 仅AGENT）。</p>
+        <p>演示环境暂未开放文档模式，请使用左侧「文本翻译」体验。</p>
+        <button type="button" class="primary-btn" id="backRareTextBtn" style="margin-top:8px">切换回文本翻译</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ 面板三：翻译审校（占位） ============ -->
+<main class="shell hidden" id="panelReview">
+  <section class="workspace">
+    <div class="ph-view">
+      <div class="empty-ring">🧪</div>
+      <h2>彬哥全力开发中，敬请期待！</h2>
+      <p>译后质量的另一道闸门：AGENT 审校员按硬错误清单逐条复核，问题码定位、带意见回译。</p>
+      <div class="ph-tags">
+        <span class="ph-tag">智能译后审校</span>
+        <span class="ph-tag">规则合规诊断</span>
+        <span class="ph-tag">质量效果评分</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ 面板四：小工具 ============ -->
+<main class="shell hidden" id="panelTools">
+  <section class="workspace">
+    <div class="ph-view" style="align-items:center">
+      <div style="max-width:860px;width:100%">
+        <div class="rare-head-row" style="margin-bottom:14px">
+          <h1 style="font-size:22px">小工具</h1>
+        </div>
+        <div class="hub-grid">
+          <div class="panel-card hub-card">
+            <span class="hub-ico">
+              <svg class="ico" style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.9 5.7 3.9 9s-1.4 6.4-3.9 9c-2.5-2.6-3.9-5.7-3.9-9S9.5 5.6 12 3z"/></svg>
+            </span>
+            <b>小语种参杂检测</b>
+            <p>识别表格中每行文本的实际语种：谷歌检测 + 本地启发式 + LLM 多路识别，主语言支持英语 / 中文，结果导出 Excel。</p>
+            <div class="hub-warn">语种检测功能部分情况下存在识别错误的情况，当前仅对英语和德语做过针对性优化。</div>
+            <button type="button" class="primary-btn" data-demo-toast="演示环境未开放该小工具工作台" style="align-self:flex-start">打开工作台</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 确认弹窗 -->
+<div class="modal-mask hidden" id="confirmMask" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="modal">
+    <h3><span class="m-ico">⚡</span><span id="confirmTitle">启动任务？</span></h3>
+    <div class="m-body" id="confirmBody"></div>
+    <div class="m-actions">
+      <button type="button" class="ghost-btn" id="confirmCancel">取消</button>
+      <button type="button" class="primary-btn" id="confirmOk">启动任务</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="demo-chip">在线演示 · 复刻自内部工具 · 流程为模拟回放 · 数据仅存于本页</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ================= 工具函数 ================= */
+  var $ = function (id) { return document.getElementById(id); };
+  var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, REDUCED ? Math.min(ms * 0.15, 120) : ms); }); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function nowStr() { var d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var toastTimer = null;
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2400);
+  }
+
+  /* ================= 数据：术语表（摘自内部真实术语库） ================= */
+  var TERM_DB = [
+    { a: 'VCU', en: 'Vehicle Control Unit', zh: '整车控制器', freq: 1284, common: false },
+    { a: 'CCU', en: 'Climate Control Unit', zh: '空调控制单元', freq: 862, common: false },
+    { a: 'MCU', en: 'Motor Control Unit', zh: '电机控制单元', freq: 957, common: false },
+    { a: 'MCM', en: 'Motor Control Module', zh: '电机控制模块', freq: 431, common: false },
+    { a: 'HCU', en: 'Hybrid Control Unit', zh: '混动控制器', freq: 388, common: false },
+    { a: 'DCU', en: 'Drive Control Unit', zh: '驱动控制单元', freq: 512, common: false },
+    { a: 'AFE', en: 'Analog Front End', zh: '电池信息采集器', freq: 265, common: false },
+    { a: 'EBD', en: 'Electronic Brakeforce Distribution', zh: '电子制动力分配系统', freq: 1104, common: false },
+    { a: 'EGR', en: 'Exhaust Gas Recirculation', zh: '废气再循环', freq: 2871, common: false },
+    { a: 'SCR', en: 'Selective Catalytic Reduction', zh: '选择性催化还原', freq: 1988, common: false },
+    { a: 'EPB', en: 'Electronic Parking Brake', zh: '电子驻车制动', freq: 3245, common: false },
+    { a: 'LKA', en: 'Lane Keeping Assist', zh: '车道保持辅助', freq: 1755, common: false },
+    { a: 'AAT', en: 'Ambient Air Temperature', zh: '环境空气温度', freq: 640, common: false },
+    { a: 'ASR', en: 'Anti-Slip Regulation', zh: '防滑调节', freq: 934, common: false },
+    { a: 'IPK', en: 'Instrument Panel Kit', zh: '组合仪表', freq: 1420, common: false },
+    { a: 'PEPS', en: 'Passive Entry Passive Start', zh: '无钥匙进入及启动', freq: 860, common: false },
+    { a: 'OBC', en: 'On-Board Charger', zh: '车载充电机', freq: 1210, common: false },
+    { a: 'ECU', en: 'Electronic Control Unit', zh: '电子控制单元', freq: 12530, common: true },
+    { a: 'BCM', en: 'Body Control Module', zh: '车身控制模块', freq: 8230, common: true },
+    { a: 'ABS', en: 'Anti-lock Braking System', zh: '防抱死制动系统', freq: 7645, common: true },
+    { a: 'DTC', en: 'Diagnostic Trouble Code', zh: '故障码', freq: 9417, common: true },
+    { a: 'VIN', en: 'Vehicle Identification Number', zh: '车辆识别码', freq: 5320, common: true },
+    { a: 'BMS', en: 'Battery Management System', zh: '电池管理系统', freq: 4520, common: true },
+    { a: 'CAN', en: 'Controller Area Network', zh: '控制器局域网', freq: 6890, common: true },
+    { a: 'GPS', en: 'Global Positioning System', zh: '全球定位系统', freq: 4210, common: true },
+    { a: 'LED', en: 'Light Emitting Diode', zh: '发光二极管', freq: 6110, common: true },
+    { a: 'OBD', en: 'On-Board Diagnostics', zh: '车载诊断', freq: 3890, common: true },
+    { a: 'TPMS', en: 'Tire Pressure Monitoring System', zh: '胎压监测系统', freq: 2450, common: true },
+    { a: 'ESP', en: 'Electronic Stability Program', zh: '电子稳定程序', freq: 3120, common: true },
+    { a: 'EPS', en: 'Electric Power Steering', zh: '电动助力转向', freq: 2780, common: true },
+    { a: 'SOC', en: 'State of Charge', zh: '电池荷电状态', freq: 3340, common: true }
+  ];
+  var TERM_MAP = {};
+  TERM_DB.forEach(function (t) { TERM_MAP[t.a] = t; });
+
+  /* ================= 数据：演示行（含精确结果与审核脚本） ================= */
+  var DEMO_LINES = [
+    {
+      src: '防盗匹配', lang: 'zh', sim: false,
+      terms: [], history: 2, rules: '短菜单风格',
+      rewrite: '防盗匹配', rewriteNote: '短菜单文本保持短语，未补充“系统”。',
+      trans: 'Anti-theft matching', transNote: '按短菜单风格保持短语，防增义。',
+      reviewFail: null
+    },
+    {
+      src: 'VCU防盗', lang: 'zh', sim: false,
+      terms: ['VCU'], history: 1, rules: '缩写展开',
+      rewrite: '整车控制器（VCU）防盗', rewriteNote: 'VCU 非常见，术语表命中整车控制器，按非常见缩写规则展开。',
+      trans: 'Vehicle Control Unit (VCU) anti-theft', transNote: '缩写镜像：英文展开为 Vehicle Control Unit (VCU)。',
+      reviewFail: { round: 1, note: '翻译文本未按镜像规则展开 VCU' }
+    },
+    {
+      src: '整车ECU防盗', lang: 'zh', sim: false,
+      terms: ['ECU'], history: 3, rules: '常见缩写保留',
+      rewrite: '整车ECU防盗', rewriteNote: 'ECU 为常见缩写，句中保留缩写，不展开。',
+      trans: 'Vehicle ECU anti-theft', transNote: '常见缩写保留 bare；与上条 VCU 展开形成对照。',
+      reviewFail: null
+    },
+    {
+      src: 'Press Next to proceed after input is complete.', lang: 'en', sim: false,
+      terms: [], history: 0, rules: '按钮名保留',
+      rewrite: 'Press Next to proceed after input is complete.', rewriteNote: 'Next 为界面按钮名，保留写法；原句 sentence-case 已合规。',
+      trans: '输入完成后，按 Next 继续。', transNote: '按钮名 Next 保留，不译。',
+      reviewFail: null
+    },
+    {
+      src: 'CCU check failed, rear mode motor actual Position out of range, please check DTC and fix it, then try again!', lang: 'en', sim: false,
+      terms: ['CCU', 'DTC'], history: 1, rules: '大小写与句式修正',
+      rewrite: 'Climate Control Unit (CCU) check failed due to rear mode motor actual position out of range. Check DTC and fix it, and then try again.', rewriteNote: '按规则展开 CCU、保留 DTC；Position 修正为小写，拆分句子并补句号。',
+      trans: '空调控制单元（CCU）检查失败，原因是后模式电机实际位置超出范围。检查故障码并进行修复，然后重试。', transNote: '缩写镜像：中文侧同样展开 CCU；历史库相似度 1.0 仅作印证。',
+      reviewFail: null
+    }
+  ];
+
+  /* ================= 数据：小语种 ================= */
+  var RARE_LANGS = [
+    { code: 'ja', label: '日语' }, { code: 'ko', label: '韩语' },
+    { code: 'de', label: '德语' }, { code: 'fr', label: '法语' },
+    { code: 'es', label: '西班牙语' }, { code: 'ru', label: '俄语' },
+    { code: 'pt', label: '葡萄牙语(巴西)' }, { code: 'th', label: '泰语' }
+  ];
+  var RARE_PRESETS = [
+    {
+      text: '防盗匹配', detected: '中文',
+      t: {
+        ja: '盗難防止マッチング', ko: '도난 방지 매칭', de: 'Diebstahlschutz-Matching',
+        fr: 'Appairage antivol', es: 'Emparejamiento antirrobo', ru: 'Сопряжение противоугонной системы',
+        pt: 'Emparelhamento antifurto', th: 'การจับคู่ระบบป้องกันการโจรกรรม'
+      }
+    },
+    {
+      text: '车辆处于运输模式，请断开电池负极后再操作。', detected: '中文',
+      t: {
+        ja: '車両は輸送モードにあります。バッテリーのマイナス端子を外してから操作してください。',
+        ko: '차량이 수송 모드에 있습니다. 배터리 음극 단자를 분리한 후 작업하십시오.',
+        de: 'Das Fahrzeug befindet sich im Transportmodus. Trennen Sie den Batterie-Minuspol, bevor Sie fortfahren.',
+        fr: 'Le véhicule est en mode transport. Débranchez la borne négative de la batterie avant toute intervention.',
+        es: 'El vehículo está en modo de transporte. Desconecte el terminal negativo de la batería antes de operar.',
+        ru: 'Автомобиль находится в транспортном режиме. Отсоедините отрицательную клемму аккумулятора перед началом работ.',
+        pt: 'O veículo está no modo de transporte. Desconecte o terminal negativo da bateria antes de operar.',
+        th: 'รถยนต์อยู่ในโหมดขนส่ง โปรดถอดขั้วแบตเตอรี่ฝั่งลบออกก่อนดำเนินการ'
+      }
+    },
+    {
+      text: '保险丝 F32 熔断，请更换后重新检测。', detected: '中文',
+      t: {
+        ja: 'ヒューズ F32 が切れています。交換してから再検査してください。',
+        ko: '퓨즈 F32가 끊어졌습니다. 교체한 후 다시 검사하십시오.',
+        de: 'Die Sicherung F32 ist durchgebrannt. Bitte ersetzen und erneut prüfen.',
+        fr: 'Le fusible F32 est grillé. Veuillez le remplacer puis effectuer un nouveau contrôle.',
+        es: 'El fusible F32 está fundido. Reemplácelo y vuelva a comprobar.',
+        ru: 'Предохранитель F32 перегорел. Замените его и повторите проверку.',
+        pt: 'O fusível F32 queimou. Substitua-o e verifique novamente.',
+        th: 'ฟิวส์ F32 ขาด โปรดเปลี่ยนแล้วตรวจสอบอีกครั้ง'
+      }
+    }
+  ];
+
+  /* ================= 数据：模拟词典（自由输入 fallback） ================= */
+  var DICT_ZH_EN = {
+    '防盗': 'anti-theft', '匹配': 'matching', '整车': 'vehicle', '控制器': 'control unit', '控制': 'control',
+    '通讯': 'communication', '超时': 'timeout', '检查': 'check', '故障码': 'DTC', '故障': 'fault', '失败': 'failed',
+    '成功': 'success', '重试': 'retry', '请': 'please', '电池': 'battery', '充电': 'charging', '车辆': 'vehicle',
+    '模式': 'mode', '系统': 'system', '模块': 'module', '传感器': 'sensor', '信号': 'signal', '数据': 'data',
+    '更新': 'update', '升级': 'upgrade', '软件': 'software', '版本': 'version', '连接': 'connect', '断开': 'disconnect',
+    '完成': 'complete', '输入': 'input', '输出': 'output', '制动': 'brake', '转向': 'steering', '空调': 'A/C',
+    '高压': 'high-voltage', '电机': 'motor', '发动机': 'engine', '变速箱': 'transmission', '轮胎': 'tire',
+    '压力': 'pressure', '温度': 'temperature', '电压': 'voltage', '电流': 'current', '保险丝': 'fuse',
+    '继电器': 'relay', '线束': 'wiring harness', '插头': 'connector', '端子': 'terminal', '更换': 'replace',
+    '检测': 'inspection', '诊断': 'diagnosis', '标定': 'calibration', '复位': 'reset', '清除': 'clear',
+    '读取': 'read', '写入': 'write', '启动': 'start', '点火': 'ignition', '车门': 'door', '车窗': 'window',
+    '灯光': 'lighting', '喇叭': 'horn', '雨刮': 'wiper', '后视镜': 'mirror', '座椅': 'seat',
+    '安全气囊': 'airbag', '安全带': 'seat belt', '显示屏': 'display', '仪表': 'instrument cluster',
+    '导航': 'navigation', '蓝牙': 'Bluetooth', '网络': 'network', '服务器': 'server', '操作': 'operation',
+    '执行': 'execute', '等待': 'wait', '确认': 'confirm', '取消': 'cancel', '删除': 'delete', '保存': 'save',
+    '导出': 'export', '导入': 'import', '上传': 'upload', '下载': 'download', '按': 'press', '继续': 'continue',
+    '指示灯': 'indicator light', '警示': 'warning', '异常': 'abnormal', '正常': 'normal', '开启': 'turn on',
+    '关闭': 'turn off', '后视': 'rear view', '前': 'front', '后': 'rear', '左': 'left', '右': 'right',
+    '和': 'and', '与': 'and', '及': 'and', '或': 'or', '的': '', '是否正常': 'is normal', '是否': 'whether',
+    '超出范围': 'out of range', '无钥匙进入及启动': 'passive entry passive start', '无钥匙进入': 'passive entry',
+    '无钥匙': 'keyless', '进入': 'entry', '钥匙': 'key',
+    '重新': 're-', '再': 'again', '然后': 'then'
+  };
+  var DICT_EN_ZH = {
+    'check': '检查', 'please': '请', 'press': '按', 'battery': '电池', 'voltage': '电压', 'fault': '故障',
+    'failed': '失败', 'failure': '故障', 'system': '系统', 'update': '更新', 'version': '版本', 'vehicle': '车辆',
+    'mode': '模式', 'button': '按钮', 'function': '功能', 'test': '测试', 'repair': '维修', 'replace': '更换',
+    'connect': '连接', 'disconnect': '断开', 'start': '启动', 'stop': '停止', 'engine': '发动机', 'brake': '制动',
+    'light': '灯', 'sensor': '传感器', 'module': '模块', 'control': '控制', 'unit': '单元', 'display': '显示',
+    'screen': '屏幕', 'select': '选择', 'enter': '输入', 'input': '输入', 'output': '输出', 'confirm': '确认',
+    'cancel': '取消', 'retry': '重试', 'timeout': '超时', 'error': '错误', 'warning': '警告', 'temperature': '温度',
+    'pressure': '压力', 'current': '电流', 'charging': '充电', 'fuse': '保险丝', 'relay': '继电器', 'door': '车门',
+    'window': '车窗', 'seat': '座椅', 'tire': '轮胎', 'reset': '复位', 'clear': '清除', 'read': '读取',
+    'data': '数据', 'signal': '信号', 'communication': '通讯', 'network': '网络', 'complete': '完成',
+    'the': '', 'a': '', 'an': '', 'is': '为', 'are': '为', 'to': '', 'and': '和', 'or': '或', 'then': '然后',
+    'after': '之后', 'before': '之前', 'again': '重新', 'out': '', 'of': '', 'range': '范围', 'actual': '实际',
+    'position': '位置', 'rear': '后', 'front': '前', 'left': '左', 'right': '右', 'motor': '电机',
+    'exceeded': '超出', 'try': '尝试', 'it': '其', 'fix': '修复', 'due': '由于'
+  };
+
+  /* ================= 语种检测 ================= */
+  function detectLang(text) {
+    if (/[\u3040-\u30ff]/.test(text)) return { code: 'ja', label: '日语' };
+    if (/[\uac00-\ud7af]/.test(text)) return { code: 'ko', label: '韩语' };
+    if (/[\u0400-\u04ff]/.test(text)) return { code: 'ru', label: '俄语' };
+    if (/[\u0e00-\u0e7f]/.test(text)) return { code: 'th', label: '泰语' };
+    if (/[\u0600-\u06ff]/.test(text)) return { code: 'ar', label: '阿拉伯语' };
+    if (/[\u4e00-\u9fff]/.test(text)) return { code: 'zh', label: '中文' };
+    if (/[a-z]/i.test(text)) return { code: 'en', label: '英文' };
+    return null;
+  }
+
+  /* ================= 术语扫描与缩写裁决 ================= */
+  function scanTerms(text) {
+    var seen = {}, hits = [], missing = [], m, re = /\b[A-Z]{2,6}\b/g;
+    while ((m = re.exec(text))) {
+      var a = m[0];
+      if (seen[a]) continue;
+      seen[a] = 1;
+      if (TERM_MAP[a]) hits.push(TERM_MAP[a]);
+      else if (!/^(THE|AND|FOR|NOT|ALL|OK|END|SET|RES|MAX|MIN|NEW|OLD|ID)$/.test(a)) missing.push(a);
+    }
+    return { hits: hits, missing: missing };
+  }
+  function buildRuling(text, lang) {
+    var sc = scanTerms(text);
+    var rulings = sc.hits.map(function (t) {
+      return t.common
+        ? { a: t.a, expand: false, why: t.a + ' 常见缩写，保留。' }
+        : { a: t.a, expand: true, why: t.a + ' 非常见，术语命中 ' + (lang === 'zh' ? t.zh : t.en) + '，展开。' };
+    });
+    sc.missing.forEach(function (a) {
+      rulings.push({ a: a, expand: false, why: a + ' 未命中术语表，保守保留。' });
+    });
+    return rulings;
+  }
+  function expandAbbr(text, lang, rulings) {
+    var out = text;
+    rulings.forEach(function (r) {
+      if (!r.expand) return;
+      var t = TERM_MAP[r.a];
+      if (!t) return;
+      if (lang === 'zh') out = out.split(r.a).join(t.zh + '（' + r.a + '）');
+      else out = out.split(r.a).join(t.en + ' (' + r.a + ')');
+    });
+    return out;
+  }
+  function dictTranslate(text, dir) {
+    var dict = dir === 'zh2en' ? DICT_ZH_EN : DICT_EN_ZH;
+    var keys = Object.keys(dict).filter(Boolean).sort(function (a, b) { return b.length - a.length; });
+    var segs = [];
+    var m;
+    if (dir === 'zh2en') {
+      var re = /([\u4e00-\u9fff]+)|([A-Za-z0-9%°.\-/]+)|(\s+)|(\S)/g;
+      while ((m = re.exec(text))) {
+        if (m[1]) {
+          var s = m[1], j = 0;
+          while (j < s.length) {
+            var hit = null;
+            for (var k = 0; k < keys.length; k++) { if (s.startsWith(keys[k], j)) { hit = keys[k]; break; } }
+            if (hit) {
+              var rep = dict[hit];
+              if (rep) segs.push({ t: rep, cjk: /[\u4e00-\u9fff]/.test(rep) });
+              j += hit.length;
+            } else j++;
+          }
+        } else if (m[2]) segs.push({ t: m[2], cjk: false });
+        else if (m[3]) segs.push({ t: ' ', cjk: false });
+        else segs.push({ t: m[4], cjk: /[\u4e00-\u9fff]/.test(m[4]) });
+      }
+    } else {
+      var re2 = /([A-Za-z0-9%°.\-/]+)|(\s+)|(\S)/g;
+      while ((m = re2.exec(text))) {
+        if (m[1]) {
+          var rep2 = dict[m[1].toLowerCase()];
+          if (rep2 !== undefined) { if (rep2) segs.push({ t: rep2, cjk: /[\u4e00-\u9fff]/.test(rep2) }); }
+          else segs.push({ t: m[1], cjk: false });
+        } else if (m[2]) segs.push({ t: ' ', cjk: false });
+        else segs.push({ t: m[3], cjk: /[\u4e00-\u9fff]/.test(m[3]) });
+      }
+    }
+    var out = '';
+    segs.forEach(function (sg) {
+      if (!sg.t) return;
+      if (sg.t === ' ') { if (out && !/\s$/.test(out)) out += ' '; return; }
+      if (out) {
+        var prev = out[out.length - 1];
+        var prevCjk = /[\u4e00-\u9fff，。！？；：、）】]/.test(prev);
+        var isPunct = /^[.,!?;:%)）\]}！？。，；：]/.test(sg.t);
+        var needSpace = false;
+        if (/[A-Za-z]-$/.test(out)) needSpace = false;
+        else if (prevCjk && sg.cjk) needSpace = false;
+        else if (prevCjk && !sg.cjk) needSpace = !isPunct;
+        else if (!prevCjk && sg.cjk) needSpace = /[A-Za-z0-9]$/.test(prev);
+        else needSpace = !isPunct && !/\s$/.test(out);
+        if (needSpace && !/\s$/.test(out)) out += ' ';
+      }
+      out += sg.t;
+    });
+    if (dir === 'zh2en') {
+      out = out.replace(/\s*（\s*/g, ' (').replace(/\s*）\s*/g, ') ')
+        .replace(/\s*([，；：！？。])\s*/g, function (_, p) {
+          return { '，': ', ', '；': '; ', '：': ': ', '！': '! ', '？': '? ', '。': '. ' }[p];
+        });
+    }
+    out = out.replace(/ {2,}/g, ' ').replace(/\(\s+/g, '(').trim();
+    return { text: out };
+  }
+
+  /* ================= 主题切换 ================= */
+  $('themeBtn').addEventListener('click', function () {
+    var html = document.documentElement;
+    var dark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', dark ? 'light' : 'dark');
+    $('iconMoon').classList.toggle('hidden', !dark);
+    $('iconSun').classList.toggle('hidden', dark);
+  });
+
+  /* ================= 顶栏 Tab ================= */
+  var navInd = $('navInd');
+  var navBtns = Array.prototype.slice.call(document.querySelectorAll('.nav-btn'));
+  function moveNavInd(btn) {
+    navInd.style.left = btn.offsetLeft + 'px';
+    navInd.style.width = btn.offsetWidth + 'px';
+  }
+  function switchPanel(name) {
+    navBtns.forEach(function (b) {
+      var on = b.dataset.panel === name;
+      b.classList.toggle('active', on);
+      if (on) moveNavInd(b);
+    });
+    $('panelZhEn').classList.toggle('hidden', name !== 'zhEn');
+    $('panelRare').classList.toggle('hidden', name !== 'rare');
+    $('panelReview').classList.toggle('hidden', name !== 'review');
+    $('panelTools').classList.toggle('hidden', name !== 'tools');
+  }
+  navBtns.forEach(function (b) {
+    b.addEventListener('click', function () { switchPanel(b.dataset.panel); });
+  });
+  window.addEventListener('resize', function () {
+    var active = navBtns.filter(function (b) { return b.classList.contains('active'); })[0];
+    if (active) moveNavInd(active);
+  });
+  requestAnimationFrame(function () { moveNavInd(navBtns[0]); });
+  document.querySelectorAll('[data-demo-toast]').forEach(function (b) {
+    b.addEventListener('click', function () { toast(b.dataset.demoToast); });
+  });
+
+  /* ================= 中英：模式 ================= */
+  var MODES = {
+    rewrite_only: {
+      badge: '仅整改', icon: '⇄', title: '仅整改 模式',
+      hint: '必要列：<code>cn_src</code> 或 <code>en_src</code>。<code>id</code>、<code>type</code> 及必要列不识别为辅助参考列；其余列上传后可勾选。'
+    },
+    translate_only: {
+      badge: '仅翻译', icon: '⇆', title: '仅翻译 模式',
+      hint: '必要列：<code>cn_src</code>/<code>en_src</code> 与 <code>cn_dst</code>/<code>en_dst</code>/<code>整改后文本</code>。输入为已整改文本，直接进入翻译 AGENT。'
+    },
+    full: {
+      badge: '整改+翻译', icon: '✦', title: '整改 + 翻译 模式',
+      hint: '必要列：<code>cn_src</code> 或 <code>en_src</code>。先由整改 AGENT 逐条整改并导出，确认后再由翻译 AGENT 逐条翻译。'
+    }
+  };
+  var currentMode = 'rewrite_only';
+  var parsedItems = null;
+
+  var modeSlider = $('modeSlider'), modeInd = $('modeInd');
+  function setMode(mode) {
+    currentMode = mode;
+    Array.prototype.forEach.call(modeSlider.querySelectorAll('.mode-btn'), function (b) {
+      b.classList.toggle('active', b.dataset.mode === mode);
+    });
+    var btn = modeSlider.querySelector('.mode-btn.active');
+    modeInd.style.left = btn.offsetLeft + 'px';
+    modeInd.style.width = btn.offsetWidth + 'px';
+    var badge = $('setupModeBadge');
+    badge.textContent = MODES[mode].badge;
+    badge.className = 'mode-badge ' + mode;
+    var desc = $('modeDesc');
+    desc.className = 'mode-desc ' + mode;
+    desc.innerHTML = '<div class="md-head"><span>' + MODES[mode].icon + '</span><span>' + MODES[mode].title + '</span></div><p class="md-body">' + MODES[mode].hint + '</p>';
+    var tc = $('tokenModeChip');
+    tc.textContent = MODES[mode].badge;
+    tc.className = 'chip mode ' + mode;
+    updateTokenCard();
+    updateDraftCard();
+  }
+  modeSlider.addEventListener('click', function (e) {
+    var btn = e.target.closest('.mode-btn');
+    if (btn) setMode(btn.dataset.mode);
+  });
+
+  /* ================= 中英：文本解析 ================= */
+  function parseLines(raw) {
+    var lines = raw.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
+    if (lines.length && /^(cn_src|en_src)\s*$/i.test(lines[0])) lines = lines.slice(1);
+    return lines.map(function (s) {
+      var d = detectLang(s);
+      return { src: s, lang: d ? d.code : 'zh', langLabel: d ? d.label : '未知' };
+    });
+  }
+  function estTokens(items, mode) {
+    var chars = items.reduce(function (n, it) { return n + it.src.length; }, 0);
+    var inTok = Math.round(chars * 1.9 + items.length * 640);
+    var outMul = mode === 'full' ? 2.4 : 1.25;
+    var outTok = Math.round(items.length * 420 * outMul + chars * 0.9);
+    return { inTok: inTok, outTok: outTok, total: inTok + outTok, cost: (inTok + outTok) * 0.000022 };
+  }
+  function updateTokenCard() {
+    if (!parsedItems || !parsedItems.length) { $('tokenCard').classList.add('hidden'); return; }
+    var est = estTokens(parsedItems, currentMode);
+    $('tokIn').textContent = est.inTok.toLocaleString();
+    $('tokOut').textContent = est.outTok.toLocaleString();
+    $('tokTotal').textContent = est.total.toLocaleString();
+    $('tokCost').textContent = '¥ ' + est.cost.toFixed(2);
+    $('tokDisc').textContent = '按 ' + parsedItems.length + ' 条 × 上下文/审核开销估算，演示口径仅供参考；实际以任务统计为准。';
+    $('tokenCard').classList.remove('hidden');
+  }
+  function updateGutter() {
+    var val = $('pasteArea').value;
+    var n = Math.max(1, (val.match(/\n/g) || []).length + 1);
+    var box = $('pgGutter');
+    var html = '';
+    for (var i = 1; i <= n; i++) html += '<span>' + i + '</span>';
+    box.innerHTML = html;
+  }
+
+  /* 上传 / 复制文本 Tab 切换 */
+  function switchInputTab(tab) {
+    $('uploadTab').classList.toggle('active', tab === 'upload');
+    $('textTab').classList.toggle('active', tab === 'text');
+    $('uploadPanel').classList.toggle('hidden', tab !== 'upload');
+    $('textPanel').classList.toggle('hidden', tab !== 'text');
+  }
+  $('uploadTab').addEventListener('click', function () { switchInputTab('upload'); });
+  $('textTab').addEventListener('click', function () { switchInputTab('text'); });
+  $('uploadBox').addEventListener('click', function () { toast('演示环境不支持文件上传，请使用「复制文本」'); });
+
+  $('fillSampleBtn').addEventListener('click', function () {
+    $('pasteArea').value = DEMO_LINES.map(function (d) { return d.src; }).join('\n');
+    updateGutter();
+    toast('已填入 5 条示例文本：防增义 / 缩写展开 / 常见缩写保留 / 按钮名 / 大小写修正');
+    confirmText(true);
+  });
+  function resetTextInput() {
+    parsedItems = null;
+    $('fileStrip').classList.add('hidden');
+    $('textPanel').classList.remove('hidden');
+    $('tokenCard').classList.add('hidden');
+    $('runBtn').disabled = true;
+    updateTokenCard();
+  }
+  $('reuploadBtn').addEventListener('click', function () {
+    $('pasteArea').value = '';
+    updateGutter();
+    resetTextInput();
+  });
+  $('replaceFileBtn').addEventListener('click', function () {
+    $('pasteArea').value = '';
+    updateGutter();
+    resetTextInput();
+    switchInputTab('text');
+    toast('已清空，请重新粘贴');
+  });
+  $('previewFileBtn').addEventListener('click', function () {
+    $('textPanel').classList.toggle('hidden');
+  });
+  function confirmText(silent) {
+    var items = parseLines($('pasteArea').value);
+    if (!items.length) { if (!silent) toast('请先粘贴或填入文本'); return false; }
+    parsedItems = items;
+    var zh = items.filter(function (i) { return i.lang === 'zh'; }).length;
+    var en = items.filter(function (i) { return i.lang === 'en'; }).length;
+    var langPart = zh && en ? '中文 / 英文混合' : zh ? '中文' : '英文';
+    $('fileSummary').textContent = '已录入粘贴文本（共 ' + items.length + ' 条，' +
+      items.reduce(function (n, i) { return n + i.src.length; }, 0) + ' 字，已识别语种：' + langPart + '，源列自动映射 cn_src / en_src）';
+    $('textPanel').classList.add('hidden');
+    $('fileStrip').classList.remove('hidden');
+    $('runBtn').disabled = false;
+    updateTokenCard();
+    if (!silent) toast('已解析 ' + items.length + ' 条文本');
+    return true;
+  }
+  $('confirmTextBtn').addEventListener('click', function () { confirmText(false); });
+  $('pasteArea').addEventListener('input', function () {
+    updateGutter();
+    if (parsedItems) resetTextInput();
+  });
+
+  /* ================= 品牌 / 业务范围组合框 ================= */
+  var COMBO_DATA = {
+    brand: ['不限', 'Hyundai', 'Kia', 'Toyota', 'Honda', 'BYD', 'GreatWall', 'Changan', 'GAC Motor', 'SAIC MG', 'Chery', 'Geely', 'Mercedes-Benz', 'BMW', 'Volkswagen', 'Porsche', 'Peugeot', 'Fiat'],
+    scope: ['不限', '诊断仪交互', '保养维修', '电路图', '用户手册', '套路测试', '故障码']
+  };
+  function setupCombo(inputId, dropId, hintId, kind) {
+    var input = $(inputId), drop = $(dropId), hint = $(hintId);
+    function render() {
+      var q = input.value.trim();
+      var items = COMBO_DATA[kind].filter(function (x) { return !q || x.indexOf(q) > -1; });
+      var html = '';
+      items.forEach(function (x) {
+        html += '<li' + (x === q ? ' class="hl"' : '') + '>' + esc(x) + '</li>';
+      });
+      drop.innerHTML = html || '<li class="hl">无匹配项，将按「不限」处理</li>';
+    }
+    function show() { render(); drop.classList.remove('hidden'); }
+    function hide() { drop.classList.add('hidden'); }
+    function updateHint() {
+      var v = input.value.trim();
+      if (!v) {
+        hint.textContent = kind === 'brand' ? '未识别到品牌时，将按照无品牌处理' : '请选择业务范围';
+        hint.className = 'combo-hint';
+      } else {
+        hint.textContent = kind === 'brand' ? '已选择：' + v + '（术语匹配将按品牌过滤）' : '已选择：' + v + '（规则和专有名词将按范围过滤）';
+        hint.className = 'combo-hint on';
+      }
+    }
+    input.addEventListener('focus', show);
+    input.addEventListener('input', function () { show(); updateHint(); });
+    input.addEventListener('blur', function () { setTimeout(hide, 160); });
+    drop.addEventListener('mousedown', function (e) {
+      var li = e.target.closest('li');
+      if (!li) return;
+      input.value = li.textContent.indexOf('无匹配项') === 0 ? '' : li.textContent;
+      hide();
+      updateHint();
+    });
+    updateHint();
+  }
+  setupCombo('brandInput', 'brandDrop', 'brandHint', 'brand');
+  setupCombo('scopeInput', 'scopeDrop', 'scopeHint', 'scope');
+
+  /* ================= 中英：侧栏（处理中 / 已完成） ================= */
+  var tasks = [];
+  var activeTaskId = null;
+  var running = false;
+  var taskSeq = 1;
+  var draftExists = false;
+  var PRESET_TASK = {
+    id: 'preset', title: '示例：短菜单与故障句翻译', mode: 'full', status: 'done', preset: true,
+    brand: 'Hyundai', scope: '诊断仪交互', createdAt: '昨日 17:42', pct: 100,
+    items: null
+  };
+
+  function taskCardHtml(t) {
+    var st = t.status === 'done' ? '已完成' : (t.status === 'running' ? '处理中' : '未开始');
+    var pct = t.status === 'done' ? 100 : (t.pct || 0);
+    var pctCls = t.status === 'done' ? 'tc-pct done' : 'tc-pct';
+    var xBtn = '<button type="button" class="tc-x" data-x="' + t.id + '" aria-label="删除任务">×</button>';
+    var bar = t.status === 'running' ? '<div class="tc-bar"><i style="width:' + pct + '%"></i></div>' : '';
+    return '<div class="tc-row"><b>' + esc(t.title) + '</b><span class="' + pctCls + '">' + pct + '%</span>' + xBtn + '</div>' +
+      '<div class="tc-sub">' + st + ' · ' + (MODES[t.mode] ? MODES[t.mode].badge : '') + '</div>' + bar;
+  }
+  function renderSidebar() {
+    var runBox = $('listRunning'), doneBox = $('listDone');
+    runBox.innerHTML = '';
+    doneBox.innerHTML = '';
+    var runningList = [];
+    if (draftExists) runningList.push({ id: 'draft', title: '新建任务', mode: currentMode, status: 'draft', pct: 0 });
+    tasks.forEach(function (t) { if (t.status !== 'done') runningList.push(t); });
+    var doneList = tasks.filter(function (t) { return t.status === 'done'; }).reverse();
+    if (!runningList.length) runBox.innerHTML = '<div class="side-empty">暂无任务</div>';
+    runningList.forEach(function (t) {
+      var el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'task-card' + (t.id === activeTaskId ? ' active' : '');
+      el.dataset.task = t.id;
+      el.innerHTML = taskCardHtml(t);
+      runBox.appendChild(el);
+    });
+    if (!doneList.length && !PRESET_TASK) doneBox.innerHTML = '<div class="side-empty">暂无任务</div>';
+    [PRESET_TASK].concat(doneList).forEach(function (t) {
+      var el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'task-card' + (t.id === activeTaskId ? ' active' : '');
+      el.dataset.task = t.id;
+      el.innerHTML = taskCardHtml(t);
+      doneBox.appendChild(el);
+    });
+    $('countRunning').textContent = runningList.length;
+    $('countDone').textContent = doneList.length + (PRESET_TASK ? 1 : 0);
+  }
+  $('workspace').addEventListener('click', function () {});
+  document.addEventListener('click', function (e) {
+    var x = e.target.closest('.tc-x');
+    if (x) {
+      e.stopPropagation();
+      var id = x.dataset.x;
+      if (id === 'draft') {
+        draftExists = false;
+        if (activeTaskId === 'draft') { activeTaskId = null; showView('viewEmpty'); }
+        renderSidebar();
+        toast('已取消新建任务');
+        return;
+      }
+      var t = taskById(id);
+      if (t && t.status === 'running') { toast('任务运行中，暂不能删除'); return; }
+      tasks = tasks.filter(function (x2) { return x2.id !== id; });
+      if (activeTaskId === id) { activeTaskId = null; showView('viewEmpty'); }
+      renderSidebar();
+      toast('任务已删除');
+      return;
+    }
+    var card = e.target.closest('.task-card[data-task]');
+    if (card) {
+      var tid = card.dataset.task;
+      if (tid === 'draft') { openDraft(); return; }
+      var t2 = tid === 'preset' ? PRESET_TASK : taskById(tid);
+      if (t2) openTask(t2);
+    }
+  });
+  function updateDraftCard() {
+    if (draftExists) renderSidebar();
+  }
+  function showView(name) {
+    ['viewEmpty', 'viewSetup', 'viewProcess'].forEach(function (v) {
+      $(v).classList.toggle('hidden', v !== name);
+    });
+    var view = $(name);
+    view.style.animation = 'none';
+    void view.offsetHeight;
+    view.style.animation = '';
+    if (name === 'viewSetup') {
+      requestAnimationFrame(function () {
+        var btn = modeSlider.querySelector('.mode-btn.active');
+        if (btn) {
+          modeInd.style.left = btn.offsetLeft + 'px';
+          modeInd.style.width = btn.offsetWidth + 'px';
+        }
+      });
+    }
+  }
+  $('newTaskBtn').addEventListener('click', openDraft);
+  function openDraft() {
+    if (running) { toast('当前有任务正在处理，请稍候'); return; }
+    draftExists = true;
+    activeTaskId = 'draft';
+    renderSidebar();
+    showView('viewSetup');
+  }
+  function openTask(t) {
+    if (running && t.id !== activeTaskId) { toast('当前有任务正在处理，请稍候'); return; }
+    activeTaskId = t.id;
+    renderSidebar();
+    if (t.status === 'done') {
+      bindProcessHeader(t);
+      renderStages(t, true);
+      $('pStatus').textContent = '已完成';
+      $('pStatus').className = 'chip status-done';
+      $('pFill').style.width = '100%';
+      $('pPct').textContent = '100%';
+      $('pTip').textContent = '任务完成';
+      $('pItems').textContent = t.items.length + ' / ' + t.items.length;
+      $('pRemain').textContent = '约 0 分钟';
+      $('pauseCard').classList.add('hidden');
+      $('exportBar').classList.add('hidden');
+      $('currentCard').classList.add('hidden');
+      $('logText').innerHTML = '';
+      appendLog('任务已完成，可查看下方结果预览。', 'lg-ok');
+      renderResults(t, true);
+      showView('viewProcess');
+    } else if (t.status === 'running') {
+      showView('viewProcess');
+    } else {
+      showView('viewSetup');
+    }
+  }
+  function taskById(id) {
+    for (var i = 0; i < tasks.length; i++) if (tasks[i].id === id) return tasks[i];
+    return null;
+  }
+
+  /* 侧栏分组折叠 */
+  $('headRunning').addEventListener('click', function () { $('groupRunning').classList.toggle('collapsed'); });
+  $('headDone').addEventListener('click', function () { $('groupDone').classList.toggle('collapsed'); });
+
+  /* ================= 中英：流程运行时 ================= */
+  var STEPS = {
+    full: ['源文件预处理', '整改AGENT处理', '整改文件导出', '整改后文件预处理', '翻译AGENT处理', '结果文件导出'],
+    rewrite_only: ['源文件预处理', '整改AGENT处理', '整改文件导出'],
+    translate_only: ['整改后文件预处理', '翻译AGENT处理', '结果文件导出']
+  };
+  var STAGE_RANGE = {
+    full: [[2, 30], [30, 60], [60, 63], [63, 66], [66, 96], [96, 100]],
+    rewrite_only: [[2, 30], [30, 92], [92, 100]],
+    translate_only: [[2, 30], [30, 92], [92, 100]]
+  };
+
+  function appendLog(msg, cls) {
+    var pre = $('logText');
+    var span = document.createElement('span');
+    span.className = cls || '';
+    span.innerHTML = '<span class="lg-time">[' + nowStr() + ']</span> ' + esc(msg) + '\n';
+    pre.appendChild(span);
+    pre.scrollTop = pre.scrollHeight;
+  }
+  function bindProcessHeader(t) {
+    $('pTitle').textContent = t.title;
+    $('pMode').textContent = MODES[t.mode].badge;
+    $('pMode').className = 'chip mode ' + t.mode;
+    $('pBrand').textContent = t.brand;
+    $('pScope').textContent = t.scope;
+    $('pMeta').textContent = '启动于 ' + t.createdAt + '（演示 10 倍速）';
+  }
+  function renderStages(t, allDone) {
+    var steps = STEPS[t.mode], ranges = STAGE_RANGE[t.mode];
+    var box = $('stageCards');
+    box.innerHTML = '';
+    steps.forEach(function (label, i) {
+      var el = document.createElement('div');
+      el.className = 'stage-card' + (allDone ? ' done' : '');
+      el.id = 'stage-' + i;
+      el.innerHTML = '<div class="sc-top"><span class="sc-ico">' + (allDone ? '✓' : (i + 1)) + '</span>' +
+        '<span class="sc-label">' + label + '</span></div><div class="sc-sub">' + (allDone ? '已完成' : '等待中') + '</div>';
+      el.dataset.range = ranges[i][0] + ',' + ranges[i][1];
+      box.appendChild(el);
+    });
+  }
+  function setStage(idx, state, sub) {
+    var el = $('stage-' + idx);
+    if (!el) return;
+    el.classList.remove('active', 'done');
+    if (state) el.classList.add(state);
+    var ico = el.querySelector('.sc-ico');
+    if (state === 'done') ico.innerHTML = '✓';
+    else if (state === 'active') ico.innerHTML = '<span class="spin"></span>';
+    else ico.innerHTML = String(idx + 1);
+    el.querySelector('.sc-sub').textContent = sub || (state === 'done' ? '已完成' : state === 'active' ? '处理中…' : '等待中');
+  }
+  var currentRunTask = null;
+  function setProgress(pct, tip) {
+    pct = Math.max(0, Math.min(100, Math.round(pct)));
+    $('pFill').style.width = pct + '%';
+    $('pPct').textContent = pct + '%';
+    if (tip) $('pTip').textContent = tip;
+    if (currentRunTask) {
+      currentRunTask.pct = pct;
+      var el = document.querySelector('.task-card[data-task="' + currentRunTask.id + '"] .tc-pct');
+      if (el) el.textContent = pct + '%';
+      var bar = document.querySelector('.task-card[data-task="' + currentRunTask.id + '"] .tc-bar i');
+      if (bar) bar.style.width = pct + '%';
+    }
+  }
+  function setItems(done, total) {
+    $('pItems').textContent = done + ' / ' + total;
+    var remainMin = Math.max(0, Math.ceil((total - done) * 0.7));
+    $('pRemain').textContent = remainMin > 0 ? '约 ' + remainMin + ' 分钟' : '即将完成';
+  }
+
+  function termChipsHtml(item, rulings) {
+    var html = '';
+    var hitAbbrs = (item.terms || []);
+    hitAbbrs.forEach(function (a) {
+      var t = TERM_MAP[a];
+      if (!t) return;
+      html += '<span class="term-chip hit"><b>' + a + '</b> · ' + esc(t.en) + ' · ' + esc(t.zh) +
+        ' · 频次 ' + t.freq.toLocaleString() + ' · ' + (t.common ? '常见' : '非常见') + '</span>';
+    });
+    (rulings || []).forEach(function (r) {
+      if (r.why.indexOf('未命中术语表') > -1) html += '<span class="term-chip"><b>' + esc(r.a) + '</b> · 未命中 · 缺失缩写</span>';
+    });
+    if (!html) html = '<span class="term-chip plain">缩写候选：无</span>';
+    html += '<span class="term-chip plain">历史参考 ' + (item.history || 0) + ' 条</span>';
+    html += '<span class="term-chip plain">规则命中：' + esc(item.rules || '通用规范') + '</span>';
+    return html;
+  }
+  function rulingChipsHtml(rulings) {
+    if (!rulings || !rulings.length) return '<span class="term-chip plain">无缩写，无需裁决</span>';
+    return rulings.map(function (r) {
+      var t = TERM_MAP[r.a];
+      var full = t ? (r.expand ? t.en + ' / ' + t.zh : '') : '';
+      return '<span class="term-chip' + (r.expand ? ' hit' : '') + '"><b>' + esc(r.a) + '</b> → ' +
+        (r.expand ? '展开' + (full ? '（' + esc(full) + '）' : '') : '保留 bare') + '</span>';
+    }).join('');
+  }
+  function typewrite(el, text, speed) {
+    return new Promise(function (resolve) {
+      if (REDUCED || !speed) { el.textContent = text; resolve(); return; }
+      el.textContent = '';
+      var txt = document.createTextNode('');
+      var caret = document.createElement('span');
+      caret.className = 'caret';
+      el.appendChild(txt);
+      el.appendChild(caret);
+      var i = 0;
+      var step = Math.max(1, Math.round(text.length / 42));
+      var timer = setInterval(function () {
+        i = Math.min(text.length, i + step);
+        txt.data = text.slice(0, i);
+        if (i >= text.length) { clearInterval(timer); caret.remove(); resolve(); }
+      }, speed);
+    });
+  }
+  function reviewChips(round, fail, done) {
+    if (!fail && !done) return '<span class="review-chip wait">审核 ' + round + ' / 3 轮 · 进行中…</span>';
+    if (!fail && done) return '<span class="review-chip pass">审核 ' + round + ' / 3 轮 · 通过 ✓</span>';
+    if (!done) return '<span class="review-chip fail">第 ' + fail.round + ' 轮未通过 · ' + esc(fail.note) + '</span><span class="review-note">带意见重新翻译…</span>';
+    return '<span class="review-chip fail">第 ' + fail.round + ' 轮未通过</span><span class="review-chip pass">第 ' + (fail.round + 1) + ' 轮通过 ✓</span>';
+  }
+
+  /* 组装任务 item 的模拟结果（预设走精确数据，自由输入走词典模拟） */
+  function buildItem(line) {
+    var preset = null;
+    for (var i = 0; i < DEMO_LINES.length; i++) {
+      if (DEMO_LINES[i].src === line.src) { preset = DEMO_LINES[i]; break; }
+    }
+    var it = {
+      src: line.src, lang: line.lang,
+      langLabel: line.langLabel || (line.lang === 'en' ? '英文' : '中文'),
+      sim: !preset, reviewFail: null, terms: [], history: 0, rules: '通用规范',
+      rewrite: '', rewriteNote: '', trans: '', transNote: ''
+    };
+    if (preset) {
+      it.terms = preset.terms; it.history = preset.history; it.rules = preset.rules;
+      it.rewrite = preset.rewrite; it.rewriteNote = preset.rewriteNote;
+      it.trans = preset.trans; it.transNote = preset.transNote;
+      it.reviewFail = preset.reviewFail;
+      it._rulings = buildRuling(preset.src, preset.lang);
+      return it;
+    }
+    // —— 自由输入：词典模拟 ——
+    var rulings = buildRuling(line.src, line.lang);
+    it.terms = rulings.filter(function (r) { return r.expand; }).map(function (r) { return r.a; })
+      .concat(rulings.filter(function (r) { return TERM_MAP[r.a] && !r.expand; }).map(function (r) { return r.a; }));
+    it.history = 0;
+    it.rules = line.lang === 'zh' ? '中文整改 → 英文翻译' : '英文整改 → 中文翻译';
+    var rewritten = expandAbbr(line.src, line.lang, rulings);
+    it.rewrite = rewritten;
+    it.rewriteNote = rulings.length
+      ? rulings.map(function (r) { return r.why; }).join(' ')
+      : '未命中需整改项，保持原文；按 sentence-case 与格式规范复核。';
+    var dir = line.lang === 'zh' ? 'zh2en' : 'en2zh';
+    var dTrans = dictTranslate(rewritten, dir);
+    it.trans = dTrans.text || rewritten;
+    it.transNote = '模拟输出：演示环境使用内置词典逐词映射，真实工具由 LLM 生成整句译文并镜像缩写。';
+    it.reviewFail = null;
+    return it;
+  }
+
+  function showCurrentCard(item, idx, total, stage) {
+    $('currentCard').classList.remove('hidden');
+    $('ccBadge').textContent = stage === 'translate' ? '翻译 AGENT' : '整改 AGENT';
+    $('ccBadge').className = 'cc-badge' + (stage === 'translate' ? ' translate' : '');
+    $('ccStageTitle').textContent = stage === 'context' ? '构建任务上下文（术语 / 历史 / 规则检索）'
+      : stage === 'rewrite' ? '整改输出（先说明后结果）'
+      : '翻译输出（镜像缩写与风格）';
+    $('ccIdx').textContent = '第 ' + idx + ' / ' + total + ' 条';
+    $('ccSrc').textContent = item.src;
+    $('ccLang').textContent = item.langLabel;
+    $('ccTerms').innerHTML = termChipsHtml(item, item._rulings);
+    $('ccRuling').innerHTML = rulingChipsHtml(item._rulings);
+    $('ccNote').textContent = '';
+    $('ccOut1').textContent = '';
+    $('ccOut1Lbl').textContent = stage === 'translate' ? '翻译文本' : '整改文本';
+    $('ccOut2Row').classList.toggle('hidden', stage !== 'translate');
+    $('ccOut2').textContent = '';
+    $('ccReview').innerHTML = '';
+  }
+
+  async function runTask(t) {
+    running = true;
+    t.status = 'running';
+    activeTaskId = t.id;
+    currentRunTask = t;
+    renderSidebar();
+    bindProcessHeader(t);
+    $('pStatus').textContent = '处理中';
+    $('pStatus').className = 'chip status-running';
+    $('logText').innerHTML = '';
+    $('resultsBlock').classList.add('hidden');
+    $('resultsList').innerHTML = '';
+    $('pauseCard').classList.add('hidden');
+    $('exportBar').classList.add('hidden');
+    $('currentCard').classList.add('hidden');
+    renderStages(t, false);
+    setItems(0, t.items.length);
+    setProgress(1, '即将开始…');
+    showView('viewProcess');
+
+    var items = t.items;
+    var N = items.length;
+    var isFull = t.mode === 'full';
+    var rewriteDone = t.mode !== 'translate_only';
+
+    appendLog('排队完成，准备处理', 'lg-ok');
+    await sleep(500);
+
+    setStage(0, 'active');
+    appendLog('生成任务上下文中…');
+    setProgress(6, '构建 AGENT 上下文中…');
+    await sleep(900);
+    appendLog('构建AGENT上下文... 30%', 'lg-agent');
+    appendLog('检索术语表（' + TERM_DB.length + '+ 词条） · 历史库 · 业务规则：' + t.scope, 'lg-agent');
+    setProgress(30, '构建 AGENT 上下文中…');
+    await sleep(800);
+    setStage(0, 'done');
+    setItems(0, N);
+
+    if (rewriteDone) {
+      setStage(1, 'active');
+      appendLog('连接整改翻译模型', 'lg-agent');
+      await sleep(500);
+      appendLog('开始处理 ' + N + ' 条整改任务…', 'lg-agent');
+      var r0 = parseFloat($('stage-1').dataset.range.split(',')[0]);
+      var r1 = parseFloat($('stage-1').dataset.range.split(',')[1]);
+      for (var i = 0; i < N; i++) {
+        var it = items[i];
+        it._rulings = buildRuling(it.src, it.lang);
+        showCurrentCard(it, i + 1, N, 'rewrite');
+        appendLog('第 ' + (i + 1) + '/' + N + ' 条 · ' + it.langLabel + '源：' + it.src);
+        await sleep(420);
+        await typewrite($('ccNote'), it.rewriteNote, 16);
+        await typewrite($('ccOut1'), it.rewrite, 14);
+        var fail = it.reviewFail;
+        $('ccReview').innerHTML = reviewChips(1, null, false);
+        appendLog('审核第 1/3 轮 …', 'lg-agent');
+        await sleep(700);
+        if (fail) {
+          $('ccReview').innerHTML = reviewChips(fail.round, fail, false);
+          appendLog('审核未通过，带意见重新翻译（' + fail.note + '）', 'lg-err');
+          await sleep(600);
+          $('ccReview').innerHTML = reviewChips(fail.round, fail, true);
+          appendLog('审核第 2/3 轮 …', 'lg-agent');
+          await sleep(600);
+          appendLog('审核通过（第 2 轮）', 'lg-ok');
+        } else {
+          $('ccReview').innerHTML = reviewChips(1, null, true);
+          appendLog('审核通过（第 1 轮）', 'lg-ok');
+        }
+        var pct = r0 + (r1 - r0) * ((i + 1) / N);
+        setProgress(pct, '整改 AGENT 处理中…');
+        setItems(i + 1, N);
+        appendLog('第 ' + (i + 1) + '/' + N + ' 条整改完成', 'lg-ok');
+        await sleep(280);
+      }
+      $('currentCard').classList.add('hidden');
+      setStage(1, 'done');
+    } else {
+      appendLog('输入为已整改文本，跳过整改阶段', 'lg-warn');
+    }
+
+    if (isFull) {
+      setStage(2, 'active', '导出中…');
+      showExportBar('正在导出整改文件', 'rewrite_output.xlsx（演示）');
+      await sleep(900);
+      hideExportBar();
+      setStage(2, 'done');
+      appendLog('整改进度 100%，已暂停等待确认（演示加速为 5 秒）', 'lg-warn');
+      await pauseCountdown();
+      setStage(3, 'active');
+      appendLog('已确认继续，导入整改文件', 'lg-ok');
+      setProgress(64, '整改后文件预处理中…');
+      await sleep(700);
+      appendLog('构建AGENT上下文... 30%', 'lg-agent');
+      setProgress(66, '构建 AGENT 上下文中…');
+      await sleep(600);
+      setStage(3, 'done');
+    } else if (t.mode === 'rewrite_only') {
+      setStage(2, 'active', '导出中…');
+      showExportBar('正在导出整改文件', 'rewrite_output.xlsx（演示）');
+      await sleep(900);
+      hideExportBar();
+      setStage(2, 'done');
+    }
+
+    var transStepIdx = isFull ? 4 : 1;
+    var exportStepIdx = isFull ? 5 : 2;
+    if (t.mode !== 'rewrite_only') {
+      setStage(transStepIdx, 'active');
+      appendLog('连接翻译模型', 'lg-agent');
+      await sleep(500);
+      appendLog('开始处理 ' + N + ' 条翻译任务…', 'lg-agent');
+      var r0t = parseFloat($('stage-' + transStepIdx).dataset.range.split(',')[0]);
+      var r1t = parseFloat($('stage-' + transStepIdx).dataset.range.split(',')[1]);
+      for (var j = 0; j < N; j++) {
+        var it2 = items[j];
+        showCurrentCard(it2, j + 1, N, 'translate');
+        $('ccNote').textContent = it2.transNote;
+        await sleep(320);
+        await typewrite($('ccOut2'), it2.trans, 13);
+        $('ccReview').innerHTML = reviewChips(1, null, true);
+        appendLog('第 ' + (j + 1) + '/' + N + ' 条翻译完成（审核 1 轮通过）', 'lg-ok');
+        var pct2 = r0t + (r1t - r0t) * ((j + 1) / N);
+        setProgress(pct2, '翻译 AGENT 处理中…');
+        setItems(t.mode === 'full' ? N + j + 1 : j + 1, t.mode === 'full' ? N * 2 : N);
+        await sleep(240);
+      }
+      $('currentCard').classList.add('hidden');
+      setStage(transStepIdx, 'done');
+      setStage(exportStepIdx, 'active', '导出中…');
+      showExportBar('正在导出结果文件', 'translate_result.xlsx（演示）');
+      await sleep(900);
+      hideExportBar();
+      setStage(exportStepIdx, 'done');
+    }
+
+    setProgress(100, '任务完成');
+    setItems(isFull ? N * 2 : N, isFull ? N * 2 : N);
+    $('pRemain').textContent = '约 0 分钟';
+    $('pStatus').textContent = '已完成';
+    $('pStatus').className = 'chip status-done';
+    appendLog('校验结果', 'lg-ok');
+    appendLog('导出Excel（演示环境不提供真实文件下载）', 'lg-ok');
+    appendLog('完成', 'lg-ok');
+    t.status = 'done';
+    renderSidebar();
+    renderResults(t, false);
+    running = false;
+    currentRunTask = null;
+    toast('任务完成，共处理 ' + N + ' 条文本');
+  }
+
+  function showExportBar(title, sub) {
+    var bar = $('exportBar');
+    bar.classList.remove('hidden');
+    $('ebTitle').textContent = title;
+    $('ebSub').textContent = sub;
+    var p = 0;
+    clearInterval(showExportBar._t);
+    showExportBar._t = setInterval(function () {
+      p = Math.min(100, p + 14);
+      $('ebPct').textContent = p + '%';
+      if (p >= 100) clearInterval(showExportBar._t);
+    }, 110);
+  }
+  function hideExportBar() {
+    clearInterval(showExportBar._t);
+    $('exportBar').classList.add('hidden');
+    $('ebPct').textContent = '0%';
+  }
+  function pauseCountdown() {
+    return new Promise(function (resolve) {
+      var card = $('pauseCard');
+      var btn = $('continueBtn');
+      card.classList.remove('hidden');
+      var left = REDUCED ? 1 : 5;
+      btn.textContent = '立即继续（' + left + 's）';
+      var timer = setInterval(function () {
+        left--;
+        if (left <= 0) { finish(); return; }
+        btn.textContent = '立即继续（' + left + 's）';
+      }, 1000);
+      function finish() {
+        clearInterval(timer);
+        btn.removeEventListener('click', onBtn);
+        card.classList.add('hidden');
+        resolve();
+      }
+      function onBtn() { finish(); }
+      btn.addEventListener('click', onBtn);
+    });
+  }
+
+  /* ================= 结果渲染 ================= */
+  function renderResults(t, instant) {
+    var box = $('resultsList');
+    box.innerHTML = '';
+    var showRewrite = t.mode !== 'translate_only';
+    var showTrans = t.mode !== 'rewrite_only';
+    $('resTitle').textContent = '结果预览（' + (t.mode === 'full' ? '整改 + 翻译' : MODES[t.mode].badge) + '）';
+    $('resCount').textContent = '共 ' + t.items.length + ' 条 · 源列 ' + (t.items.some(function (i) { return i.lang === 'en'; }) ? 'cn_src / en_src' : 'cn_src');
+    t.items.forEach(function (it, idx) {
+      var card = document.createElement('div');
+      card.className = 'result-card';
+      card.style.animationDelay = instant ? '0ms' : (idx * 60) + 'ms';
+      var badges = '<span class="rc-badge ok">审核 ' + (it.reviewFail ? '2 轮' : '1 轮') + '通过</span>';
+      if (it._rulings && it._rulings.length) {
+        badges += '<span class="rc-badge info">缩写裁决 ' + it._rulings.length + ' 项</span>';
+      }
+      if (it.sim) badges += '<span class="rc-badge sim">模拟输出</span>';
+      var rows = '<div class="rc-row"><span class="lbl">源文本</span><p>' + esc(it.src) + '</p></div>';
+      if (showRewrite) rows += '<div class="rc-row"><span class="lbl">整改</span><p class="out rewrite">' + esc(it.rewrite) + '</p></div>';
+      if (showTrans) rows += '<div class="rc-row"><span class="lbl">翻译</span><p class="out">' + esc(it.trans) + '</p></div>';
+      var note = showTrans ? (it.rewriteNote + (it.transNote ? ' / ' + it.transNote : '')) : it.rewriteNote;
+      card.innerHTML = '<div class="rc-top"><span class="rc-idx">#' + (idx + 1) + '</span>' +
+        '<span class="lang-badge">' + esc(it.langLabel) + '</span>' + badges + '</div>' +
+        '<div class="rc-flow">' + rows + '</div>' +
+        '<div class="rc-note">' + esc(note) + '</div>';
+      box.appendChild(card);
+    });
+    $('resultsBlock').classList.remove('hidden');
+  }
+  $('copyResBtn').addEventListener('click', function () {
+    var t = activeTaskId === 'preset' ? PRESET_TASK : taskById(activeTaskId);
+    if (!t) return;
+    var showTrans = t.mode !== 'rewrite_only';
+    var lines = ['源文本\t整改文本\t翻译文本\t说明'];
+    t.items.forEach(function (it) {
+      lines.push([it.src, it.rewrite, showTrans ? it.trans : '', it.rewriteNote].join('\t'));
+    });
+    copyText(lines.join('\n'), '结果已复制到剪贴板（TSV，可直接粘贴回 Excel）');
+  });
+  $('exportResBtn').addEventListener('click', function () {
+    toast('演示环境不提供文件导出，请使用「复制全部结果」');
+  });
+  function copyText(text, okMsg) {
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); toast(okMsg); } catch (e) { toast('复制失败，请手动选择文本'); }
+      ta.remove();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { toast(okMsg); }, fallback);
+    } else fallback();
+  }
+
+  /* ================= 开始处理入口 ================= */
+  var confirmCtx = null;
+  $('runBtn').addEventListener('click', function () {
+    if (running) { toast('当前有任务正在处理，请稍候'); return; }
+    if (!parsedItems || !parsedItems.length) { toast('请先「确认文本」'); return; }
+    var title = $('taskName').value.trim() || ('未命名任务 ' + taskSeq);
+    var items = parsedItems.map(buildItem);
+    confirmCtx = {
+      title: title, items: items, mode: currentMode,
+      brand: $('brandInput').value.trim() || '不限',
+      scope: $('scopeInput').value.trim() || '不限',
+      markSensitive: $('markSensitive').checked
+    };
+    $('confirmTitle').textContent = '启动任务「' + title + '」？';
+    $('confirmBody').innerHTML = '共 <b>' + items.length + '</b> 条文本 · 模式 <b>' + MODES[currentMode].badge + '</b> · 品牌 <b>' +
+      esc(confirmCtx.brand) + '</b> · 范围 <b>' + esc(confirmCtx.scope) + '</b>' +
+      (confirmCtx.markSensitive ? ' · <b>标记敏感词</b>' : '') + '<br>' +
+      '真实工具中处理大文件可能需要数十分钟并进入队列；演示环境将<b>在本页内以 10 倍速模拟回放</b>全部阶段。';
+    $('confirmMask').classList.remove('hidden');
+  });
+  $('confirmCancel').addEventListener('click', function () { $('confirmMask').classList.add('hidden'); });
+  $('confirmMask').addEventListener('click', function (e) { if (e.target === this) this.classList.add('hidden'); });
+  $('confirmOk').addEventListener('click', function () {
+    $('confirmMask').classList.add('hidden');
+    var t = {
+      id: 't' + (taskSeq++),
+      title: confirmCtx.title,
+      mode: confirmCtx.mode,
+      brand: confirmCtx.brand,
+      scope: confirmCtx.scope,
+      items: confirmCtx.items,
+      status: 'running',
+      pct: 0,
+      createdAt: nowStr()
+    };
+    tasks.push(t);
+    draftExists = false;
+    runTask(t);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') $('confirmMask').classList.add('hidden');
+  });
+  document.querySelectorAll('[data-demo]').forEach(function (b) {
+    b.addEventListener('click', function () { toast('演示环境不支持该操作'); });
+  });
+
+  /* ================= 小语种：子 Tab ================= */
+  $('rareTextTab').addEventListener('click', function () {
+    $('rareTextTab').classList.add('active');
+    $('rareDocTab').classList.remove('active');
+    $('rareTextView').classList.remove('hidden');
+    $('rareDocView').classList.add('hidden');
+  });
+  $('rareDocTab').addEventListener('click', function () {
+    $('rareDocTab').classList.add('active');
+    $('rareTextTab').classList.remove('active');
+    $('rareDocView').classList.remove('hidden');
+    $('rareTextView').classList.add('hidden');
+  });
+  $('backRareTextBtn').addEventListener('click', function () { $('rareTextTab').click(); });
+
+  /* ================= 小语种：引擎与语种 ================= */
+  var engine = 'agent_google';
+  var ENGINE_LABEL = {
+    agent_google: 'AGENT + 谷歌', agent_deepl: 'AGENT + DeepL',
+    only_agent: '仅 AGENT', only_google: '仅谷歌', only_deepl: '仅 DeepL'
+  };
+  var selectedLangs = { ja: true, ko: true, de: true, fr: false, es: false, ru: false, pt: false, th: false };
+
+  var langChipsBox = $('langChips');
+  RARE_LANGS.forEach(function (l) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'lang-chip' + (selectedLangs[l.code] ? ' on' : '');
+    b.textContent = l.label;
+    b.dataset.code = l.code;
+    b.addEventListener('click', function () {
+      selectedLangs[l.code] = !selectedLangs[l.code];
+      b.classList.toggle('on', selectedLangs[l.code]);
+      updateLangCount();
+      updateDeepTip();
+    });
+    langChipsBox.appendChild(b);
+  });
+  function updateLangCount() {
+    var n = RARE_LANGS.filter(function (l) { return selectedLangs[l.code]; }).length;
+    $('langPickCount').textContent = '已选 ' + n + ' 种';
+  }
+  $('langAllBtn').addEventListener('click', function () {
+    RARE_LANGS.forEach(function (l) { selectedLangs[l.code] = true; });
+    syncLangChips();
+  });
+  $('langNoneBtn').addEventListener('click', function () {
+    RARE_LANGS.forEach(function (l) { selectedLangs[l.code] = false; });
+    syncLangChips();
+  });
+  function syncLangChips() {
+    langChipsBox.querySelectorAll('.lang-chip').forEach(function (b) {
+      b.classList.toggle('on', !!selectedLangs[b.dataset.code]);
+    });
+    updateLangCount();
+    updateDeepTip();
+  }
+  var engineSlider = $('engineSlider');
+  engineSlider.addEventListener('click', function (e) {
+    var btn = e.target.closest('.engine-btn');
+    if (!btn) return;
+    engine = btn.dataset.engine;
+    engineSlider.querySelectorAll('.engine-btn').forEach(function (b) {
+      b.classList.toggle('active', b === btn);
+    });
+    var badge = $('rareEngineBadge');
+    badge.textContent = ENGINE_LABEL[engine];
+    badge.className = 'mode-badge ' + (engine === 'only_google' || engine === 'only_deepl' ? 'translate_only' : 'full');
+    updateDeepTip();
+  });
+  function updateDeepTip() {
+    var tip = $('deepTip');
+    var thOn = selectedLangs.th;
+    var deepl = engine === 'agent_deepl' || engine === 'only_deepl';
+    if (thOn && deepl) {
+      tip.textContent = '⚠ DeepL 不支持泰语等 7 种语言（fa / fil / km / hr / ms / sr / th），该语种将自动回退为谷歌引擎。';
+      tip.classList.remove('hidden');
+    } else if (engine === 'only_google' || engine === 'only_deepl') {
+      tip.textContent = '当前为纯机器引擎：输出未经 AGENT 精修，不注入不译项与已译上下文，术语一致性会下降。';
+      tip.classList.remove('hidden');
+    } else {
+      tip.classList.add('hidden');
+    }
+  }
+  $('rareSampleBtn').addEventListener('click', function () {
+    $('rareSource').value = RARE_PRESETS.map(function (p) { return p.text; }).join('\n');
+    detectSourceLang();
+    toast('已填入 3 条示例文本');
+  });
+  $('rareClearBtn').addEventListener('click', function () {
+    $('rareSource').value = '';
+    detectSourceLang();
+  });
+  function detectSourceLang() {
+    var text = $('rareSource').value.trim();
+    var badge = $('detectedBadge');
+    if (!text) { badge.classList.add('hidden'); return; }
+    var d = detectLang(text);
+    badge.classList.remove('hidden');
+    if (d) {
+      badge.textContent = '检测语种：' + d.label;
+      badge.className = 'detected-badge';
+    } else {
+      badge.textContent = '未识别到语种';
+      badge.className = 'detected-badge unknown';
+    }
+  }
+  $('rareSource').addEventListener('input', detectSourceLang);
+
+  var rareRunning = false;
+  $('rareRunBtn').addEventListener('click', async function () {
+    if (rareRunning) { toast('正在翻译中，请稍候'); return; }
+    var text = $('rareSource').value.trim();
+    if (!text) { toast('请输入要翻译的文本'); return; }
+    var langs = RARE_LANGS.filter(function (l) { return selectedLangs[l.code]; });
+    if (!langs.length) { toast('请至少选择一个目标语种'); return; }
+    rareRunning = true;
+    var out = $('rareOutput');
+    out.innerHTML = '';
+    var lines = text.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
+    var presetsByLine = lines.map(function (ln) {
+      for (var i = 0; i < RARE_PRESETS.length; i++) {
+        if (RARE_PRESETS[i].text === ln) return RARE_PRESETS[i];
+      }
+      return null;
+    });
+    var hasSim = presetsByLine.some(function (p) { return !p; });
+    var useNoTrans = $('noTransChk').checked;
+    var mtOnly = engine === 'only_google' || engine === 'only_deepl';
+
+    appendRareNote(out, '引擎：' + ENGINE_LABEL[engine] + (mtOnly ? '（机器直译，未经 AGENT 精修）' : ' · AGENT 注入不译项' + (useNoTrans ? '（已启用）' : '（关闭）') + ' / 专用名词 / 已译上下文') + (hasSim ? ' · 部分输入未内置真实译文，将显示模拟输出' : ''));
+
+    for (var k = 0; k < langs.length; k++) {
+      var l = langs[k];
+      var row = document.createElement('div');
+      row.className = 'lang-row';
+      row.innerHTML = '<div class="lr-head"><span>' + l.label + '</span>' +
+        '<span class="lr-state"><span class="spin"></span>翻译中…</span></div><p></p>';
+      out.appendChild(row);
+      row.scrollIntoView({ block: 'nearest', behavior: REDUCED ? 'auto' : 'smooth' });
+      await sleep(500 + Math.random() * 350);
+      var fallbackEng = (l.code === 'th') && (engine === 'agent_deepl' || engine === 'only_deepl');
+      var vals = lines.map(function (ln, li) {
+        var p = presetsByLine[li];
+        return p ? p.t[l.code] : '〔模拟译文〕' + ln;
+      });
+      var isSim = hasSim;
+      var val = vals.join('\n');
+      var p2 = row.querySelector('p');
+      if (mtOnly) p2.className = 'mt';
+      p2.style.whiteSpace = 'pre-line';
+      await typewrite(p2, val, 10);
+      var state = row.querySelector('.lr-state');
+      state.innerHTML = '<span class="ok-ico">✓</span>' +
+        (fallbackEng ? 'DeepL 回退谷歌' : (mtOnly ? ENGINE_LABEL[engine] : 'AGENT 精修完成')) +
+        (isSim ? ' · 模拟' : '');
+      if (fallbackEng) row.classList.add('engine-fallback');
+      await sleep(160);
+    }
+    rareRunning = false;
+    toast('翻译完成：' + langs.length + ' 个语种');
+  });
+  function appendRareNote(box, text) {
+    var n = document.createElement('div');
+    n.className = 'rare-meta-note';
+    n.style.cssText = 'background:var(--track);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;';
+    n.textContent = text;
+    box.appendChild(n);
+  }
+
+  /* ================= 初始化 ================= */
+  PRESET_TASK.items = DEMO_LINES.map(buildItem);
+  setMode('rewrite_only');
+  updateLangCount();
+  updateDeepTip();
+  updateGutter();
+  renderSidebar();
+  showView('viewEmpty');
+})();
+</script>
+</body>
+</html>

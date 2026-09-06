@@ -5,23 +5,23 @@ import { Button } from '../ui/Button';
 import { useLightbox } from '../modal/LightboxProvider';
 import { Reveal } from '../motion/Reveal';
 
-function ActionButtons({ actions }: { actions: ProjectAction[] }) {
+function DemoButtons({ actions }: { actions: ProjectAction[] }) {
   const { open } = useLightbox();
   return (
-    <div className="mt-4 flex flex-wrap gap-3">
-      {actions.map((action, i) => {
-        if (action.kind === 'iframe') {
-          return (
-            <Button key={i} variant="primary" onClick={() => open(action)} ariaLabel={action.ariaLabel}>
-              <Icon name="play" className="h-4 w-4" stroke={false} />
-              {action.label}
-            </Button>
-          );
-        }
-        /* 视频/文档以媒体角上的圆形按钮呈现，此处不渲染 */
-        return null;
-      })}
-    </div>
+    <>
+      {actions.map((action, i) => (
+        <Button
+          key={i}
+          variant="primary"
+          className="shrink-0"
+          onClick={() => open(action)}
+          ariaLabel={action.ariaLabel}
+        >
+          <Icon name="play" className="h-4 w-4" stroke={false} />
+          {action.label}
+        </Button>
+      ))}
+    </>
   );
 }
 
@@ -36,6 +36,7 @@ export function ProjectCard({ project }: { project: Project }) {
   const mediaActions = (project.actions ?? [])
     .filter((a) => a.kind === 'doc' || a.kind === 'video')
     .sort((a, b) => (a.kind === 'doc' ? -1 : 1) - (b.kind === 'doc' ? -1 : 1));
+  const demoActions = (project.actions ?? []).filter((a) => a.kind === 'iframe');
 
   return (
     <Reveal
@@ -168,10 +169,13 @@ export function ProjectCard({ project }: { project: Project }) {
               ))}
             </ul>
           )}
-          <p className="mt-auto rounded-xl bg-accent/[0.08] px-3.5 py-2.5 text-[13px] leading-[1.65] text-accent-deep max-lg:mt-2">
-            {project.result}
-          </p>
-          {project.actions && <ActionButtons actions={project.actions} />}
+          {/* 成果徽章与「在线体验」按钮同一行，按钮固定在行尾 */}
+          <div className="mt-auto flex flex-wrap items-center gap-3 max-lg:mt-2">
+            <p className="min-w-[220px] flex-1 rounded-xl bg-accent/[0.08] px-3.5 py-2.5 text-[13px] leading-[1.65] text-accent-deep">
+              {project.result}
+            </p>
+            {demoActions.length > 0 && <DemoButtons actions={demoActions} />}
+          </div>
         </div>
       </article>
     </Reveal>

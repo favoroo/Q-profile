@@ -76,6 +76,12 @@ export const projects: Project[] = [
     image: withBase('/images/project-4.webp'),
     imageAlt: '翻译 Agent 工具配图',
     actions: [
+      {
+        kind: 'iframe',
+        label: '在线体验',
+        ariaLabel: '在线体验翻译 Agent 工具',
+        frameSrc: withBase('/evkit/tools/trans-agent-tool.html'),
+      },
       { kind: 'video', ariaLabel: '查看翻译 Agent 演示视频', videoKey: 'trans' },
       { kind: 'doc', ariaLabel: '查看翻译 Agent 开发手册', docKey: 'trans-doc' },
     ],

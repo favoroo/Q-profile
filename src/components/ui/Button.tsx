@@ -7,6 +7,7 @@ interface ButtonProps {
   href?: string;
   onClick?: () => void;
   ariaLabel?: string;
+  className?: string;
   children: ReactNode;
 }
 
@@ -28,9 +29,10 @@ export function Button({
   href,
   onClick,
   ariaLabel,
+  className,
   children,
 }: ButtonProps) {
-  const cls = `${baseClass} ${variantClass[variant]}`;
+  const cls = `${baseClass} ${variantClass[variant]}${className ? ` ${className}` : ''}`;
   if (href) {
     return (
       <a className={cls} href={href} aria-label={ariaLabel}>
