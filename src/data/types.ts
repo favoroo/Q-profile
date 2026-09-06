@@ -105,7 +105,7 @@ export type VideoKey = 'trans' | 'docs';
 export type DocKey = 'trans-doc' | 'docs-doc';
 
 export type ProjectAction =
-  | { kind: 'iframe'; label: string; ariaLabel: string; frameSrc: string }
+  | { kind: 'iframe'; label: string; ariaLabel: string; frameSrc: string; frameTabs?: FrameTab[] }
   | { kind: 'video'; ariaLabel: string; videoKey: VideoKey }
   | { kind: 'doc'; ariaLabel: string; docKey: DocKey };
 
@@ -114,6 +114,18 @@ export type ProjectSize = 'featured' | 'standard' | 'compact';
 export interface ProjectTag {
   label: string;
   highlight?: boolean;
+}
+
+/** 项目配图画廊的单张截图（点击后在 Lightbox 画廊模式中浏览） */
+export interface GalleryImage {
+  src: string;
+  alt: string;
+  /** 缩略图叠加与弹窗底部展示的名称 */
+  caption: string;
+  /** 主图实际宽度（用于 srcset 描述符） */
+  width: number;
+  /** 配套可交互静态演示页（存在时点击缩略图直接打开该 Demo） */
+  demoSrc?: string;
 }
 
 export interface Project {
@@ -127,6 +139,8 @@ export interface Project {
   result: string;
   image: string;
   imageAlt: string;
+  /** 配套工具截图画廊（展示在卡片媒体区，点击进入画廊弹窗） */
+  gallery?: GalleryImage[];
   actions?: ProjectAction[];
   tags?: ProjectTag[];
 }
@@ -134,6 +148,12 @@ export interface Project {
 export interface VideoTab {
   src: string;
   label: string;
+}
+
+/** iframe 弹窗内的顶部板块切换标签（如 EV Kit 在线体验的多个板块） */
+export interface FrameTab {
+  label: string;
+  src: string;
 }
 
 export interface DocResource {

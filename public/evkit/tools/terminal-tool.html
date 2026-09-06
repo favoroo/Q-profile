@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高压连接器端子标注平台 · 在线演示</title>
+<style>
+  /* ===== 原工具样式移植（qqbox/templates/index-HVC.html）· 演示版精简：去备注列、主题切换、排除框与上传导出按钮 ===== */
+  :root {
+    --primary-color: #007bff;
+    --primary-hover: #0069d9;
+    --success-color: #28a745;
+    --success-hover: #218838;
+    --danger-color: #dc3545;
+    --light-gray: #f4f6f8;
+    --border-color: #dee2e6;
+    --text-color: #333;
+    --point-fill: #51e4ff;
+    --point-border: #007aff;
+    --radius-pill: 999px;
+    --radius-card: 12px;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    height: 100vh; display: flex; overflow: hidden;
+    background: var(--light-gray); color: var(--text-color);
+    -webkit-font-smoothing: antialiased;
+  }
+  button, input { outline: none; transition: all 0.2s; font-family: inherit; }
+  button:active { transform: translateY(1px); }
+  .container { display: flex; width: 100%; height: 100%; }
+
+  /* ── 左面板 ── */
+  .left-panel {
+    width: 525px; flex-shrink: 0;
+    background: white; border-right: 1px solid var(--border-color);
+    display: flex; flex-direction: column;
+    padding: 12px; box-shadow: var(--shadow-sm); z-index: 10;
+    overflow-y: auto; overflow-x: hidden;
+  }
+  .left-panel::-webkit-scrollbar { width: 8px; }
+  .left-panel::-webkit-scrollbar-thumb { background: #d3d8e0; border-radius: 8px; }
+
+  .img-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .current-img-name {
+    font-size: 18px; font-weight: 700; color: #222;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px;
+  }
+  .current-img-name.empty { color: #999; font-weight: 500; }
+  .btn-copy-name {
+    background: #eef1f5; color: #555; border: 1px solid #dde1e6;
+    padding: 4px 12px; font-size: 12px; border-radius: var(--radius-pill);
+    cursor: pointer; display: inline-flex; align-items: center; flex-shrink: 0;
+  }
+  .btn-copy-name::before { content: "📋 "; margin-right: 3px; font-size: 11px; }
+  .btn-copy-name:hover:not(:disabled) { background: #e2e6ea; color: #333; border-color: #cbd3da; }
+  .btn-copy-name:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .canvas-wrapper {
+    width: 500px; height: 375px; flex-shrink: 0;
+    position: relative; border: 2px solid #e9ecef;
+    margin: 0 auto 20px auto; background: #F7F7F8; box-sizing: content-box;
+    cursor: crosshair; user-select: none;
+  }
+  #canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; display: block; }
+  .canvas-placeholder {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 8px; color: #999; font-size: 13px; pointer-events: none;
+    text-align: center; padding: 0 24px;
+  }
+  .canvas-placeholder .big { font-size: 32px; opacity: 0.5; }
+  .marker {
+    position: absolute; width: 6px; height: 6px;
+    background-color: var(--point-fill); border: 2px solid var(--point-border);
+    border-radius: 50%; pointer-events: none; display: none;
+    box-shadow: 0 0 8px rgba(0,0,0,0.6); transform: translate(-50%, -50%); z-index: 5;
+  }
+
+  .label-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 10px; }
+  .label-btn {
+    padding: 8px 0; font-size: 12px; border: 1px solid var(--border-color);
+    background: white; cursor: pointer; border-radius: var(--radius-pill);
+    text-align: center; color: #555; font-weight: 500;
+  }
+  .label-btn:hover { background: #f8f9fa; border-color: #ccc; color: #333; }
+  .label-btn.active {
+    background-color: #e7f5ff; border-color: var(--primary-color);
+    color: var(--primary-color); font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,123,255,0.15);
+  }
+  .hotkey-tip { font-size: 12px; color: #999; margin-bottom: 8px; font-weight: 500; }
+  .hotkey-tip kbd {
+    display: inline-block; padding: 0 4px; font-size: 10.5px; font-family: ui-monospace, Menlo, monospace;
+    background: #f1f3f5; border: 1px solid var(--border-color); border-bottom-width: 2px; border-radius: 4px;
+  }
+
+  .action-bar { margin-bottom: 20px; }
+  .btn-complete {
+    width: 100%; background: var(--primary-color); color: white; border: none;
+    padding: 12px; border-radius: var(--radius-pill);
+    cursor: pointer; font-weight: bold; font-size: 15px;
+    box-shadow: 0 4px 10px rgba(0,123,255,0.25);
+  }
+  .btn-complete:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); }
+  .btn-complete:disabled { background: #d6d8db; cursor: not-allowed; box-shadow: none; transform: none; }
+
+  .group-label { font-size: 12px; color: #999; margin-bottom: 8px; font-weight: 500; }
+  .input-group { margin-bottom: 12px; display: flex; gap: 8px; align-items: center; }
+  .input-group input {
+    flex: 1; min-width: 0; padding: 10px 15px; border: 1px solid var(--border-color);
+    border-radius: var(--radius-pill); font-size: 13px; color: #444; background: #fff;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+  .input-group input:focus { border-color: var(--primary-color); }
+  .input-group input::placeholder { color: #a8b1bf; font-family: inherit; }
+  .input-group button {
+    padding: 8px 18px; cursor: pointer; background: #fff;
+    border: 1px solid var(--border-color); border-radius: var(--radius-pill);
+    font-size: 13px; color: #555; white-space: nowrap;
+  }
+  .input-group button:hover:not(:disabled) { background: #f1f3f5; color: #333; }
+  .input-group button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── 右面板 ── */
+  .right-panel { flex: 1; min-width: 0; background: #f8f9fa; display: flex; flex-direction: column; overflow: hidden; }
+  .search-toolbar {
+    padding: 15px 56px 15px 25px;
+    background: white; border-bottom: 1px solid var(--border-color);
+    display: flex; gap: 15px; align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); flex-shrink: 0;
+    flex-wrap: nowrap; white-space: nowrap; overflow-x: auto;
+  }
+  .search-input {
+    width: 300px; flex-shrink: 0; padding: 10px 20px; border: 1px solid #ccc;
+    border-radius: var(--radius-pill); font-size: 14px; background: #f8f9fa;
+  }
+  .search-input:focus { border-color: var(--primary-color); background: white; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
+  .filter-group { display: flex; align-items: center; gap: 8px; font-size: 14px; user-select: none; cursor: pointer; color: #555; flex-shrink: 0; }
+  .filter-group input { width: 16px; height: 16px; cursor: pointer; }
+  .result-count { font-size: 13px; color: #888; margin-left: auto; margin-right: 10px; white-space: nowrap; flex-shrink: 0; }
+  .btn-refresh {
+    width: 36px; height: 36px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: white; border: 1px solid var(--border-color); border-radius: 50%;
+    color: #6c757d; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer;
+  }
+  .btn-refresh svg { width: 20px; height: 20px; fill: currentColor; }
+  .btn-refresh:hover { color: var(--primary-color); border-color: var(--primary-color); background-color: #f0f8ff; box-shadow: 0 4px 10px rgba(0,123,255,0.2); transform: translateY(-1px); }
+  .btn-reset {
+    padding: 8px 14px; background: #eef1f5; color: #555; border: 1px solid #dde1e6;
+    border-radius: var(--radius-pill); cursor: pointer; font-size: 12px; flex-shrink: 0;
+  }
+  .btn-reset:hover { background: #e2e6ea; color: #333; }
+
+  /* ── 图库行 ── */
+  #gallery-container { flex: 1; padding: 25px; overflow-y: auto; }
+  #gallery-container::-webkit-scrollbar { width: 10px; }
+  #gallery-container::-webkit-scrollbar-track { background: #f1f3f5; border-radius: 8px; }
+  #gallery-container::-webkit-scrollbar-thumb { background: #c1c7d0; border-radius: 8px; border: 2px solid #f1f3f5; }
+  #gallery-container { scrollbar-width: thin; scrollbar-color: #c1c7d0 #f1f3f5; }
+
+  .gallery-row {
+    background: white; border-radius: var(--radius-card); padding: 15px; margin-bottom: 20px;
+    display: flex; gap: 20px; align-items: stretch;
+    border: 1px solid transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: all 0.2s;
+  }
+  .gallery-row:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.06); }
+  .gallery-row.current { border-color: var(--primary-color); }
+
+  .main-thumb-box { width: 200px; text-align: center; flex-shrink: 0; cursor: pointer; }
+  .main-thumb-box img {
+    width: 100%; height: 150px; object-fit: fill; display: block;
+    border: 2px solid transparent; border-radius: 8px; background: #F7F7F8;
+  }
+  .main-thumb-box:hover img { border-color: #cbd3da; }
+  .main-thumb-box.selected img { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0,123,255,0.15); }
+  .main-thumb-name { font-size: 13px; font-weight: 600; color: #444; margin-top: 8px; word-break: break-all; }
+
+  .annotated-list { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 15px; align-content: flex-start; padding-left: 25px; border-left: 2px dashed #e9ecef; }
+  .anno-item { position: relative; width: 200px; cursor: pointer; transition: transform 0.2s; }
+  .anno-item:hover { transform: translateY(-3px); }
+  .anno-item-img-box {
+    position: relative; width: 100%; height: 150px;
+    background: #F7F7F8; border-radius: 8px; overflow: hidden; border: 1px solid #dee2e6;
+  }
+  .anno-item img { width: 100%; height: 100%; object-fit: fill; display: block; }
+  .mini-point {
+    position: absolute; width: 4px; height: 4px;
+    background: var(--point-fill); border: 1px solid var(--point-border);
+    border-radius: 50%; box-shadow: 0 0 2px black; transform: translate(-50%, -50%);
+  }
+  .anno-label-tag {
+    font-size: 12px; text-align: center; background: #e9ecef; color: #444;
+    margin-top: 5px; border-radius: 4px; padding: 2px 0; font-weight: 700;
+  }
+  .anno-item.active-anno .anno-item-img-box { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0,123,255,0.3); }
+  .anno-item.active-anno .anno-label-tag { background-color: var(--primary-color); color: white; }
+  .btn-delete-anno {
+    position: absolute; top: -8px; right: -8px; width: 22px; height: 22px;
+    background-color: var(--danger-color); color: white; border: 2px solid white;
+    border-radius: 50%; text-align: center; line-height: 17px; font-size: 14px;
+    cursor: pointer; display: none; z-index: 5; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 0;
+  }
+  .anno-item:hover .btn-delete-anno { display: block; }
+
+  /* ── toast（顶部居中）── */
+  #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; pointer-events: none; }
+  .toast {
+    background: rgba(0,0,0,0.75); color: white; padding: 10px 25px;
+    border-radius: var(--radius-pill); font-size: 14px; font-weight: 500;
+    opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2); max-width: 80vw;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { background: var(--success-color); }
+
+  @media (max-width: 620px) {
+    .canvas-wrapper { width: 100%; height: auto; aspect-ratio: 4 / 3; box-sizing: border-box; }
+    .search-input { width: 100%; }
+    .search-toolbar { flex-wrap: wrap; }
+    .gallery-row { flex-direction: column; }
+    .annotated-list { padding-left: 0; border-left: none; border-top: 2px dashed #e9ecef; padding-top: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 左：标注工作区 -->
+  <div class="left-panel">
+    <div class="img-header">
+      <span class="current-img-name empty" id="display-name">请选择图片</span>
+      <button class="btn-copy-name" id="btn-copy-name" disabled>复制图号</button>
+    </div>
+
+    <div class="canvas-wrapper" id="canvas-wrapper">
+      <canvas id="canvas" width="1000" height="750"></canvas>
+      <div class="marker" id="point-marker"></div>
+      <div class="canvas-placeholder" id="canvas-placeholder">
+        <span class="big">⚡</span>
+        <span>在右侧选择连接器端子图后，<br>选择端子标签并点击图上位置标注</span>
+      </div>
+    </div>
+
+    <div class="label-grid" id="label-container"></div>
+    <div class="hotkey-tip">快捷键：<kbd>q</kbd>/<kbd>e</kbd>=HV± · <kbd>1</kbd>-<kbd>4</kbd>=AC · <kbd>a</kbd>/<kbd>s</kbd>/<kbd>d</kbd>=UVW · <kbd>Space</kbd>=保存 · <kbd>Ctrl+Z</kbd>=撤销</div>
+
+    <div class="action-bar">
+      <button id="btn-complete" class="btn-complete" disabled>完成 / 保存此点</button>
+    </div>
+
+    <div class="group-label">x,y 坐标 (验证区)</div>
+    <div class="input-group">
+      <input type="text" id="coord-input" readonly placeholder="点击图片后显示坐标" style="background:#f8f9fa; color:var(--success-color); font-weight:bold; letter-spacing:0.5px;">
+      <button id="btn-copy-coords" disabled>复制</button>
+    </div>
+    <div class="input-group">
+      <input type="text" id="manual-input" placeholder="输入坐标定位 (如: 259.20,343.98)">
+      <button id="btn-locate">定位</button>
+    </div>
+    <div class="input-group">
+      <input type="text" id="load-input" placeholder="输入图号加载 (回车)">
+      <button id="btn-load">加载</button>
+    </div>
+  </div>
+
+  <!-- 右：工具栏 + 图库 -->
+  <div class="right-panel">
+    <div class="search-toolbar">
+      <input type="text" id="search-input" class="search-input" placeholder="🔍 搜索图号...">
+      <label class="filter-group"><input type="checkbox" id="filter-unannotated"><span>未完成</span></label>
+      <button id="btn-refresh" class="btn-refresh" title="刷新列表">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+      </button>
+      <div class="result-count" id="result-count"></div>
+      <button id="btn-reset" class="btn-reset" title="重置演示数据">↺ 重置</button>
+    </div>
+    <div id="gallery-container"><div style="text-align:center; color:#999; margin-top:50px;">正在加载数据...</div></div>
+  </div>
+</div>
+
+<div id="toast-container"><div id="toast" class="toast">提示信息</div></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── 与原工具一致：900×675 虚拟坐标系、9 个端子标签 ── */
+  var COORD_MAX_X = 900.0;
+  var COORD_MAX_Y = 675.0;
+  var IMAGE_ROOT = '../08HVC/';
+  var LABELS = ['HV+', 'HV-', 'AC-L1', 'AC-L2', 'AC-L3', 'AC-N', 'U', 'V', 'W'];
+  var KEYMAP = { '1': 'AC-L1', '2': 'AC-L2', '3': 'AC-L3', '4': 'AC-N', 'q': 'HV+', 'e': 'HV-', 'a': 'U', 's': 'V', 'd': 'W' };
+  var STORE_KEY = 'hvc-demo-annotations-v4';
+
+  var IMAGES = [
+    'JBTC-TSL-2PINL-1-COP', 'JBTC-TSL-2PINL-1-HAR', 'JBTC-TSL-2PINL-2-COP', 'JBTC-TSL-2PINL-2-HAR',
+    'JBTC-TSL-2PINS-1-COP', 'JBTC-TSL-2PINS-1-HAR', 'JBTC-TSL-2PINS-2-COP', 'JBTC-TSL-2PINS-2-HAR',
+    'JBTC-TSL-5PIN-1-COP-OBC', 'JBTC-TSL-5PIN-1-COP', 'JBTC-TSL-5PIN-1-COP2', 'JBTC-TSL-5PIN-1-HAR-OBC', 'JBTC-TSL-5PIN-1-HAR', 'JBTC-TSL-5PIN-1-HAR2',
+    'JBTC-VW-2PINL-1-COP', 'JBTC-VW-2PINL-1-HAR', 'JBTC-VW-2PINL-2-COP',
+    'JBTC-VW-2PINS-1-COP', 'JBTC-VW-2PINS-1-HAR', 'JBTC-VW-2PINS-1_2-COP', 'JBTC-VW-2PINS-2-COP', 'JBTC-VW-2PINS-2-HAR', 'JBTC-VW-2PINS-2_2-COP',
+    'JBTC-VW-2PINS-4-COP', 'JBTC-VW-2PINS-4-HAR', 'JBTC-VW-2PINS-5-COP', 'JBTC-VW-2PINS-5-HAR',
+    'JBTC-VW-3PINS-1-COP', 'JBTC-VW-3PINS-1-HAR', 'JBTC-VW-6PINS-1-COP', 'JBTC-VW-6PINS-1-HAR', 'JBTC-VW-6PINS-1_2-COP', 'JBTC-VW-6PINS-1_2-HAR'];
+
+  /* 预置示例标注：TSL 系列坐标与绝缘检测工具（TSL-GYKT-MD3-1）的端子测量点同源，
+     +8,+8 为该工具在 900 宽画布上的圆心补偿；绝缘工具未收录的车型沿用原演示数据 */
+  var SEED = {
+    'JBTC-TSL-2PINL-1-COP': { 'HV+': [593.92, 247.29], 'HV-': [354.52, 241.89] },
+    'JBTC-TSL-2PINL-1-HAR': { 'HV+': [525.52, 267.09], 'HV-': [350.92, 267.09] },
+    'JBTC-TSL-2PINL-2-COP': { 'HV+': [476.92, 526.29], 'HV-': [484.12, 430.89] },
+    'JBTC-TSL-2PINL-2-HAR': { 'HV+': [403.12, 259.89], 'HV-': [536.32, 258.09] },
+    'JBTC-TSL-2PINS-2-COP': { 'HV+': [358.12, 382.29], 'HV-': [545.32, 387.69] },
+    'JBTC-TSL-2PINS-2-HAR': { 'HV+': [566.92, 409.29], 'HV-': [361.72, 407.49] },
+    'JBTC-TSL-5PIN-1-COP': { 'HV+': [448.12, 267.09], 'HV-': [530.92, 261.69] },
+    'JBTC-TSL-5PIN-1-HAR': { 'HV+': [487.72, 229.29], 'HV-': [485.92, 150.09] },
+    'JBTC-TSL-5PIN-1-COP2': { 'HV+': [448.12, 375.09], 'HV-': [534.52, 378.69] },
+    'JBTC-TSL-5PIN-1-HAR2': { 'HV+': [392.32, 229.29], 'HV-': [390.52, 142.89] },
+    'JBTC-TSL-5PIN-1-COP-OBC': { 'AC-L1': [527.32, 249.09], 'AC-L2': [529.12, 369.69], 'AC-L3': [446.32, 245.49], 'AC-N': [446.32, 371.49] },
+    'JBTC-TSL-5PIN-1-HAR-OBC': { 'AC-L1': [496.72, 137.49], 'AC-L2': [386.92, 139.29], 'AC-L3': [500.32, 213.09], 'AC-N': [388.72, 213.09] },
+    'JBTC-VW-2PINL-1-COP': { 'HV+': [208.80, 365.58], 'HV-': [671.40, 367.38] },
+    'JBTC-VW-6PINS-1-COP': { 'U': [152.40, 258.00], 'V': [351.00, 261.60], 'W': [551.40, 258.60] },
+    'JBTC-VW-2PINS-1-COP': { 'HV+': [207.00, 350.40] }
+  };
+
+  var annotations = load();
+  var current = null;
+  var activeLabel = null;
+  var pending = null;
+  var history = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var canvas = $('canvas');
+  var ctx = canvas.getContext('2d');
+  var wrap = $('canvas-wrapper');
+  var marker = $('point-marker');
+  var toastTimer = null;
+
+  function toast(msg, type) {
+    var el = $('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.className = 'toast'; }, 2400);
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) { /* ignore */ }
+    return JSON.parse(JSON.stringify(SEED));
+  }
+  function persist() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(annotations)); } catch (e) { /* ignore */ }
+  }
+
+  function copyText(text, done) {
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { /* ignore */ }
+      document.body.removeChild(ta);
+      done(ok);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () { fallback(); });
+    } else {
+      fallback();
+    }
+  }
+
+  /* ── 完成规则（原版）：HV+&HV- 或 U&V&W 或 AC-L1&AC-N ── */
+  function isCompleted(ann) {
+    if (!ann) return false;
+    var has = function (k) { return Object.prototype.hasOwnProperty.call(ann, k); };
+    return (has('HV+') && has('HV-')) || (has('U') && has('V') && has('W')) || (has('AC-L1') && has('AC-N'));
+  }
+
+  /* ── 绘制：固定 1000×750 缓冲（源图即 900×675 同比例），不随容器尺寸变形 ── */
+  var drawToken = 0;
+  function drawImage(name) {
+    $('canvas-placeholder').style.display = 'none';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var token = ++drawToken;
+    var img = new Image();
+    img.onload = function () {
+      if (token !== drawToken) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.onerror = function () {
+      if (token !== drawToken) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      $('canvas-placeholder').style.display = 'flex';
+      $('canvas-placeholder').innerHTML = '<span class="big">⚠️</span><span>图片加载失败：' + name + '</span>';
+    };
+    img.src = IMAGE_ROOT + encodeURIComponent(name) + '.webp';
+  }
+
+  function setPending(x, y) {
+    pending = { x: x, y: y };
+    marker.style.left = (x / COORD_MAX_X * 100) + '%';
+    marker.style.top = (y / COORD_MAX_Y * 100) + '%';
+    marker.style.display = 'block';
+    $('coord-input').value = x.toFixed(2) + ',' + y.toFixed(2);
+    $('btn-copy-coords').disabled = false;
+    refreshSaveBtn();
+  }
+
+  function refreshSaveBtn() {
+    var ok = activeLabel && pending && current;
+    $('btn-complete').disabled = !ok;
+    $('btn-complete').textContent = ok ? '完成 / 保存 ' + activeLabel : '完成 / 保存此点';
+  }
+
+  function renderLabels() {
+    var grid = $('label-container');
+    grid.innerHTML = '';
+    LABELS.forEach(function (lb) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'label-btn' + (lb === activeLabel ? ' active' : '');
+      btn.textContent = lb;
+      btn.addEventListener('click', function () { selectLabel(lb); });
+      grid.appendChild(btn);
+    });
+  }
+
+  function selectLabel(lb) {
+    activeLabel = lb;
+    pending = null;
+    marker.style.display = 'none';
+    var ann = current ? annotations[current] : null;
+    if (ann && ann[lb]) {
+      setPending(ann[lb][0], ann[lb][1]);
+      toast('「' + lb + '」已有标注，可重新点击图上位置修改后保存');
+    } else {
+      $('coord-input').value = '';
+      $('coord-input').placeholder = '选择「' + lb + '」后点击图上位置';
+    }
+    refreshSaveBtn();
+    renderLabels();
+  }
+
+  function selectImage(name) {
+    current = name;
+    activeLabel = null;
+    pending = null;
+    marker.style.display = 'none';
+    var nameEl = $('display-name');
+    nameEl.textContent = name;
+    nameEl.classList.remove('empty');
+    $('btn-copy-name').disabled = false;
+    $('btn-copy-coords').disabled = true;
+    $('coord-input').value = '';
+    $('coord-input').placeholder = '点击图片后显示坐标';
+    $('load-input').value = '';
+    drawImage(name);
+    renderLabels();
+    renderRows();
+    refreshSaveBtn();
+  }
+
+  function savePoint() {
+    if (!current || !activeLabel || !pending) return;
+    var ann = annotations[current] || (annotations[current] = {});
+    var prev = ann[activeLabel] || null;
+    ann[activeLabel] = [pending.x, pending.y];
+    history.push({ type: 'ADD', img: current, label: activeLabel, prevVal: prev });
+    persist();
+    toast('已保存 ' + activeLabel + ' @ ' + pending.x.toFixed(2) + ',' + pending.y.toFixed(2), 'success');
+    renderLabels();
+    renderRows();
+    refreshSaveBtn();
+  }
+
+  function deletePoint(img, label) {
+    var ann = annotations[img];
+    if (!ann || !ann[label]) return;
+    history.push({ type: 'DELETE', img: img, label: label, prevVal: ann[label].slice() });
+    delete ann[label];
+    if (current === img && activeLabel === label) {
+      pending = null;
+      marker.style.display = 'none';
+      $('coord-input').value = '';
+      refreshSaveBtn();
+    }
+    persist();
+    toast('已删除 ' + img + ' 的 ' + label + '（Ctrl+Z 可撤销）');
+    renderLabels();
+    renderRows();
+  }
+
+  function undo() {
+    var h = history.pop();
+    if (!h) { toast('没有可撤销的操作'); return; }
+    var ann = annotations[h.img] || (annotations[h.img] = {});
+    if (h.type === 'ADD') {
+      if (h.prevVal) { ann[h.label] = h.prevVal.slice(); } else { delete ann[h.label]; }
+    } else {
+      ann[h.label] = h.prevVal.slice();
+    }
+    persist();
+    selectImage(h.img);
+    toast('已撤销', 'success');
+  }
+
+  /* ── 图库行 ── */
+  function renderRows() {
+    var box = $('gallery-container');
+    box.innerHTML = '';
+    var search = $('search-input').value.trim().toLowerCase();
+    var todoOnly = $('filter-unannotated').checked;
+    var shown = 0;
+
+    IMAGES.forEach(function (name) {
+      if (search && name.toLowerCase().indexOf(search) === -1) return;
+      var ann = annotations[name] || {};
+      var labels = Object.keys(ann).filter(function (k) { return k !== 'remark'; }); /* 兼容旧版本地数据中残留的 remark 字段 */
+      var done = isCompleted(ann);
+      if (todoOnly && done) return;
+      shown++;
+
+      var row = document.createElement('div');
+      row.className = 'gallery-row' + (name === current ? ' current' : '');
+
+      /* 主缩略图 */
+      var thumb = document.createElement('div');
+      thumb.className = 'main-thumb-box' + (name === current ? ' selected' : '');
+      var img = document.createElement('img');
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.src = IMAGE_ROOT + encodeURIComponent(name) + '.webp';
+      img.alt = name;
+      var nm = document.createElement('div');
+      nm.className = 'main-thumb-name';
+      nm.textContent = name;
+      thumb.appendChild(img);
+      thumb.appendChild(nm);
+      thumb.addEventListener('click', function () { selectImage(name); });
+      row.appendChild(thumb);
+      /* 已标注列表 */
+      var list = document.createElement('div');
+      list.className = 'annotated-list';
+      labels.forEach(function (lb) {
+        var item = document.createElement('div');
+        item.className = 'anno-item' + (name === current && lb === activeLabel ? ' active-anno' : '');
+        var box2 = document.createElement('div');
+        box2.className = 'anno-item-img-box';
+        var cimg = document.createElement('img');
+        cimg.loading = 'lazy';
+        cimg.src = IMAGE_ROOT + encodeURIComponent(name) + '.webp';
+        cimg.alt = '';
+        var pt = document.createElement('div');
+        pt.className = 'mini-point';
+        pt.style.left = (ann[lb][0] / COORD_MAX_X * 100) + '%';
+        pt.style.top = (ann[lb][1] / COORD_MAX_Y * 100) + '%';
+        box2.appendChild(cimg);
+        box2.appendChild(pt);
+        var tag = document.createElement('div');
+        tag.className = 'anno-label-tag';
+        tag.textContent = lb;
+        var del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'btn-delete-anno';
+        del.textContent = '×';
+        del.title = '删除 ' + lb;
+        del.addEventListener('click', function (e) { e.stopPropagation(); deletePoint(name, lb); });
+        item.appendChild(box2);
+        item.appendChild(tag);
+        item.appendChild(del);
+        item.addEventListener('click', function () {
+          selectImage(name);
+          selectLabel(lb);
+        });
+        list.appendChild(item);
+      });
+      row.appendChild(list);
+
+      box.appendChild(row);
+    });
+
+    if (!shown) {
+      var empty = document.createElement('div');
+      empty.style.cssText = 'text-align:center;color:#999;margin-top:50px;';
+      empty.textContent = '没有符合条件的图片';
+      box.appendChild(empty);
+    }
+    updateCount();
+  }
+
+  function visibleImages() {
+    var search = $('search-input').value.trim().toLowerCase();
+    return IMAGES.filter(function (n) {
+      return !search || n.toLowerCase().indexOf(search) !== -1;
+    });
+  }
+
+  function updateCount() {
+    var vis = visibleImages();
+    $('result-count').textContent = '共 ' + vis.length + ' 张';
+  }
+
+  /* ── 画布点击 → 900×675 虚拟坐标 ── */
+  wrap.addEventListener('click', function (e) {
+    if (!current) { toast('请先在右侧选择连接器端子图'); return; }
+    if (!activeLabel) { toast('请先选择端子标签（HV+ / HV- / AC-L1 …）'); return; }
+    var rect = wrap.getBoundingClientRect();
+    var x = (e.clientX - rect.left) / rect.width * COORD_MAX_X;
+    var y = (e.clientY - rect.top) / rect.height * COORD_MAX_Y;
+    x = Math.min(Math.max(x, 0), COORD_MAX_X);
+    y = Math.min(Math.max(y, 0), COORD_MAX_Y);
+    setPending(Math.round(x * 100) / 100, Math.round(y * 100) / 100);
+  });
+
+  /* ── 按钮 ── */
+  $('btn-complete').addEventListener('click', savePoint);
+  $('btn-copy-name').addEventListener('click', function () {
+    if (current) copyText(current, function (ok) { toast(ok ? '已复制图号' : '复制失败', ok ? 'success' : ''); });
+  });
+  $('btn-copy-coords').addEventListener('click', function () {
+    if (!pending) return;
+    copyText(pending.x.toFixed(2) + ',' + pending.y.toFixed(2), function (ok) { toast(ok ? '已复制坐标' : '复制失败', ok ? 'success' : ''); });
+  });
+
+  function locate() {
+    if (!current) { toast('请先选择图片'); return; }
+    var parts = $('manual-input').value.trim().split(/[,，\s]+/).filter(Boolean);
+    if (parts.length !== 2 || isNaN(parseFloat(parts[0])) || isNaN(parseFloat(parts[1]))) {
+      toast('坐标格式：259.20,343.98'); return;
+    }
+    var x = Math.min(Math.max(parseFloat(parts[0]), 0), COORD_MAX_X);
+    var y = Math.min(Math.max(parseFloat(parts[1]), 0), COORD_MAX_Y);
+    setPending(Math.round(x * 100) / 100, Math.round(y * 100) / 100);
+    toast('已定位：' + x.toFixed(2) + ', ' + y.toFixed(2), 'success');
+  }
+  $('btn-locate').addEventListener('click', locate);
+  $('manual-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') locate(); });
+
+  function loadByName() {
+    var q = $('load-input').value.trim().toLowerCase();
+    if (!q) return;
+    var hit = IMAGES.find(function (n) { return n.toLowerCase().indexOf(q) !== -1; });
+    if (hit) { selectImage(hit); toast('已加载：' + hit, 'success'); }
+    else toast('未找到图号包含「' + q + '」的图片');
+  }
+  $('btn-load').addEventListener('click', loadByName);
+  $('load-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') loadByName(); });
+
+  $('search-input').addEventListener('input', renderRows);
+  $('filter-unannotated').addEventListener('change', renderRows);
+  $('btn-refresh').addEventListener('click', function () { renderRows(); toast('列表已刷新'); });
+
+  $('btn-reset').addEventListener('click', function () {
+    annotations = JSON.parse(JSON.stringify(SEED));
+    history = [];
+    persist();
+    renderRows();
+    renderLabels();
+    toast('已重置为预置示例数据', 'success');
+  });
+
+  /* ── 键盘 ── */
+  document.addEventListener('keydown', function (e) {
+    var tag = (document.activeElement && document.activeElement.tagName) || '';
+    var inInput = tag === 'INPUT' || tag === 'TEXTAREA';
+    var k = e.key.toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && k === 's') { e.preventDefault(); savePoint(); return; }
+    if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); undo(); return; }
+    if (inInput) return;
+    if (e.key === ' ') { e.preventDefault(); savePoint(); return; }
+    if (KEYMAP[k]) selectLabel(KEYMAP[k]);
+  });
+
+  /* ── 初始 ── */
+  renderLabels();
+  selectImage(IMAGES[0]); /* JBTC-TSL-2PINL-1-COP */
+})();
+</script>
+</body>
+</html>

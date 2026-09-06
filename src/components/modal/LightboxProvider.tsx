@@ -1,22 +1,24 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { ProjectAction } from '../../data/types';
+import type { FrameTab, GalleryImage, ProjectAction } from '../../data/types';
 
 export type LightboxState =
   | { mode: 'video'; payload: { videoKey: string } }
-  | { mode: 'frame'; payload: { src: string; title: string } }
+  | { mode: 'frame'; payload: { src: string; title: string; tabs?: FrameTab[] } }
   | { mode: 'doc'; payload: { docKey: string } }
+  | { mode: 'gallery'; payload: { images: GalleryImage[]; startIndex: number } }
   | null;
 
 interface LightboxContextValue {
   state: LightboxState;
   open: (action: ProjectAction) => void;
+  openGallery: (images: GalleryImage[], startIndex?: number) => void;
   close: () => void;
 }
 
 const LightboxContext = createContext<LightboxContextValue | null>(null);
 
-/** 弹窗状态提供者：项目卡片 action（iframe/video/doc）统一从这里打开。 */
+/** 弹窗状态提供者：项目卡片 action（iframe/video/doc）与图片画廊统一从这里打开。 */
 export function LightboxProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<LightboxState>(null);
   const lastTrigger = useRef<HTMLElement | null>(null);
@@ -24,12 +26,20 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
   const open = useCallback((action: ProjectAction) => {
     lastTrigger.current = document.activeElement as HTMLElement | null;
     if (action.kind === 'iframe') {
-      setState({ mode: 'frame', payload: { src: action.frameSrc, title: action.ariaLabel } });
+      setState({
+        mode: 'frame',
+        payload: { src: action.frameSrc, title: action.ariaLabel, tabs: action.frameTabs },
+      });
     } else if (action.kind === 'video') {
       setState({ mode: 'video', payload: { videoKey: action.videoKey } });
     } else {
       setState({ mode: 'doc', payload: { docKey: action.docKey } });
     }
+  }, []);
+
+  const openGallery = useCallback((images: GalleryImage[], startIndex = 0) => {
+    lastTrigger.current = document.activeElement as HTMLElement | null;
+    setState({ mode: 'gallery', payload: { images, startIndex } });
   }, []);
 
   const close = useCallback(() => {
@@ -38,7 +48,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     window.setTimeout(() => lastTrigger.current?.focus?.(), 0);
   }, []);
 
-  const value = useMemo(() => ({ state, open, close }), [state, open, close]);
+  const value = useMemo(() => ({ state, open, openGallery, close }), [state, open, openGallery, close]);
   return <LightboxContext.Provider value={value}>{children}</LightboxContext.Provider>;
 }
 

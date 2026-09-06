@@ -13,11 +13,12 @@ export function withBase(path: string): string {
 }
 
 /**
- * 由项目配图的 WebP 主图路径（1376w）派生 srcset，
+ * 由项目配图的 WebP 主图路径派生 srcset，
  * 命名约定：同目录存在 `-800w` 小图变体。
+ * width 为主图实际像素宽度（默认 1376，画廊截图约 1920）。
  */
-export function projectImageSrcSet(path: string): string {
+export function projectImageSrcSet(path: string, width = 1376): string {
   const small = path.replace(/\.webp$/, '-800w.webp');
   if (small === path) return '';
-  return `${small} 800w, ${path} 1376w`;
+  return `${small} 800w, ${path} ${width}w`;
 }

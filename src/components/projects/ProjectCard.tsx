@@ -30,8 +30,9 @@ function ActionButtons({ actions }: { actions: ProjectAction[] }) {
  * hover 上浮 + 图片微缩放微动效；视频/文档按钮叠加在配图右上角。
  */
 export function ProjectCard({ project }: { project: Project }) {
-  const { open } = useLightbox();
+  const { open, openGallery } = useLightbox();
   const featured = project.size === 'featured';
+  const gallery = project.gallery;
   const mediaActions = (project.actions ?? [])
     .filter((a) => a.kind === 'doc' || a.kind === 'video')
     .sort((a, b) => (a.kind === 'doc' ? -1 : 1) - (b.kind === 'doc' ? -1 : 1));
@@ -46,23 +47,79 @@ export function ProjectCard({ project }: { project: Project }) {
           featured ? 'lg:grid lg:grid-cols-[1.1fr_1fr]' : ''
         }`}
       >
-        {/* 媒体区 */}
+        {/* 媒体区：主图 + （可选）配套工具截图缩略图行 */}
         <div
           className={`relative overflow-hidden ${
-            featured ? 'lg:h-full lg:min-h-[280px]' : 'aspect-16/10'
+            gallery
+              ? 'flex flex-col lg:h-full lg:min-h-[280px]'
+              : featured
+                ? 'lg:h-full lg:min-h-[280px]'
+                : 'aspect-16/10'
           }`}
         >
-          <img
-            src={project.image}
-            srcSet={projectImageSrcSet(project.image) || undefined}
-            sizes={featured ? '(max-width: 1023px) 100vw, 562px' : '(max-width: 767px) 100vw, 531px'}
-            alt={project.imageAlt}
-            width={1376}
-            height={768}
-            loading="lazy"
-            decoding="async"
-            className="block h-full w-full object-cover transition-transform duration-700 ease-[var(--ease-out-apple)] group-hover:scale-[1.04]"
-          />
+          <div
+            className={`w-full ${gallery ? 'overflow-hidden lg:min-h-0 lg:flex-1' : 'h-full'}`}
+          >
+            <img
+              src={project.image}
+              srcSet={projectImageSrcSet(project.image) || undefined}
+              sizes={featured ? '(max-width: 1023px) 100vw, 562px' : '(max-width: 767px) 100vw, 531px'}
+              alt={project.imageAlt}
+              width={1376}
+              height={768}
+              loading="lazy"
+              decoding="async"
+              className="block h-full w-full object-cover transition-transform duration-700 ease-[var(--ease-out-apple)] group-hover:scale-[1.04]"
+            />
+          </div>
+          {gallery && gallery.length > 0 && (
+            <div className="flex-none p-2 max-lg:p-2.5 lg:p-2.5">
+              <div className="grid grid-cols-3 gap-2">
+                {gallery.map((img, i) => (
+                  <button
+                    key={img.src}
+                    type="button"
+                    aria-label={img.demoSrc ? `在线体验${img.caption}` : `查看${img.caption}界面截图`}
+                    title={img.demoSrc ? `在线体验 · ${img.caption}` : img.caption}
+                    onClick={() =>
+                      img.demoSrc
+                        ? open({
+                            kind: 'iframe',
+                            label: img.caption,
+                            ariaLabel: `在线体验${img.caption}`,
+                            frameSrc: img.demoSrc,
+                          })
+                        : openGallery(gallery, i)
+                    }
+                    className="group/thumb relative cursor-pointer overflow-hidden rounded-[10px] shadow-[0_1px_4px_rgba(0,0,0,0.08)] transition-transform duration-300 ease-[var(--ease-out-apple)] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(0,0,0,0.14)]"
+                  >
+                    <img
+                      src={img.src}
+                      srcSet={projectImageSrcSet(img.src, img.width) || undefined}
+                      sizes="(max-width: 767px) 30vw, 180px"
+                      alt={img.alt}
+                      width={800}
+                      height={400}
+                      loading="lazy"
+                      decoding="async"
+                      className="block aspect-[2/1] w-full object-cover transition-transform duration-500 ease-[var(--ease-out-apple)] group-hover/thumb:scale-[1.06]"
+                    />
+                    <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-2 pt-4 pb-2 text-left text-[11px] leading-none font-medium text-white">
+                      {img.demoSrc && (
+                        <span
+                          aria-hidden="true"
+                          className="mr-1 inline-block align-[-1px] text-[9px] leading-none"
+                        >
+                          ▶
+                        </span>
+                      )}
+                      {img.caption}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 内容区 */}

@@ -14,16 +14,47 @@ export const projects: Project[] = [
     points: [
       '负责全体数据的开发，包含高压系统框图，图片的绘制。',
       '落地高压测量流程，保障测量数据准确、流程规范',
+      '独立制作一整套从开发到落地的全流程提效工具',
     ],
     result: '成果：高压测量全流程从设计到落地完整交付',
     image: withBase('/images/project-1.webp'),
     imageAlt: 'EV Kit 2 高压测量项目配图',
+    gallery: [
+      {
+        src: withBase('/images/project-1-tool-marking.webp'),
+        alt: '标点工具界面：选择车型后在整车图上标注测量点并复制坐标',
+        caption: '标点工具',
+        width: 1920,
+        demoSrc: withBase('/evkit/tools/point-tool.html'),
+      },
+      {
+        src: withBase('/images/project-1-tool-terminal.webp'),
+        alt: '高压端子工具界面：端子孔位图库与坐标标注',
+        caption: '高压端子工具',
+        width: 1910,
+        demoSrc: withBase('/evkit/tools/terminal-tool.html'),
+      },
+      {
+        src: withBase('/images/project-1-tool-imageproc.webp'),
+        alt: '图片处理工具界面：零件照片批量生成线稿图',
+        caption: '图片处理工具',
+        width: 1907,
+        demoSrc: withBase('/evkit/tools/imageproc-tool.html'),
+      },
+    ],
     actions: [
       {
         kind: 'iframe',
         label: '在线体验',
         ariaLabel: '打开 EV Kit 2 高压测量在线体验',
-        frameSrc: withBase('/evkit/05WZT/TSL-GYKT-MD3-1_CN.html'),
+        frameSrc: withBase('/evkit/06DLC/MOP_MSD_04300004-LIO.html'),
+        frameTabs: [
+          { label: '断电流程', src: withBase('/evkit/06DLC/MOP_MSD_04300004-LIO.html') },
+          { label: '绝缘测试', src: withBase('/evkit/05WZT/TSL-GYKT-MD3-1_CN.html') },
+          { label: '标点工具', src: withBase('/evkit/tools/point-tool.html') },
+          { label: '高压端子工具', src: withBase('/evkit/tools/terminal-tool.html') },
+          { label: '图片处理工具', src: withBase('/evkit/tools/imageproc-tool.html') },
+        ],
       },
     ],
   },

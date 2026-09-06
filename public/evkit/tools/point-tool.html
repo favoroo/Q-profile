@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>车辆标点工具 · 在线演示</title>
+<style>
+  /* ===== 原工具样式 1:1 移植（#001Car-point_tool new.py / create_html_content）===== */
+  :root {
+    --point-fill-color: #51e4ff; --point-border-color: #007aff;
+    --gallery-gap: 3px; --primary-color: #007bff; --success-color: #28a745;
+    --light-gray: #f0f2f5; --border-color: #dee2e6; --border-radius-panel: 12px; --border-radius-button: 999px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    margin: 0; padding: 20px; background-color: var(--light-gray);
+    display: flex; height: 100vh; box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+  }
+  .main-container { display: flex; flex-grow: 1; gap: 20px; overflow: hidden; width: 100%; }
+  .left-column { width: 560px; flex-shrink: 0; position: relative; display: flex; }
+  .panel {
+    padding: 20px; background-color: white; border-radius: var(--border-radius-panel);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); height: 100%; box-sizing: border-box;
+  }
+  .annotation-panel {
+    display: flex; flex-direction: column; width: 100%;
+    overflow-y: auto; overflow-x: hidden;
+  }
+  .annotation-panel::-webkit-scrollbar { width: 8px; }
+  .annotation-panel::-webkit-scrollbar-thumb { background: #d3d8e0; border-radius: 8px; }
+
+  button { border-radius: var(--border-radius-button) !important; font-family: inherit; }
+  .category-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .category-buttons button {
+    flex-grow: 1; padding: 10px 16px; font-size: 16px; border: 1px solid var(--border-color);
+    background-color: #fff; cursor: pointer; transition: all 0.2s ease-in-out; color: #333;
+  }
+  .category-buttons button:hover { background-color: #f8f9fa; }
+  .category-buttons button.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+  .image-name-area { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; flex-shrink: 0; }
+  #image-name { font-size: 16px; color: #333; font-weight: 600; word-break: break-all; }
+  #copy-name-btn { padding: 8px 16px; cursor: pointer; border: 1px solid var(--border-color); background-color: #f8f9fa; font-size: 14px; flex-shrink: 0; }
+  #copy-name-btn:hover:not(:disabled) { background-color: #e9ecef; }
+  #copy-name-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .canvas-container {
+    position: relative; width: 500px; height: 500px; flex-shrink: 0;
+    margin: 0 auto; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden;
+    background-color: #f9f9f9; cursor: crosshair; user-select: none;
+  }
+  #annotation-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .canvas-placeholder {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 8px; color: #999; font-size: 14px; pointer-events: none; padding: 0 24px; text-align: center;
+  }
+  .canvas-placeholder .big { font-size: 34px; opacity: 0.5; }
+  #point-marker {
+    position: absolute; width: 6px; height: 6px; background-color: var(--point-fill-color);
+    border: 2px solid var(--point-border-color); border-radius: 50%; pointer-events: none;
+    display: none; box-shadow: 0 0 8px rgba(0,0,0,0.5); transform: translate(-50%, -50%); z-index: 5;
+  }
+
+  .controls { margin-top: auto; padding-top: 20px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+  .control-group { display: flex; align-items: center; gap: 10px; }
+  .control-group.button-group { display: grid; grid-template-columns: 1fr 1fr; }
+  .control-group input {
+    flex-grow: 1; min-width: 0; padding: 8px 16px; border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-button); font-size: 14px; color: #333; background: #fff; outline: none;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+  .control-group input:focus { border-color: var(--primary-color); }
+  .control-group input[readonly] { background: #f8f9fa; }
+  .control-group input::placeholder { color: #a8b1bf; font-family: inherit; }
+  .control-group button {
+    padding: 8px 12px; cursor: pointer; border: 1px solid var(--border-color);
+    background-color: #f8f9fa; white-space: nowrap; font-size: 14px; color: #333; flex-shrink: 0;
+  }
+  .control-group button:hover:not(:disabled) { background-color: #e9ecef; }
+  .control-group button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #copy-all-btn { background-color: var(--success-color); color: white; border-color: var(--success-color); font-weight: bold; }
+  #copy-all-btn:hover:not(:disabled) { background-color: #218838; }
+
+  #toast-notification {
+    position: absolute; bottom: 20px; left: 50%; transform: translate(-50%, 20px);
+    background-color: #f1c40f; color: #333; padding: 12px 25px;
+    border-radius: var(--border-radius-button); box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    font-size: 14px; font-weight: 500; opacity: 0; visibility: hidden; transition: all 0.4s;
+    z-index: 1000; pointer-events: none; max-width: 90%;
+  }
+  #toast-notification.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+
+  .gallery-panel { flex-grow: 1; overflow-y: auto; padding: 10px; min-width: 0; }
+  #image-gallery { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--gallery-gap); }
+  .gallery-item {
+    position: relative; cursor: pointer; border: 3px solid transparent; border-radius: 6px;
+    overflow: hidden; transition: all 0.2s; background: #f9f9f9; padding: 0;
+  }
+  .gallery-item:hover { border-color: rgba(0, 123, 255, 0.5); box-shadow: 0 6px 16px rgba(0,0,0,0.12); transform: translateY(-2px); }
+  .gallery-item.selected { border-color: var(--primary-color); box-shadow: 0 8px 20px rgba(0, 123, 255, 0.25); transform: translateY(0); }
+  .gallery-item img { width: 100%; height: auto; opacity: 0; transition: opacity 0.4s; display: block; }
+  .gallery-item img.loaded { opacity: 1; }
+  .gallery-item-name {
+    position: absolute; bottom: 0; left: 0; right: 0; background-color: rgba(0, 0, 0, 0.45); color: white;
+    font-size: 12px; padding: 3px 5px; text-align: center; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.2s; pointer-events: none;
+  }
+  .gallery-item:hover .gallery-item-name, .gallery-item.selected .gallery-item-name { opacity: 1; visibility: visible; transform: translateY(0); }
+  .gallery-empty { grid-column: 1 / -1; text-align: center; color: #999; padding: 60px 0; font-size: 14px; }
+
+  /* 演示说明角标（非原工具元素） */
+  .demo-chip {
+    position: fixed; right: 14px; bottom: 14px; z-index: 900;
+    font-size: 11px; font-weight: 600; color: #6b7280;
+    background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border-color);
+    padding: 4px 10px; border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    backdrop-filter: blur(6px); pointer-events: none;
+  }
+
+  @media (max-width: 620px) {
+    body { padding: 10px; }
+    .main-container { flex-direction: column; overflow-y: auto; }
+    .left-column { width: 100%; }
+    .panel { height: auto; }
+    .canvas-container { width: 100%; height: auto; aspect-ratio: 1 / 1; }
+    .gallery-panel { overflow: visible; }
+    #image-gallery { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="main-container">
+  <div class="left-column">
+    <div class="panel annotation-panel">
+      <div class="category-buttons" id="category-buttons"></div>
+      <div class="image-name-area">
+        <span id="image-name">未选择图片</span>
+        <button id="copy-name-btn" disabled>复制</button>
+      </div>
+      <div class="canvas-container" id="canvas-container">
+        <canvas id="annotation-canvas" width="1000" height="1000"></canvas>
+        <div id="point-marker"></div>
+        <div class="canvas-placeholder" id="canvas-placeholder">
+          <span class="big">🚗</span>
+          <span>选择车型后在图上点击放置测量点</span>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="control-group"><input type="text" id="xy-coords" readonly placeholder="x,y 坐标"></div>
+        <div class="control-group button-group">
+          <button id="copy-all-btn" disabled>一键复制 (Ctrl+C)</button>
+          <button id="copy-coords-btn" disabled>复制坐标</button>
+        </div>
+        <div class="control-group">
+          <input type="text" id="manual-coords" placeholder="输入坐标, e.g. 162.54,225.01">
+          <button id="show-point-btn">定位</button>
+        </div>
+        <div class="control-group">
+          <input type="text" id="image-name-input" placeholder="输入图号加载 (回车)">
+          <button id="load-image-btn">加载</button>
+        </div>
+      </div>
+    </div>
+    <div id="toast-notification"></div>
+  </div>
+  <div class="panel gallery-panel"><div id="image-gallery"></div></div>
+</div>
+
+<div class="demo-chip">在线演示 · 复刻自内部工具 · 数据仅存于本页</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── 与原工具一致：400×400 虚拟坐标系、6 列图库 ── */
+  var COORD_MAX = 400.0;
+  var IMAGE_ROOT = '../02png/';
+  var CATEGORIES = ['Sedan', 'SUV', 'Pickup2', 'Pickup4'];
+  var IMAGES = {
+    Sedan: ['Sedan_01', 'Sedan_02', 'Sedan_03', 'Sedan_04', 'Sedan_05', 'Sedan_07', 'Sedan_08', 'Sedan_09', 'Sedan_10', 'Sedan_11', 'Sedan_12', 'Sedan_13', 'Sedan_14', 'Sedan_15', 'Sedan_18', 'Sedan_20', 'Sedan_23', 'Sedan_25', 'Sedan_26', 'Sedan_27', 'Sedan_28', 'Sedan_29', 'Sedan_30', 'Sedan_31'],
+    SUV: ['SUV_02', 'SUV_03', 'SUV_04', 'SUV_05', 'SUV_06', 'SUV_07', 'SUV_08', 'SUV_09', 'SUV_10', 'SUV_12', 'SUV_13', 'SUV_14', 'SUV_15', 'SUV_18', 'SUV_19', 'SUV_20', 'SUV_22', 'SUV_23', 'SUV_25', 'SUV_26', 'SUV_27', 'SUV_28', 'SUV_29', 'SUV_30', 'SUV_31'],
+    Pickup2: [],
+    Pickup4: []
+  };
+
+  var state = { cat: 'Sedan', name: null, point: null };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var canvas = $('annotation-canvas');
+  var ctx = canvas.getContext('2d');
+  var wrap = $('canvas-container');
+  var marker = $('point-marker');
+  var toastTimer = null;
+
+  function toast(msg) {
+    var el = $('toast-notification');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2200);
+  }
+
+  function copyText(text, done) {
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { /* ignore */ }
+      document.body.removeChild(ta);
+      done(ok);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () { fallback(); });
+    } else {
+      fallback();
+    }
+  }
+
+  /* ── 绘制：固定 1000×1000 缓冲，与显示尺寸解耦，任何容器尺寸下不变形 ── */
+  var drawToken = 0;
+  function drawImage(name) {
+    $('canvas-placeholder').style.display = 'none';
+    var token = ++drawToken;
+    var img = new Image();
+    img.onload = function () {
+      if (token !== drawToken) return; /* 已切到其他图，丢弃过期回调 */
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.onerror = function () {
+      if (token !== drawToken) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      $('canvas-placeholder').style.display = 'flex';
+      $('canvas-placeholder').innerHTML = '<span class="big">⚠️</span><span>图片加载失败：' + name + '</span>';
+    };
+    img.src = IMAGE_ROOT + encodeURIComponent(name) + '.webp';
+  }
+
+  function setPoint(x, y, silent) {
+    state.point = { x: x, y: y };
+    marker.style.left = (x / COORD_MAX * 100) + '%';
+    marker.style.top = (y / COORD_MAX * 100) + '%';
+    marker.style.display = 'block';
+    $('xy-coords').value = x.toFixed(2) + ',' + y.toFixed(2);
+    $('copy-all-btn').disabled = false;
+    $('copy-coords-btn').disabled = false;
+    if (!silent) toast('已放置标点：' + x.toFixed(2) + ', ' + y.toFixed(2));
+  }
+
+  function clearPoint() {
+    state.point = null;
+    marker.style.display = 'none';
+    $('xy-coords').value = '';
+    $('copy-all-btn').disabled = true;
+    $('copy-coords-btn').disabled = true;
+  }
+
+  /* ── 分类按钮 ── */
+  function renderCategories() {
+    var box = $('category-buttons');
+    box.innerHTML = '';
+    CATEGORIES.forEach(function (cat) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = cat;
+      btn.className = state.cat === cat ? 'active' : '';
+      btn.addEventListener('click', function () {
+        if (state.cat === cat) return;
+        state.cat = cat;
+        state.name = null;
+        clearPoint();
+        renderCategories();
+        renderGallery();
+        if (IMAGES[cat].length) selectImage(IMAGES[cat][0]);
+        else {
+          $('image-name').textContent = '未选择图片';
+          $('copy-name-btn').disabled = true;
+        }
+      });
+      box.appendChild(btn);
+    });
+  }
+
+  /* ── 图库 ── */
+  function renderGallery() {
+    var gallery = $('image-gallery');
+    gallery.innerHTML = '';
+    var list = IMAGES[state.cat];
+    if (!list.length) {
+      var empty = document.createElement('div');
+      empty.className = 'gallery-empty';
+      empty.textContent = '演示素材未收录 ' + state.cat + ' 车型图片';
+      gallery.appendChild(empty);
+      return;
+    }
+    list.forEach(function (name) {
+      var item = document.createElement('div');
+      item.className = 'gallery-item' + (name === state.name ? ' selected' : '');
+      item.dataset.name = name;
+      var img = document.createElement('img');
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.src = IMAGE_ROOT + encodeURIComponent(name) + '.webp';
+      img.alt = name;
+      img.addEventListener('load', function () { img.classList.add('loaded'); });
+      var cap = document.createElement('span');
+      cap.className = 'gallery-item-name';
+      cap.textContent = name;
+      item.appendChild(img);
+      item.appendChild(cap);
+      item.addEventListener('click', function () { selectImage(name); });
+      gallery.appendChild(item);
+    });
+    var sel = gallery.querySelector('.gallery-item.selected');
+    if (sel) sel.scrollIntoView({ block: 'nearest' });
+  }
+
+  function selectImage(name) {
+    state.name = name;
+    $('image-name').textContent = name;
+    $('copy-name-btn').disabled = false;
+    clearPoint();
+    drawImage(name);
+    var gallery = $('image-gallery');
+    gallery.querySelectorAll('.gallery-item').forEach(function (el) {
+      el.classList.toggle('selected', el.dataset.name === name);
+    });
+    var sel = gallery.querySelector('.gallery-item.selected');
+    if (sel) sel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  /* ── 画布点击 → 400×400 虚拟坐标 ── */
+  wrap.addEventListener('click', function (e) {
+    if (!state.name) { toast('请先选择车型图片'); return; }
+    var rect = wrap.getBoundingClientRect();
+    var x = (e.clientX - rect.left) / rect.width * COORD_MAX;
+    var y = (e.clientY - rect.top) / rect.height * COORD_MAX;
+    x = Math.min(Math.max(x, 0), COORD_MAX);
+    y = Math.min(Math.max(y, 0), COORD_MAX);
+    setPoint(Math.round(x * 100) / 100, Math.round(y * 100) / 100);
+  });
+
+  /* ── 复制（原工具格式：图号 + 制表符 + 坐标）── */
+  function copyAll() {
+    if (!state.name || !state.point) return;
+    copyText(state.name + '\t' + state.point.x.toFixed(2) + ',' + state.point.y.toFixed(2), function (ok) {
+      toast(ok ? '已复制：' + state.name + ' → ' + state.point.x.toFixed(2) + ',' + state.point.y.toFixed(2) : '复制失败，请手动选择坐标文本');
+    });
+  }
+  $('copy-all-btn').addEventListener('click', copyAll);
+  $('copy-coords-btn').addEventListener('click', function () {
+    if (!state.point) return;
+    copyText(state.point.x.toFixed(2) + ',' + state.point.y.toFixed(2), function (ok) { toast(ok ? '已复制坐标' : '复制失败'); });
+  });
+  $('copy-name-btn').addEventListener('click', function () {
+    if (!state.name) return;
+    copyText(state.name, function (ok) { toast(ok ? '已复制图号' : '复制失败'); });
+  });
+
+  /* ── 坐标定位 ── */
+  function locate() {
+    if (!state.name) { toast('请先选择车型图片'); return; }
+    var parts = $('manual-coords').value.trim().split(/[,，\s]+/).filter(Boolean);
+    if (parts.length !== 2 || isNaN(parseFloat(parts[0])) || isNaN(parseFloat(parts[1]))) {
+      toast('坐标格式：162.54,225.01'); return;
+    }
+    var x = Math.min(Math.max(parseFloat(parts[0]), 0), COORD_MAX);
+    var y = Math.min(Math.max(parseFloat(parts[1]), 0), COORD_MAX);
+    setPoint(Math.round(x * 100) / 100, Math.round(y * 100) / 100, true);
+    toast('已定位到：' + x.toFixed(2) + ', ' + y.toFixed(2));
+  }
+  $('show-point-btn').addEventListener('click', locate);
+  $('manual-coords').addEventListener('keydown', function (e) { if (e.key === 'Enter') locate(); });
+
+  /* ── 图号加载 ── */
+  function loadByName() {
+    var q = $('image-name-input').value.trim();
+    if (!q) return;
+    var ql = q.toLowerCase();
+    for (var c = 0; c < CATEGORIES.length; c++) {
+      var cat = CATEGORIES[c];
+      var hit = IMAGES[cat].find(function (n) { return n.toLowerCase().indexOf(ql) !== -1; });
+      if (hit) {
+        state.cat = cat;
+        renderCategories();
+        renderGallery();
+        selectImage(hit);
+        toast('已加载：' + hit);
+        return;
+      }
+    }
+    toast('未找到图号包含「' + q + '」的图片');
+  }
+  $('load-image-btn').addEventListener('click', loadByName);
+  $('image-name-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') loadByName(); });
+
+  /* ── 键盘：Ctrl+C / 方向键切换 ── */
+  function galleryColumns() {
+    var g = $('image-gallery');
+    var cols = getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean).length;
+    return Math.max(cols, 1);
+  }
+  function stepSelection(delta) {
+    var list = IMAGES[state.cat];
+    if (!list.length) return;
+    var idx = state.name ? list.indexOf(state.name) : -1;
+    idx = (idx + delta + list.length) % list.length;
+    selectImage(list[idx]);
+  }
+  document.addEventListener('keydown', function (e) {
+    var tag = (document.activeElement && document.activeElement.tagName) || '';
+    var inInput = tag === 'INPUT' || tag === 'TEXTAREA';
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+      if (!inInput && state.point) { e.preventDefault(); copyAll(); }
+      return;
+    }
+    if (inInput || !state.name) return;
+    var cols = galleryColumns();
+    if (e.key === 'ArrowRight') { e.preventDefault(); stepSelection(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); stepSelection(-1); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); stepSelection(cols); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); stepSelection(-cols); }
+  });
+
+  /* ── 初始：默认选中当前分类第一张图，不留空画布 ── */
+  renderCategories();
+  renderGallery();
+  if (IMAGES[state.cat].length) selectImage(IMAGES[state.cat][0]);
+})();
+</script>
+</body>
+</html>

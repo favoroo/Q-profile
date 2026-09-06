@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>MOP_MSD_04300004-LIO</title>
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background-color: #f0f2f5;
+            font-size: 14px;
+            padding: 20px;
+        }
+
+        .content-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tab-bar {
+            display: flex;
+            background-color: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+            overflow-x: auto;
+        }
+        .tab-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+            color: #666;
+            font-size: 14px;
+        }
+        .tab-item:hover {
+            color: #1890ff;
+        }
+        .tab-item.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+            background-color: #fff;
+            font-weight: 500;
+        }
+        .tab-item .step-index {
+            display: inline-block;
+            background-color: #e6f7ff;
+            color: #1890ff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-right: 6px;
+        }
+        .tab-item.active .step-index {
+            background-color: #1890ff;
+            color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .step-title-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .info-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: #1890ff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            margin-left: 8px;
+        }
+        .info-btn:hover {
+            background-color: #40a9ff;
+            transform: scale(1.1);
+        }
+
+        .info-popup {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .info-popup.active {
+            display: block;
+        }
+        .info-popup h3 {
+            color: #1890ff;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e6f7ff;
+            font-size: 16px;
+        }
+        .info-popup h4 {
+            color: #333;
+            margin: 15px 0 10px 0;
+            font-size: 14px;
+        }
+        .info-popup p, .info-popup li {
+            color: #666;
+            line-height: 1.8;
+            font-size: 13px;
+        }
+        .info-popup ol {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        .info-popup li {
+            margin-bottom: 8px;
+        }
+        .info-popup-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+        }
+        .info-popup-close:hover {
+            color: #333;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        .overlay.active {
+            display: block;
+        }
+
+        .step-content {
+            line-height: 1.8;
+            color: #333;
+        }
+        .step-content p {
+            margin-bottom: 10px;
+        }
+
+        .step-subtitle {
+            font-size: 15px;
+            font-weight: bold;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 10px 15px;
+            margin: 15px 0 10px 0;
+            border-left: 4px solid #666;
+            border-radius: 4px;
+        }
+
+        .img-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin: 5px 0;
+        }
+        .img-box img {
+            max-width: 200px;
+            max-height: 150px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .img-box img:hover {
+            transform: scale(1.05);
+        }
+        .img-name {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+            font-family: Consolas, monospace;
+        }
+        .placeholder-missing {
+            color: #ff4d4f;
+            font-weight: bold;
+            font-size: 12px;
+            background-color: #fff2f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .img-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 10px 0;
+        }
+        .img-row img {
+            max-width: 200px;
+            max-height: 150px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .img-row img:hover {
+            transform: scale(1.05);
+        }
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1002;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .lightbox.active {
+            display: flex;
+        }
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .error-msg {
+            color: #ff4d4f;
+            font-weight: bold;
+            padding: 30px;
+            text-align: center;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+
+</head>
+<body>
+    <div class="lightbox" id="lightbox" onclick="this.classList.remove('active')">
+        <img id="lightbox-img" src="">
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeInfoPopup()"></div>
+
+    <div class="info-popup" id="infoPopup">
+        <button class="info-popup-close" onclick="closeInfoPopup()">×</button>
+        <h3>⚠️ 安全提示</h3>
+        <h4>切断高压系统电压必要性</h4>
+        <ol>
+            <li>高压系统以危险的电压进行工作，其中流动着高电流。小心触电，有生命危险！</li>
+            <li>通常禁止在带电的高电压组件进行维修工作。执行涉及到高压组件的每个工作步骤前，必须先切断高压系统的电压并防止发生未经准许的再次接通。</li>
+        </ol>
+        <h4>注意事项</h4>
+        <ol>
+            <li>维修过程中，对车辆做好标识，标明正在维修高压。维修未结束，禁止连接维修开关（如配备）、低压蓄电池。</li>
+            <li>使用测量的万用表量程应在DC1000V。</li>
+            <li>操作过程请全程佩戴绝缘手套、护目镜、绝缘帽等个人安全防护用品。</li>
+        </ol>
+    </div>
+
+    <div class="content-card" data-brand="Tesla" data-id="MOP_MSD_04300004-LIO">
+        <div class="tab-bar">
+            <div class="tab-item"
+                 onclick="switchTab(this, 'MOP_MSD_04300004-LIO', 0)"
+                 data-content-id="MOP_MSD_04300004-LIO"
+                 data-index="0">
+                <span class="step-index">0</span>
+                关闭车辆电源
+            </div>
+            <div class="tab-item"
+                 onclick="switchTab(this, 'MOP_MSD_04300004-LIO', 1)"
+                 data-content-id="MOP_MSD_04300004-LIO"
+                 data-index="1">
+                <span class="step-index">1</span>
+                断开低压电池
+            </div>
+            <div class="tab-item"
+                 onclick="switchTab(this, 'MOP_MSD_04300004-LIO', 2)"
+                 data-content-id="MOP_MSD_04300004-LIO"
+                 data-index="2">
+                <span class="step-index">2</span>
+                断开紧急响应程序回路
+            </div>
+            <div class="tab-item"
+                 onclick="switchTab(this, 'MOP_MSD_04300004-LIO', 3)"
+                 data-content-id="MOP_MSD_04300004-LIO"
+                 data-index="3">
+                <span class="step-index">3</span>
+                检查电压
+            </div>
+        </div>
+        <div class="tab-content"
+             id="content-MOP_MSD_04300004-LIO-0"
+             data-tab-title="关闭车辆电源">
+
+            <div class="step-title-section">
+                <span class="step-title-value">操作步骤</span>
+                <button class="info-btn" onclick="showInfoPopup(event)">i</button>
+            </div>
+
+            <div class="step-content">
+                1. 断开所有充电电缆。<br>2. 打开左前车门并降下左前车窗。<br>3. 在触摸屏上点击“控制 &gt; 安全&gt; 关闭电源”。
+            </div>
+        </div>
+        <div class="tab-content"
+             id="content-MOP_MSD_04300004-LIO-1"
+             data-tab-title="断开低压电池">
+
+            <div class="step-title-section">
+                <span class="step-title-value">操作步骤</span>
+            </div>
+
+            <div class="step-content">
+                1. 拆下后部挡板。<div class="img-row"><div class="img-box"><img src="../09MOP/MOP-TSL-MD3-001.webp" alt="MOP-TSL-MD3-001"><div class="img-name">MOP-TSL-MD3-001.webp</div></div></div>2. 根据下图连接器的外观，选择其中一种方式断开低压电池连接器：<br>- 连接器A：1.向外拉动绿色锁片。 2.按下1号黑色锁片，向外拉动黑色连接器。 3.按下2号黑色锁片，向外拉动黑色连接器。<div class="img-row"><div class="img-box"><img src="../09MOP/MOP-TSL-MD3-LIB001.webp" alt="MOP-TSL-MD3-LIB001"><div class="img-name">MOP-TSL-MD3-LIB001.webp</div></div><div class="img-box"><img src="../09MOP/MOP-TSL-MD3-LIB002.webp" alt="MOP-TSL-MD3-LIB002"><div class="img-name">MOP-TSL-MD3-LIB002.webp</div></div><div class="img-box"><img src="../09MOP/MOP-TSL-MD3-LIB003.webp" alt="MOP-TSL-MD3-LIB003"><div class="img-name">MOP-TSL-MD3-LIB003.webp</div></div></div>- 连接器B：向上拉动绿色按钮，向外拉动黑色连接器。<div class="img-row"><div class="img-box"><img src="../09MOP/MOP-TSL-MD3-LIB2001.webp" alt="MOP-TSL-MD3-LIB2001"><div class="img-name">MOP-TSL-MD3-LIB2001.webp</div></div></div>3. 上拉以断开连接器。<div class="img-row"><div class="img-box"><img src="../09MOP/MOP-TSL-MD3-LIB004.webp" alt="MOP-TSL-MD3-LIB004"><div class="img-name">MOP-TSL-MD3-LIB004.webp</div></div></div>
+            </div>
+        </div>
+        <div class="tab-content"
+             id="content-MOP_MSD_04300004-LIO-2"
+             data-tab-title="断开紧急响应程序回路">
+
+            <div class="step-title-section">
+                <span class="step-title-value">操作步骤</span>
+            </div>
+
+            <div class="step-content">
+                1. 断开紧急响应程序回路。<div class="img-row"><div class="img-box"><img src="../09MOP/MOP-TSL-MD3-LIO-LOOP.webp" alt="MOP-TSL-MD3-LIO-LOOP"><div class="img-name">MOP-TSL-MD3-LIO-LOOP.webp</div></div></div>2. 在继续维修车辆之前，等待 2 分钟以使所有电路放电。
+            </div>
+        </div>
+        <div class="tab-content"
+             id="content-MOP_MSD_04300004-LIO-3"
+             data-tab-title="检查电压">
+
+            <div class="step-title-section">
+                <span class="step-title-value">操作步骤</span>
+            </div>
+
+            <div class="step-content">
+                1. 拆下第 2 排座椅坐垫。<br>2. 拆下高压探头盖。<div class="img-row"><div class="img-box"><img src="../09MOP/MOP-TSL-MD3-004.webp" alt="MOP-TSL-MD3-004"><div class="img-name">MOP-TSL-MD3-004.webp</div></div></div>3. 使用绝缘万用表测量电压。测量以下电压：正极对地、负极对地、正极对负极。电压高于 10 V 则表明电池包接触器已闭合或粘连。<div class="img-row"><div class="img-box"><img src="../09MOP/MOP-TSL-MD3-005.webp" alt="MOP-TSL-MD3-005"><div class="img-name">MOP-TSL-MD3-005.webp</div></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabElement, contentId, index) {
+            const tabBar = tabElement.parentElement;
+            tabBar.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+            tabElement.classList.add('active');
+
+            const card = tabElement.closest('.content-card');
+            card.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`content-${contentId}-${index}`).classList.add('active');
+        }
+
+        function showInfoPopup(event) {
+            event.stopPropagation();
+            const popup = document.getElementById('infoPopup');
+            const overlay = document.getElementById('overlay');
+
+            popup.style.left = '50%';
+            popup.style.top = '50%';
+            popup.style.transform = 'translate(-50%, -50%)';
+
+            popup.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        function closeInfoPopup() {
+            document.getElementById('infoPopup').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('.tab-item');
+            const firstContent = document.querySelector('.tab-content');
+            if (firstTab && firstContent) {
+                firstTab.classList.add('active');
+                firstContent.classList.add('active');
+            }
+
+            document.addEventListener('click', e => {
+                if (e.target.tagName === 'IMG' && (e.target.closest('.img-box') || e.target.closest('.img-row'))) {
+                    document.getElementById('lightbox-img').src = e.target.src;
+                    document.getElementById('lightbox').classList.add('active');
+                }
+            });
+
+            document.addEventListener('keydown', e => {
+                if(e.key === 'Escape') {
+                    document.getElementById('lightbox').classList.remove('active');
+                    closeInfoPopup();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

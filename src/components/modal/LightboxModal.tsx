@@ -5,6 +5,7 @@ import { useBodyScrollLock } from '../../lib/useBodyScrollLock';
 import { VideoContent } from './VideoContent';
 import { FrameContent } from './FrameContent';
 import { DocContent } from './DocContent';
+import { GalleryContent } from './GalleryContent';
 import { DOCS } from '../../data';
 import { Icon } from '../ui/icons';
 import './modal.css';
@@ -13,6 +14,7 @@ const panelSize: Record<string, string> = {
   video: 'w-[min(1280px,96vw)] max-h-[94vh]',
   frame: 'w-[95vw] h-[92vh] max-sm:w-[100dvw] max-sm:h-[100dvh] max-sm:rounded-none',
   doc: 'w-[min(860px,94vw)] h-[max(560px,88vh)] max-sm:w-[96vw] max-sm:h-[92vh]',
+  gallery: 'w-[min(1180px,96vw)] max-sm:w-[100dvw] max-sm:rounded-none',
 };
 
 /** 弹窗内可获取焦点的元素（用于 Tab 焦点循环） */
@@ -110,10 +112,17 @@ export function LightboxModal() {
             </button>
             {state.mode === 'video' && <VideoContent videoKey={state.payload.videoKey} />}
             {state.mode === 'frame' && (
-              <FrameContent src={state.payload.src} title={state.payload.title} />
+              <FrameContent
+                src={state.payload.src}
+                title={state.payload.title}
+                tabs={state.payload.tabs}
+              />
             )}
             {state.mode === 'doc' && (
               <DocContent doc={DOCS[state.payload.docKey as keyof typeof DOCS]} />
+            )}
+            {state.mode === 'gallery' && (
+              <GalleryContent images={state.payload.images} startIndex={state.payload.startIndex} />
             )}
           </motion.div>
         </motion.div>
