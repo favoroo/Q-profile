@@ -19,8 +19,12 @@ export const site: Site = {
       title: '项目经历',
     },
   },
-  heroActions: [
-    { label: '查看项目经历', href: '#projects', variant: 'primary' },
-    { label: '联系我', href: '#contact', variant: 'secondary' },
-  ],
+  hero: {
+    status: '在职 · 湖南道通科技 · 长沙',
+    name: '黄谦',
+    title: '**AI 时代**的汽车技术工程师',
+    eyebrow: 'HUANG QIAN · AUTOMOTIVE TECH ENGINEER',
+    tags: ['四轮定位', 'VIN 码解析', 'EV 高压测量', 'AI Agent 开发'],
+    scrollCue: '向下滚动',
+  },
 };

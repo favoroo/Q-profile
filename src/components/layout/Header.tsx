@@ -27,17 +27,29 @@ const itemVariants: Variants = {
   exit: { opacity: 0, transition: { duration: 0.12 } },
 };
 
-/** sticky 毛玻璃顶栏：滚动 >8px 加边框，滚动监听高亮当前区块，移动端悬浮下拉菜单。 */
+/** sticky 毛玻璃顶栏：滚动 >8px 加边框，滚动监听高亮当前区块，移动端悬浮下拉菜单。
+ *  悬浮于首屏蓝色色块之上时切换为透明白字（on-accent），滚过色块恢复玻璃态。 */
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [onAccent, setOnAccent] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const activeId = useScrollSpy();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+      /* 色块底边在页面坐标 offsetHeight - 52（Hero 以 -mt-52 顶到视口顶部），
+         顶栏底沿接近色块底边前切换回玻璃态，避免压到圆角过渡区 */
+      const hero = document.getElementById('home');
+      setOnAccent(!!hero && window.scrollY < hero.offsetHeight - 110);
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
     onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
   }, []);
 
   /* 移动菜单打开时支持 Escape 关闭 */
@@ -51,9 +63,11 @@ export function Header() {
   }, [menuOpen]);
 
   const linkCls = (href: string) =>
-    `relative py-1 text-[13px] text-ink-2 no-underline transition-colors duration-200 hover:text-ink after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[1.5px] after:rounded-full after:bg-ink after:transition-transform after:duration-300 after:ease-[var(--ease-out-apple)] hover:after:scale-x-100 after:scale-x-0 after:origin-center ${
+    `relative py-1 text-[13px] no-underline transition-colors duration-200 ${
+      onAccent ? 'text-white/70 hover:text-white after:bg-white/60' : 'text-ink-2 hover:text-ink after:bg-ink'
+    } after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[1.5px] after:rounded-full after:transition-transform after:duration-300 after:ease-[var(--ease-out-apple)] hover:after:scale-x-100 after:scale-x-0 after:origin-center ${
       activeId === href.slice(1)
-        ? 'font-semibold text-ink after:scale-x-100'
+        ? `font-semibold ${onAccent ? 'text-white' : 'text-ink'} after:scale-x-100`
         : ''
     }`;
 
@@ -76,18 +90,34 @@ export function Header() {
       </AnimatePresence>
 
       <header
-        className={`sticky top-0 z-100 border-b bg-white/72 backdrop-blur-[20px] backdrop-saturate-180 transition-all duration-300 ${
-          scrolled ? 'bg-white/82' : ''
+        data-on-accent={onAccent || undefined}
+        className={`sticky top-0 z-100 border-b transition-all duration-300 ${
+          onAccent
+            ? scrolled
+              ? /* 色块内滚动：半透明蓝玻璃保持白字可读 */
+                'bg-accent/60 backdrop-blur-[20px] backdrop-saturate-180'
+              : 'bg-transparent'
+            : `bg-white/72 backdrop-blur-[20px] backdrop-saturate-180 ${scrolled ? 'bg-white/82' : ''}`
         }`}
-        style={{ borderColor: scrolled ? 'rgba(0,0,0,0.08)' : 'transparent' }}
+        style={{ borderColor: !onAccent && scrolled ? 'rgba(0,0,0,0.08)' : 'transparent' }}
       >
         <div className="mx-auto flex h-[52px] w-[min(1080px,calc(100%-48px))] items-center justify-between">
           <a className="flex items-baseline gap-2 no-underline" href="#home" aria-label="回到顶部">
-            <strong className="text-[17px] font-bold tracking-[-0.01em] text-ink">
+            <strong
+              className={`text-[17px] font-bold tracking-[-0.01em] transition-colors duration-300 ${
+                onAccent ? 'text-white' : 'text-ink'
+              }`}
+            >
               {site.brand.name}
-              <span className="text-accent">.</span>
+              <span className={onAccent ? 'text-white/60' : 'text-accent'}>.</span>
             </strong>
-            <small className="text-[12px] tracking-[0.02em] text-ink-3">{site.brand.subtitle}</small>
+            <small
+              className={`text-[12px] tracking-[0.02em] transition-colors duration-300 ${
+                onAccent ? 'text-white/60' : 'text-ink-3'
+              }`}
+            >
+              {site.brand.subtitle}
+            </small>
           </a>
           <nav className="hidden gap-[34px] md:flex" aria-label="主导航">
             {site.navLinks.map((l) => (
@@ -101,8 +131,16 @@ export function Header() {
             aria-expanded={menuOpen}
             aria-controls="mobileMenu"
             aria-label={menuOpen ? '关闭菜单' : '打开菜单'}
-            className={`grid h-[38px] w-[38px] cursor-pointer place-items-center rounded-[10px] border-none text-ink transition-colors duration-200 md:hidden ${
-              menuOpen ? 'bg-black/[0.06]' : 'bg-transparent hover:bg-black/5'
+            className={`grid h-[38px] w-[38px] cursor-pointer place-items-center rounded-[10px] border-none transition-colors duration-200 md:hidden ${
+              onAccent ? 'text-white' : 'text-ink'
+            } ${
+              menuOpen
+                ? onAccent
+                  ? 'bg-white/20'
+                  : 'bg-black/[0.06]'
+                : onAccent
+                  ? 'bg-transparent hover:bg-white/10'
+                  : 'bg-transparent hover:bg-black/5'
             }`}
             onClick={() => setMenuOpen((v) => !v)}
           >

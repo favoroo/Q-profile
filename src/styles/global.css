@@ -57,6 +57,32 @@ body {
   }
 }
 
+/* Hero 滚动指引竖线：上半程自顶端展开，下半程向底端收起 */
+@keyframes scroll-line {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  45% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+
+/* 顶栏悬浮于首屏蓝色色块上（on-accent）时，焦点环改白色保证可见 */
+header[data-on-accent] a:focus-visible,
+header[data-on-accent] button:focus-visible {
+  outline-color: #ffffff;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

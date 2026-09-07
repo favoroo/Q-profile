@@ -8,6 +8,7 @@ import {
   DRAG_LIMIT,
   DRAG_LERP,
   FLING_GAIN,
+  MOUNT_ANGLE,
   REST_ANGLE_GAIN,
   REST_X,
   REST_Y,
@@ -370,6 +371,8 @@ export function useLanyardPhysics(reducedMotion: boolean): LanyardPhysics {
     };
     wakeRef.current = wake;
 
+    /* 入场摆角脉冲：像刚挂上去一样自然回摆（减动效下跳过，保持静帧） */
+    if (!reducedRef.current) s.angle = MOUNT_ANGLE;
     /* 首帧渲染静止基线（挂绳初始路径），减动效下无物理、不启动循环 */
     render();
     wake();

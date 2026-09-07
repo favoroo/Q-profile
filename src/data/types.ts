@@ -29,10 +29,20 @@ export interface SectionCopy {
   description?: string;
 }
 
-export interface HeroAction {
-  label: string;
-  href: string;
-  variant: 'primary' | 'secondary';
+/** 首屏 Hero 文案（大色块布局：状态徽章 + display 姓名 + 定位语 + 实践标签） */
+export interface Hero {
+  /** 顶部状态徽章文案（配呼吸点） */
+  status: string;
+  /** display 巨字姓名 */
+  name: string;
+  /** 定位语，支持 `**关键词**` 行内强调 */
+  title: string;
+  /** mono 小字拉丁署名 */
+  eyebrow: string;
+  /** 实践方向标签（信息件，非按钮） */
+  tags: string[];
+  /** 底部滚动指引文案 */
+  scrollCue: string;
 }
 
 export interface Site {
@@ -43,7 +53,7 @@ export interface Site {
     skills: SectionCopy;
     projects: SectionCopy;
   };
-  heroActions: HeroAction[];
+  hero: Hero;
 }
 
 export interface Profile {

@@ -27,4 +27,6 @@ export const REST_Y = 46;
 export const DRAG_LERP = 0.42;
 /* 释放甩动角度增益 */
 export const FLING_GAIN = 0.06;
+/* 挂载入场：初始摆角（deg），弹簧自然回摆形成「刚挂上去」的入场 */
+export const MOUNT_ANGLE = 14;
 
