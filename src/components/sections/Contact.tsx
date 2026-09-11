@@ -1,8 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { contact } from '../../data';
 import { Icon } from '../ui/icons';
 import { Reveal } from '../motion/Reveal';
+
+const CarSceneBackground = lazy(() => import('../3d/CarSceneBackground'));
 
 export function Contact() {
   const [toast, setToast] = useState<string | null>(null);
@@ -44,23 +46,28 @@ export function Contact() {
   };
 
   return (
-    <section className="bg-black pt-[60px] pb-[72px] text-[#F5F5F7]" id="contact">
-      <div className="mx-auto w-[min(1080px,calc(100%-48px))]">
-        <Reveal className="mb-9 text-center">
-          <p className="mb-2 font-mono text-[12.5px] font-semibold tracking-[0.22em] text-accent uppercase">
+    <section className="relative bg-black pt-[84px] pb-[96px] text-[#F5F5F7] overflow-hidden min-h-[640px] flex flex-col justify-center" id="contact">
+      {/* 3D 车模全景背景 (React Bits ModelViewer) */}
+      <Suspense fallback={null}>
+        <CarSceneBackground showSlogan={true} />
+      </Suspense>
+
+      <div className="relative z-10 mx-auto w-[min(1080px,calc(100%-48px))]">
+        <Reveal className="mb-10 text-center">
+          <p className="mb-2 font-mono text-[12.5px] font-semibold tracking-[0.22em] text-accent uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             {contact.eyebrow}
           </p>
-          <h2 className="m-0 text-[clamp(28px,4vw,44px)] leading-[1.1] font-bold tracking-[-0.02em] text-white">
+          <h2 className="m-0 text-[clamp(28px,4vw,44px)] leading-[1.1] font-bold tracking-[-0.02em] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
             {contact.title}
           </h2>
-          <p className="mx-auto mt-2.5 max-w-[560px] text-[15px] leading-[1.65] text-[rgba(245,245,247,0.62)]">
+          <p className="mx-auto mt-2.5 max-w-[560px] text-[15px] leading-[1.65] text-[rgba(245,245,247,0.78)] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             {contact.description}
           </p>
         </Reveal>
 
         <Reveal>
           <div className="mx-auto max-w-[480px]">
-            <div className="rounded-[28px] border border-white/[0.1] bg-white/[0.07] p-8 backdrop-blur-2xl max-md:p-6">
+            <div className="rounded-[28px] border border-white/[0.18] bg-black/55 p-8 shadow-[0_28px_60px_rgba(0,0,0,0.65)] backdrop-blur-2xl ring-1 ring-white/10 max-md:p-6 transition-all hover:border-white/[0.28]">
               <div className="flex flex-col gap-[20px]">
                 {contact.rows.map((row) => (
                   <div key={row.label} className="flex items-center gap-4">
