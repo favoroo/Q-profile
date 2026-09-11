@@ -10,15 +10,14 @@
   user-select: none;
   -webkit-user-select: none;
   z-index: 10;
-  width: clamp(176px, 16vw, 224px);
-  /* 顶部留出挂绳垂落空间：挂绳视觉起点贴近色块顶缘 */
-  margin: 32px auto 0;
+  width: clamp(146px, 14vw, 172px);
+  margin: 50px auto 16px;
   touch-action: none;
 }
 @media (max-width: 700px) {
   .stage {
-    width: clamp(150px, 42vw, 180px);
-    margin: 64px auto 0;
+    width: clamp(130px, 36vw, 150px);
+    margin: 44px auto 12px;
   }
 }
 
@@ -51,24 +50,7 @@
   cursor: grabbing;
 }
 
-/* 待机微摆层：CSS 动画独立于 badgeBody 的 JS transform，叠加以保持"活着"的观感 */
-.sway {
-  width: 100%;
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-  animation: badge-sway 6.5s ease-in-out infinite;
-}
-@keyframes badge-sway {
-  0%,
-  100% {
-    transform: rotate(0.9deg);
-  }
-  50% {
-    transform: rotate(-0.9deg);
-  }
-}
-
-/* 一体化 3D 翻转卡片（悬浮于蓝色色块之上，阴影带冷色调） */
+/* 一体化 3D 翻转卡片（精致工牌边框与轻量质感） */
 .cardInner {
   position: relative;
   width: 100%;
@@ -76,19 +58,11 @@
   border-radius: 16px;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
-  transition: transform 0.5s var(--ease-out-apple), box-shadow 0.5s var(--ease-out-apple);
-  box-shadow:
-    0 16px 36px -8px rgba(4, 32, 74, 0.38),
-    0 3px 10px rgba(0, 0, 0, 0.12);
+  transition: transform 0.5s var(--ease-out-apple);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 .cardInner.is-flipped {
   transform: rotateY(180deg);
-}
-/* hover：阴影加深抬升悬浮感 */
-.stage:hover .cardInner {
-  box-shadow:
-    0 28px 56px -12px rgba(4, 32, 74, 0.46),
-    0 6px 16px rgba(0, 0, 0, 0.16);
 }
 
 /* 工牌金属扣夹（正面/背面，随卡片一同 3D 旋转） */
@@ -141,32 +115,6 @@
   padding: 7px 7px 9px;
   justify-content: space-between;
   transform: rotateY(0deg) translateZ(0.1px);
-}
-
-/* hover 光泽扫过：斜向高光从左掠到右（每次 hover 播放一次） */
-.faceFront::after {
-  content: '';
-  position: absolute;
-  inset: -20%;
-  background: linear-gradient(
-    115deg,
-    transparent 42%,
-    rgba(255, 255, 255, 0.5) 50%,
-    transparent 58%
-  );
-  transform: translateX(-130%);
-  pointer-events: none;
-}
-.stage:hover .faceFront::after {
-  animation: gloss-sweep 0.9s var(--ease-out-apple);
-}
-@keyframes gloss-sweep {
-  from {
-    transform: translateX(-130%);
-  }
-  to {
-    transform: translateX(130%);
-  }
 }
 
 /* 照片区域：工牌证件照内衬视窗边框 */
@@ -245,18 +193,12 @@
   }
 }
 
-/* 无障碍：减少动态时取消翻转过渡、待机微摆与光泽扫过 */
+/* 无障碍：减少动态时取消翻转过渡 */
 @media (prefers-reduced-motion: reduce) {
   .cardInner {
     transition-duration: 0.01ms;
   }
   .emojiItem {
-    animation: none;
-  }
-  .sway {
-    animation: none;
-  }
-  .stage:hover .faceFront::after {
     animation: none;
   }
 }
