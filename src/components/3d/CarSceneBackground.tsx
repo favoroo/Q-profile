@@ -67,16 +67,15 @@ export function CarSceneBackground({ showSlogan = true }: CarSceneBackgroundProp
           enableManualRotation={true}
           enableManualZoom={false}
           floorMeshes={CAR_MESHES}
-          lightweightMaterials={true}
-          environment={true}
-          // 环境贴图（HDR 摄影棚）现在是主光源，车漆清漆层与红布绒面的观感几乎全由它决定；
-          // 环境底噪压得很低（近黑），所以强度可以放心开大：暗部乘完依然暗，
-          // 亮部与光斑则被推到接近纯白 —— 明暗对比不会被破坏，只会更"通透"。
-          environmentIntensity={1.6}
-          ambientIntensity={0.05}
-          keyLightIntensity={1.5}
-          fillLightIntensity={0.3}
-          rimLightIntensity={0.7}
+          // hdr = 自托管真实摄影 HDR（public/hdr/forest_slope_1k.hdr，React Bits 同款文件），
+          // 与 React Bits 官方示例的 Environment preset="forest" 同源同观感；
+          // 材质保持原厂状态（不降级 transmission 玻璃、不动布料参数）—— 原示例也不碰材质。
+          // 若个别机器复现早年「HDR 环境打挂 WebGL」的问题，改 environment="procedural" 一行即可回退。
+          environment="hdr"
+          environmentFiles={withBase('/hdr/forest_slope_1k.hdr')}
+          lightweightMaterials={false}
+          // 原站默认环境强度；灯光也用 React Bits 原版默认（ambient 0.3 / key 1 / fill 0.5 / rim 0.8）
+          environmentIntensity={1}
           showScreenshotButton={false}
           autoRotate={false}
           fadeIn={true}
@@ -106,10 +105,11 @@ export function CarSceneBackground({ showSlogan = true }: CarSceneBackgroundProp
         </div>
       )}
 
-      {/* 柔和暗角与顶部过渡渐变，保证与黑色背景无缝过渡 */}
-      <div className="pointer-events-none absolute inset-0 bg-radial-[circle_at_50%_40%] from-transparent via-black/25 to-black/80" />
+      {/* 柔和暗角与顶部过渡渐变，保证与黑色背景无缝过渡。
+          暗角不能压太狠：车身恰好落在画布右缘，压到 /80 会把车漆镜面高光一起吃掉 */}
+      <div className="pointer-events-none absolute inset-0 bg-radial-[circle_at_50%_40%] from-transparent via-black/25 to-black/70" />
       <div className="pointer-events-none absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-black via-black/70 to-transparent" />
-      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-black via-black/80 to-transparent" />
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-black via-black/70 to-transparent" />
     </div>
   );
 }

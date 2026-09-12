@@ -52,7 +52,9 @@ export function Contact() {
         <CarSceneBackground showSlogan={true} />
       </Suspense>
 
-      <div className="relative z-10 mx-auto w-[min(1080px,calc(100%-48px))]">
+      {/* pointer-events-none：放行鼠标到底下的 3D canvas（车模可拖拽旋转），
+          需要交互的元素在内部单独开 pointer-events-auto */}
+      <div className="pointer-events-none relative z-10 mx-auto w-[min(1080px,calc(100%-48px))]">
         <Reveal className="mb-10 text-center">
           <p className="mb-2 font-mono text-[12.5px] font-semibold tracking-[0.22em] text-accent uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             {contact.eyebrow}
@@ -67,7 +69,7 @@ export function Contact() {
 
         <Reveal>
           <div className="mx-auto max-w-[480px]">
-            <div className="rounded-[28px] border border-white/[0.18] bg-black/55 p-8 shadow-[0_28px_60px_rgba(0,0,0,0.65)] backdrop-blur-2xl ring-1 ring-white/10 max-md:p-6 transition-all hover:border-white/[0.28]">
+            <div className="pointer-events-auto rounded-[28px] border border-white/[0.18] bg-black/55 p-8 shadow-[0_28px_60px_rgba(0,0,0,0.65)] backdrop-blur-2xl ring-1 ring-white/10 max-md:p-6 transition-all hover:border-white/[0.28]">
               <div className="flex flex-col gap-[20px]">
                 {contact.rows.map((row) => (
                   <div key={row.label} className="flex items-center gap-4">

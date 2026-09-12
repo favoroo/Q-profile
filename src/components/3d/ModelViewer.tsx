@@ -11,7 +11,7 @@ import {
   type CSSProperties,
 } from 'react';
 import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
-import { OrbitControls, useGLTF, useProgress, Html, ContactShadows } from '@react-three/drei';
+import { OrbitControls, useGLTF, useProgress, Html, ContactShadows, Environment } from '@react-three/drei';
 import { ProceduralEnv } from './ProceduralEnv';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
@@ -37,9 +37,17 @@ export interface ModelViewerProps {
   keyLightIntensity?: number;
   fillLightIntensity?: number;
   rimLightIntensity?: number;
-  /** 是否启用本地程序化环境贴图（IBL），关闭后仅靠灯光照明 */
-  environment?: boolean;
-  /** 环境光强度 */
+  /**
+   * 环境贴图（IBL）来源：
+   *  - `'hdr'`       ：drei `<Environment files={environmentFiles} />` 加载真实 HDR（推荐，
+   *                    与 React Bits 官方示例同款观感，需传入自托管的 .hdr 文件 URL）
+   *  - `'procedural'`：本地程序化生成的 HDR 环境布光（零资产兜底方案）
+   *  - `false`       ：不使用环境贴图，仅靠灯光照明
+   */
+  environment?: 'hdr' | 'procedural' | false;
+  /** `'hdr'` 模式下加载的 .hdr 文件 URL（public 静态资源，需经 withBase 包裹） */
+  environmentFiles?: string;
+  /** 环境光强度（作用于 scene.environmentIntensity） */
   environmentIntensity?: number;
   autoFrame?: boolean;
   /**
@@ -301,11 +309,21 @@ function ModelInner({
             p.metalness = 0;
             p.envMapIntensity = 3.2;
             p.needsUpdate = true;
-          } else if (p.isMeshPhysicalMaterial && p.sheen > 0) {
-            // 绒布台座：sheen 的"绒面辉光"完全来自环境在掠射角的反射。
-            // 原模型的 baseColor 是很深的灰（0.15），漫反射几乎不出亮度，
-            // 观感全靠这一层 —— 抬高环境权重，红布才有那种丝绒的光泽感。
-            p.envMapIntensity = 1.8;
+          } else if (lightweightMaterials && p.isMeshPhysicalMaterial && p.sheen > 0) {
+            // 绒布台座（仅 lightweightMaterials 兼容模式；hdr 模式保持原厂材质）：
+            // 观感 = 深红漫反射底 + 红色 sheen 掠射辉光。
+            // ⚠️ envMapIntensity 必须压在 0.02 量级：布面是水平的，环境里那几块
+            // 高峰值灯板（有效亮度数百）对它的漫反射辐照度 E≈95，倍率给高一点
+            // G/B 通道就直接爆白（实测 0.2 时整块布被洗成粉白）；车漆吃的是
+            // 灯板的「镜面峰」所以不受影响 —— 两者由此解耦。
+            // 直接光（平行灯）不随 envMapIntensity 缩放，是亮度下限，
+            // 固有色乘一层暗红抵掉平行灯的洗白部分；sheen 保持满档出绒面辉光。
+            p.envMapIntensity = 0.02;
+            // 绒布几乎不该有相干镜面：介质 specular 的菲涅尔项（F→1 @ 掠射角）
+            // 会把褶皱剪影全部打出白色高光，这是布面"粉白"的最后一层来源，
+            // specularIntensity 只缩镜面项、不动漫反射与 sheen —— 正好外科手术式切除
+            p.specularIntensity = 0.12;
+            p.color.multiply(new THREE.Color(0.4, 0.28, 0.28));
             p.needsUpdate = true;
           }
           // 记下「基准不透明度」：淡入动画要按这个基准按比例恢复，
@@ -593,7 +611,8 @@ export function ModelViewer({
   keyLightIntensity = 1,
   fillLightIntensity = 0.5,
   rimLightIntensity = 0.8,
-  environment = true,
+  environment = 'hdr',
+  environmentFiles,
   environmentIntensity = 1,
   autoFrame = false,
   excludeMeshes = [],
@@ -700,7 +719,13 @@ export function ModelViewer({
         camera={{ fov: 45, position: [0, 0, camZ], near: 0.01, far: 100 }}
         style={{ touchAction: 'pan-y pinch-zoom' }}
       >
-        {environment && <ProceduralEnv intensity={environmentIntensity} />}
+        {/* 环境贴图（IBL）：hdr = 自托管真实 HDR（原站同款观感）；procedural = 零资产兜底 */}
+        {environment === 'hdr' && environmentFiles && (
+          <Suspense fallback={null}>
+            <Environment files={environmentFiles} background={false} />
+          </Suspense>
+        )}
+        {environment === 'procedural' && <ProceduralEnv intensity={environmentIntensity} />}
 
         <ambientLight intensity={ambientIntensity} />
         <directionalLight position={[5, 5, 5]} intensity={keyLightIntensity} castShadow />
