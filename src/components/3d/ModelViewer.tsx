@@ -89,8 +89,17 @@ const PARALLAX_MAG = 0.05;
 const PARALLAX_EASE = 0.12;
 const HOVER_MAG = deg2rad(6);
 const HOVER_EASE = 0.15;
-/** transmission 降级后玻璃件的 alpha 值（保留通透观感，去掉昂贵的折射通道） */
-const GLASS_OPACITY = 0.34;
+/**
+ * 降级后玻璃的不透明度。给到偏高：低不透明度会让车内的红布透出来，
+ * 车窗变成一块暗红色 —— 而这类扫描件车内并没有内饰，透过去只会更难看的。
+ */
+const GLASS_OPACITY = 0.82;
+/**
+ * 降级后玻璃的固有色。原始 baseColor 是 (0.3, 0.8, 0.3) 的**绿色** —— 那是给
+ * transmission 当「透射色」用的（光穿过玻璃后染成绿），换成普通不透明玻璃后
+ * 会变成一块生硬的绿板。这里压暗、去饱和，交给环境反射来出效果。
+ */
+const GLASS_TINT: [number, number, number] = [0.02, 0.028, 0.026];
 
 function Loader({ placeholderSrc }: { placeholderSrc?: string }) {
   const { progress, active } = useProgress();
@@ -285,6 +294,18 @@ function ModelInner({
             p.transparent = true;
             p.opacity = GLASS_OPACITY;
             p.depthWrite = false;
+            // 玻璃的「高级感」来自反射而不是固有色：压暗本体色、恢复低粗糙度，
+            // 并抬高环境反射权重，车窗上才会出现和车漆同源的高光
+            p.color.setRGB(GLASS_TINT[0], GLASS_TINT[1], GLASS_TINT[2]);
+            p.roughness = 0.03;
+            p.metalness = 0;
+            p.envMapIntensity = 3.2;
+            p.needsUpdate = true;
+          } else if (p.isMeshPhysicalMaterial && p.sheen > 0) {
+            // 绒布台座：sheen 的"绒面辉光"完全来自环境在掠射角的反射。
+            // 原模型的 baseColor 是很深的灰（0.15），漫反射几乎不出亮度，
+            // 观感全靠这一层 —— 抬高环境权重，红布才有那种丝绒的光泽感。
+            p.envMapIntensity = 1.8;
             p.needsUpdate = true;
           }
           // 记下「基准不透明度」：淡入动画要按这个基准按比例恢复，
@@ -689,10 +710,14 @@ export function ModelViewer({
         <ContactShadows
           ref={contactRef}
           position={[0, floorY + 0.002, 0]}
-          opacity={0.55}
-          scale={fitRadius * 1.7}
-          blur={2.6}
-          far={0.32}
+          opacity={0.72}
+          // scale 必须盖住整个模型（车 + 红布台座约 3~4 单位）：
+          // 太小会让阴影在边缘被硬裁掉，太大则把阴影纹素摊薄、糊成一片
+          scale={fitRadius * 4}
+          blur={2.5}
+          // far = 阴影平面往上多远参与投影。给到略高于车身，整个车才会压出「实心+柔边」的落地阴影
+          far={fitRadius * 2.1}
+          resolution={512}
         />
 
         <Suspense fallback={<Loader placeholderSrc={placeholderSrc} />}>

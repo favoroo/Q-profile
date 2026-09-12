@@ -30,13 +30,17 @@ export function CarSceneBackground({ showSlogan = true }: CarSceneBackgroundProp
 
   const viewportWidth = useViewportWidth();
   const isNarrow = useMediaQuery('(max-width: 1023px)');
-  // 车模在屏幕上的占比随可视宽度变化，按屏宽反向补偿相机距离
+  // 车模在屏幕上的占比随可视宽度变化，按屏宽反向补偿相机距离。
+  // 上限不能给太大：手机屏窄，若按 1280/390 全额补偿（≈3.3）相机会拉得极远，
+  // 车缩成指甲盖大小、光影细节全丢。收到 1.9 后手机上仍能看清车身与红绒布台。
   const zoom = Math.min(
     Math.max(BASE_ZOOM * (BASE_WIDTH / viewportWidth), BASE_ZOOM * 0.6),
-    BASE_ZOOM * 2.6,
+    BASE_ZOOM * 1.9,
   );
-  const xOffset = isNarrow ? 0.08 : 0.58;
-  const yOffset = isNarrow ? -0.72 : -0.28;
+  // 窄屏（手机 / 竖屏平板）下联系卡片几乎占满宽度，车只能退到卡片下方靠右陈列，
+  // 靠太近会被卡片压住、太靠下又会被画布底边裁掉
+  const xOffset = isNarrow ? 0.16 : 0.58;
+  const yOffset = isNarrow ? -0.78 : -0.28;
 
   // 优先加载本地 public/models/ToyCar.glb
   const modelUrl = useMemo(() => {
@@ -65,11 +69,14 @@ export function CarSceneBackground({ showSlogan = true }: CarSceneBackgroundProp
           floorMeshes={CAR_MESHES}
           lightweightMaterials={true}
           environment={true}
-          environmentIntensity={1.15}
-          ambientIntensity={0.26}
-          keyLightIntensity={1.3}
-          fillLightIntensity={0.55}
-          rimLightIntensity={0.95}
+          // 环境贴图（HDR 摄影棚）现在是主光源，车漆清漆层与红布绒面的观感几乎全由它决定；
+          // 环境底噪压得很低（近黑），所以强度可以放心开大：暗部乘完依然暗，
+          // 亮部与光斑则被推到接近纯白 —— 明暗对比不会被破坏，只会更"通透"。
+          environmentIntensity={1.6}
+          ambientIntensity={0.05}
+          keyLightIntensity={1.5}
+          fillLightIntensity={0.3}
+          rimLightIntensity={0.7}
           showScreenshotButton={false}
           autoRotate={false}
           fadeIn={true}
