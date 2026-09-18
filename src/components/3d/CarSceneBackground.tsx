@@ -30,6 +30,7 @@ export function CarSceneBackground({ showSlogan = true }: CarSceneBackgroundProp
 
   const viewportWidth = useViewportWidth();
   const isNarrow = useMediaQuery('(max-width: 1023px)');
+  const isPhone = useMediaQuery('(max-width: 639px)');
   // 车模在屏幕上的占比随可视宽度变化，按屏宽反向补偿相机距离。
   // 上限不能给太大：手机屏窄，若按 1280/390 全额补偿（≈3.3）相机会拉得极远，
   // 车缩成指甲盖大小、光影细节全丢。收到 1.9 后手机上仍能看清车身与红绒布台。
@@ -38,9 +39,11 @@ export function CarSceneBackground({ showSlogan = true }: CarSceneBackgroundProp
     BASE_ZOOM * 1.9,
   );
   // 窄屏（手机 / 竖屏平板）下联系卡片几乎占满宽度，车只能退到卡片下方靠右陈列，
-  // 靠太近会被卡片压住、太靠下又会被画布底边裁掉
-  const xOffset = isNarrow ? 0.16 : 0.58;
-  const yOffset = isNarrow ? -0.78 : -0.28;
+  // 靠太近会被卡片压住、太靠下又会被画布底边裁掉。
+  // 手机端（≤639px）联系区额外加了底部留白当「车模展示区」，车整体上抬
+  // 让红绒布台完整入镜，不再贴着画布底边被裁切。
+  const xOffset = isPhone ? 0.12 : isNarrow ? 0.16 : 0.54;
+  const yOffset = isPhone ? -0.55 : isNarrow ? -0.78 : -0.20;
 
   // 优先加载本地 public/models/ToyCar.glb
   const modelUrl = useMemo(() => {
@@ -57,8 +60,8 @@ export function CarSceneBackground({ showSlogan = true }: CarSceneBackgroundProp
           height="100%"
           modelXOffset={xOffset}
           modelYOffset={yOffset}
-          defaultRotationX={-45}
-          defaultRotationY={18}
+          defaultRotationX={-60}
+          defaultRotationY={12}
           defaultZoom={zoom}
           minZoomDistance={0.6}
           maxZoomDistance={3}
@@ -83,10 +86,11 @@ export function CarSceneBackground({ showSlogan = true }: CarSceneBackgroundProp
         />
       </div>
 
-      {/* 还原 React Bits 样式的发光动感标语 "Fast as lightning" */}
+      {/* 还原 React Bits 样式的发光动感标语 "Fast as lightning"
+          桌面端右移至车模上方，与左侧联系信息栏形成左右分栏布局 */}
       {showSlogan && (
         <div
-          className={`pointer-events-none absolute top-10 left-6 sm:top-14 sm:left-12 lg:left-20 xl:left-32 transition-all duration-1000 ease-out ${
+          className={`pointer-events-none absolute top-10 left-6 sm:top-14 sm:left-12 lg:top-20 lg:left-auto lg:right-12 xl:right-24 transition-all duration-1000 ease-out ${
             modelLoaded ? 'opacity-85 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >

@@ -45,8 +45,11 @@ export function Contact() {
     }
   };
 
+  // 移动端底部留白加大：卡片下方给 3D 车模留出完整展示区，页面也能继续下滑。
+  // 桌面端内容顶对齐（lg:justify-start），让左侧标题块与右上角 "FAST AS LIGHTNING"
+  // 标语形成同高度视觉对齐；移动端保持垂直居中。
   return (
-    <section className="relative bg-black pt-[84px] pb-[96px] text-[#F5F5F7] overflow-hidden min-h-[640px] flex flex-col justify-center" id="contact">
+    <section className="relative bg-black pt-[84px] pb-[96px] max-md:pb-[340px] lg:justify-start lg:pt-[76px] text-[#F5F5F7] overflow-hidden min-h-[640px] flex flex-col justify-center" id="contact">
       {/* 3D 车模全景背景 (React Bits ModelViewer) */}
       <Suspense fallback={null}>
         <CarSceneBackground showSlogan={true} />
@@ -55,20 +58,32 @@ export function Contact() {
       {/* pointer-events-none：放行鼠标到底下的 3D canvas（车模可拖拽旋转），
           需要交互的元素在内部单独开 pointer-events-auto */}
       <div className="pointer-events-none relative z-10 mx-auto w-[min(1080px,calc(100%-48px))]">
-        <Reveal className="mb-10 text-center">
-          <p className="mb-2 font-mono text-[12.5px] font-semibold tracking-[0.22em] text-accent uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+        {/* 标题区：字体风格与右侧 "FAST AS LIGHTNING" 标语呼应
+            （font-black italic 展示体 + 白/蓝辉光，强度比标语收敛一档） */}
+        <Reveal className="mb-10 text-center lg:text-left">
+          <p
+            className="mb-2 font-mono text-[12.5px] font-semibold tracking-[0.22em] text-accent uppercase"
+            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 16px rgba(0,113,227,0.45)' }}
+          >
             {contact.eyebrow}
           </p>
-          <h2 className="m-0 text-[clamp(28px,4vw,44px)] leading-[1.1] font-bold tracking-[-0.02em] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]">
+          <h2
+            className="m-0 font-sans text-[clamp(30px,4.2vw,48px)] leading-[1.08] font-black italic tracking-[-0.02em] text-white/95 select-none"
+            style={{
+              textShadow:
+                '0 2px 12px rgba(0,0,0,0.55), 0 0 22px rgba(255,255,255,0.35), 0 0 56px rgba(0,113,227,0.4)',
+            }}
+          >
             {contact.title}
           </h2>
-          <p className="mx-auto mt-2.5 max-w-[560px] text-[15px] leading-[1.65] text-[rgba(245,245,247,0.78)] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+          <p className="mx-auto lg:mx-0 mt-3 max-w-[560px] text-[15px] leading-[1.65] text-[rgba(245,245,247,0.78)] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             {contact.description}
           </p>
         </Reveal>
 
         <Reveal>
-          <div className="mx-auto max-w-[480px]">
+          {/* 桌面端卡片左对齐 1080px 内容栅格，避开右侧 3D 车模与红绒布台 */}
+          <div className="mx-auto max-w-[480px] lg:ml-0 lg:mr-auto">
             <div className="pointer-events-auto rounded-[28px] border border-white/[0.18] bg-black/55 p-8 shadow-[0_28px_60px_rgba(0,0,0,0.65)] backdrop-blur-2xl ring-1 ring-white/10 max-md:p-6 transition-all hover:border-white/[0.28]">
               <div className="flex flex-col gap-[20px]">
                 {contact.rows.map((row) => (
