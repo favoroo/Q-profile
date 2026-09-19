@@ -184,4 +184,6 @@ export interface Contact {
   title: string;
   description: string;
   rows: ContactRow[];
+  /** 联系区 3D 车模场景右上角的英文动感标语（大写斜体辉光展示，纯装饰） */
+  slogan: string;
 }

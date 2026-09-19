@@ -2,9 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { ModelViewer } from './ModelViewer';
 import { withBase } from '../../lib/asset';
 import { useMediaQuery, useViewportWidth } from '../../lib/useMediaQuery';
+import styles from './CarSceneBackground.module.css';
 
 interface CarSceneBackgroundProps {
   showSlogan?: boolean;
+  /** 右上角动感标语文案（大写斜体辉光展示），由 src/data/contact.ts 供给 */
+  slogan?: string;
 }
 
 /**
@@ -24,7 +27,25 @@ const CAR_MESHES = ['toycar'];
 const BASE_WIDTH = 1280;
 const BASE_ZOOM = 1.0;
 
-export function CarSceneBackground({ showSlogan = true }: CarSceneBackgroundProps) {
+/** 标语文字样式：基础层与扫光层共用（不含颜色），保证两层完全对齐 */
+const SLOGAN_TEXT_CLASS =
+  'font-sans text-[clamp(26px,4.8vw,56px)] font-black tracking-tighter uppercase italic select-none';
+
+/** 基础辉光（扫光层不发光，只在字形内滑过一道高光带） */
+const SLOGAN_STYLE_BASE = {
+  textShadow:
+    '0 0 20px rgba(255,255,255,0.6), 0 0 40px rgba(0,113,227,0.45), 0 0 80px rgba(0,113,227,0.25)',
+  letterSpacing: '-0.02em',
+};
+
+/** 扫光层：比基础层更亮的白字 + 自带辉光，经滑动遮罩只露出一段高光带；字距须与基础层一致 */
+const SLOGAN_STYLE_SHEEN = {
+  textShadow:
+    '0 0 18px rgba(255,255,255,0.9), 0 0 48px rgba(0,113,227,0.8), 0 0 96px rgba(0,113,227,0.5)',
+  letterSpacing: '-0.02em',
+};
+
+export function CarSceneBackground({ showSlogan = true, slogan }: CarSceneBackgroundProps) {
   const [modelLoaded, setModelLoaded] = useState(false);
   const handleLoaded = useCallback(() => setModelLoaded(true), []);
 
@@ -86,24 +107,26 @@ export function CarSceneBackground({ showSlogan = true }: CarSceneBackgroundProp
         />
       </div>
 
-      {/* 还原 React Bits 样式的发光动感标语 "Fast as lightning"
+      {/* 发光动感标语（React Bits 同款样式，文案来自 src/data/contact.ts）
           桌面端右移至车模上方，与左侧联系信息栏形成左右分栏布局 */}
-      {showSlogan && (
+      {showSlogan && slogan && (
         <div
           className={`pointer-events-none absolute top-10 left-6 sm:top-14 sm:left-12 lg:top-20 lg:left-auto lg:right-12 xl:right-24 transition-all duration-1000 ease-out ${
             modelLoaded ? 'opacity-85 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
           <div className="relative inline-block">
+            <span className={`${SLOGAN_TEXT_CLASS} text-white/90`} style={SLOGAN_STYLE_BASE}>
+              {slogan}
+            </span>
+            {/* 扫光层：同文案 background-clip:text 叠加，高光带周期性从左至右扫过
+                （module 内含 reduced-motion 关停，静息位与基础层同色） */}
             <span
-              className="font-sans text-[clamp(24px,4.2vw,48px)] font-black tracking-tighter text-white/90 uppercase italic select-none"
-              style={{
-                textShadow:
-                  '0 0 20px rgba(255,255,255,0.6), 0 0 40px rgba(0,113,227,0.45), 0 0 80px rgba(0,113,227,0.25)',
-                letterSpacing: '-0.02em',
-              }}
+              aria-hidden="true"
+              className={`${SLOGAN_TEXT_CLASS} ${styles.sheenSweep}`}
+              style={SLOGAN_STYLE_SHEEN}
             >
-              Fast as lightning
+              {slogan}
             </span>
           </div>
         </div>

@@ -46,19 +46,19 @@ export function Contact() {
   };
 
   // 移动端底部留白加大：卡片下方给 3D 车模留出完整展示区，页面也能继续下滑。
-  // 桌面端内容顶对齐（lg:justify-start），让左侧标题块与右上角 "FAST AS LIGHTNING"
+  // 桌面端内容顶对齐（lg:justify-start），让左侧标题块与右上角 "NEVER IDLE"
   // 标语形成同高度视觉对齐；移动端保持垂直居中。
   return (
     <section className="relative bg-black pt-[84px] pb-[96px] max-md:pb-[340px] lg:justify-start lg:pt-[76px] text-[#F5F5F7] overflow-hidden min-h-[640px] flex flex-col justify-center" id="contact">
       {/* 3D 车模全景背景 (React Bits ModelViewer) */}
       <Suspense fallback={null}>
-        <CarSceneBackground showSlogan={true} />
+        <CarSceneBackground showSlogan={true} slogan={contact.slogan} />
       </Suspense>
 
       {/* pointer-events-none：放行鼠标到底下的 3D canvas（车模可拖拽旋转），
           需要交互的元素在内部单独开 pointer-events-auto */}
       <div className="pointer-events-none relative z-10 mx-auto w-[min(1080px,calc(100%-48px))]">
-        {/* 标题区：字体风格与右侧 "FAST AS LIGHTNING" 标语呼应
+        {/* 标题区：字体风格与右侧 "NEVER IDLE" 标语呼应
             （font-black italic 展示体 + 白/蓝辉光，强度比标语收敛一档） */}
         <Reveal className="mb-10 text-center lg:text-left">
           <p

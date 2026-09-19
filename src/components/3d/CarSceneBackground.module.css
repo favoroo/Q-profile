@@ -1,0 +1,46 @@
+/* NEVER IDLE 标语的「扫光」层：与基础标语同文案叠加，整层是更亮的白字 + 自带辉光，
+   用一条滑动的渐变遮罩只露出窄窄一段——高光带（连同辉光）周期性从左至右扫过，
+   静息位整层完全遮住，观感即基础层。
+   组件级循环动效收在 CSS Modules 内（同 LanyardBadge 的组织方式）。 */
+.sheenSweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: #fff;
+  -webkit-mask-image: linear-gradient(105deg, transparent 44%, #000 50%, transparent 56%);
+  mask-image: linear-gradient(105deg, transparent 44%, #000 50%, transparent 56%);
+  -webkit-mask-size: 300% 100%;
+  mask-size: 300% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  /* 静息位：可视窗口在遮罩右段，全是透明区，整层不可见 */
+  -webkit-mask-position: 100% 0;
+  mask-position: 100% 0;
+  animation: sheenSweep 5s ease-in-out 1.2s infinite;
+}
+
+@keyframes sheenSweep {
+  /* 静默 ~3s */
+  0%,
+  60% {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+  /* ~1.2s 高光带从左至右扫过一遍 */
+  84% {
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+  }
+  100% {
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+  }
+}
+
+/* global.css 的全局兜底只把动画时长压到 0.01ms，对 infinite 循环等效于随机闪帧而非静止，
+   这里必须显式关停；关停后停在静息位（遮罩全遮），观感与基础层一致（同 LanyardBadge） */
+@media (prefers-reduced-motion: reduce) {
+  .sheenSweep {
+    animation: none;
+  }
+}
