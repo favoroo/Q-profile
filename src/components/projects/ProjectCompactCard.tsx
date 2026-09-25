@@ -7,18 +7,18 @@ import { Reveal } from '../motion/Reveal';
 export function ProjectCompactCard({ project, delay = 0 }: { project: Project; delay?: number }) {
   return (
     <Reveal className="col-span-2 max-md:col-span-1" delay={delay}>
-      <article className="group grid h-full grid-cols-[200px_1fr] overflow-hidden rounded-[28px] border border-black/[0.08] bg-bg-alt transition-all duration-500 ease-[var(--ease-out-apple)] hover:-translate-y-[3px] hover:border-accent/[0.24] hover:shadow-card-hover max-md:grid-cols-1">
+      <article className="group grid h-full grid-cols-[240px_1fr] lg:grid-cols-[260px_1fr] overflow-hidden rounded-[28px] border border-black/[0.08] bg-bg-alt transition-all duration-500 ease-[var(--ease-out-apple)] hover:-translate-y-[3px] hover:border-accent/[0.24] hover:shadow-card-hover max-md:grid-cols-1">
         <div className="relative h-full min-h-[135px] overflow-hidden bg-black/[0.04] max-md:aspect-16/9 max-md:h-auto max-md:min-h-0">
           <img
             src={project.image}
             srcSet={projectImageSrcSet(project.image) || undefined}
-            sizes="(max-width: 767px) 100vw, 200px"
+            sizes="(max-width: 767px) 100vw, 260px"
             alt={project.imageAlt}
             width={1376}
             height={768}
             loading="lazy"
             decoding="async"
-            className="block h-full w-full object-cover transition-transform duration-500 ease-[var(--ease-out-apple)] group-hover:scale-[1.06]"
+            className="block h-full w-full object-cover object-center transition-transform duration-500 ease-[var(--ease-out-apple)] group-hover:scale-[1.06]"
           />
 
         </div>
