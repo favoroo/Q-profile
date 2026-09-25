@@ -56,6 +56,16 @@ export const projects: Project[] = [
           { label: '图片处理工具', src: withBase('/evkit/tools/imageproc-tool.html') },
         ],
       },
+      {
+        kind: 'iframe',
+        label: '分享文档',
+        ariaLabel: '打开 EV Kit 2 项目开发分享文档',
+        // public/evkit/share/ 是 Flask 模板的静态导出产物，改内容要重跑
+        // npm run export:evkit-share，别直接编辑这个目录里的文件
+        frameSrc: withBase('/evkit/share/index.html'),
+        variant: 'secondary',
+        icon: 'doc',
+      },
     ],
   },
 

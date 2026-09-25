@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="description" content="EVKit2 项目开发分享 —— 新能源汽车高压诊断套件。新能源汽车高压诊断套件的完整开发脉络：从市场缺口、产品形态、UE/UI 确认，到整车检测功能与数据开发工具链。">
+<title>EVKit2 · 项目开发分享</title>
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314130F'/%3E%3Cpath d='M6 21h5.5l3-10 3 14 3-8h5.5' fill='none' stroke='%23F5B301' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+<link rel="stylesheet" href="./assets/css/style.css?v=20260921_v23">
+
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "./assets/vendor/three/three.module.js"
+  }
+}
+</script>
+</head>
+
+<body>
+
+<div class="atmo-noise" aria-hidden="true"></div>
+
+<div class="progress" role="presentation"><div class="progress__bar"></div></div>
+
+<header class="topbar" id="topbar">
+  <a class="topbar__mark" href="#top">
+    <span class="topbar__dot" aria-hidden="true"></span>
+    <b data-ep="site.title">EVKit2</b><i data-ep="site.title_sub">项目开发分享</i>
+  </a>
+  <span class="topbar__spacer"></span>
+  <span class="topbar__meta" data-ep="site.meta">汽车技术部 · 黄谦</span>
+</header>
+
+<nav class="indexnav" id="indexnav" aria-label="章节导航">
+  <p class="indexnav__title" data-ep="ui.indexnav_title">目录 / CONTENTS</p>
+  <div class="indexnav__track">
+    <span class="indexnav__rail" aria-hidden="true"></span>
+    <span class="indexnav__fill" aria-hidden="true"></span>
+<div class="indexnav__item">
+        <span class="indexnav__bullet" aria-hidden="true"></span>
+        <a class="indexnav__link" href="#background" data-spy="background">
+          <span class="indexnav__no" data-ep="chapters.0.no">01</span>
+          <span data-ep="chapters.0.title">项目背景</span>
+        </a>
+      </div>
+<div class="indexnav__item">
+        <span class="indexnav__bullet" aria-hidden="true"></span>
+        <a class="indexnav__link" href="#product" data-spy="product">
+          <span class="indexnav__no" data-ep="chapters.1.no">02</span>
+          <span data-ep="chapters.1.title">EVKit2 产品展示</span>
+        </a>
+      </div>
+<div class="indexnav__item">
+        <span class="indexnav__bullet" aria-hidden="true"></span>
+        <a class="indexnav__link" href="#process" data-spy="process">
+          <span class="indexnav__no" data-ep="chapters.2.no">03</span>
+          <span data-ep="chapters.2.title">前期开发确认流程</span>
+        </a>
+      </div>
+<div class="indexnav__item">
+        <span class="indexnav__bullet" aria-hidden="true"></span>
+        <a class="indexnav__link" href="#standalone" data-spy="standalone">
+          <span class="indexnav__no" data-ep="chapters.3.no">04</span>
+          <span data-ep="chapters.3.title">独立测量功能界面介绍</span>
+        </a>
+      </div>
+<div class="indexnav__item">
+        <span class="indexnav__bullet" aria-hidden="true"></span>
+        <a class="indexnav__link" href="#vehicle" data-spy="vehicle">
+          <span class="indexnav__no" data-ep="chapters.4.no">05</span>
+          <span data-ep="chapters.4.title">整车检测功能介绍</span>
+        </a>
+      </div>
+<div class="indexnav__item">
+        <span class="indexnav__bullet" aria-hidden="true"></span>
+        <a class="indexnav__link" href="#data" data-spy="data">
+          <span class="indexnav__no" data-ep="chapters.5.no">06</span>
+          <span data-ep="chapters.5.title">整车检测数据开发过程详解</span>
+        </a>
+      </div>
+<div class="indexnav__item">
+        <span class="indexnav__bullet" aria-hidden="true"></span>
+        <a class="indexnav__link" href="#joint" data-spy="joint">
+          <span class="indexnav__no" data-ep="chapters.6.no">07</span>
+          <span data-ep="chapters.6.title">和其他项目结合</span>
+        </a>
+      </div>
+  </div>
+</nav>
+
+<div class="navselect" id="navselect" data-open="false">
+  <button class="navselect__btn" type="button" aria-expanded="false" aria-controls="navselect-menu">
+    <span class="topbar__dot" aria-hidden="true"></span>
+    <span id="navselect-cur" data-ep="ui.navselect_default">目录</span>
+  </button>
+  <nav class="navselect__menu" id="navselect-menu" aria-label="章节导航">
+      <a href="#background"><span data-ep="chapters.0.no">01</span><span data-ep="chapters.0.title">项目背景</span></a>
+      <a href="#product"><span data-ep="chapters.1.no">02</span><span data-ep="chapters.1.title">EVKit2 产品展示</span></a>
+      <a href="#process"><span data-ep="chapters.2.no">03</span><span data-ep="chapters.2.title">前期开发确认流程</span></a>
+      <a href="#standalone"><span data-ep="chapters.3.no">04</span><span data-ep="chapters.3.title">独立测量功能界面介绍</span></a>
+      <a href="#vehicle"><span data-ep="chapters.4.no">05</span><span data-ep="chapters.4.title">整车检测功能介绍</span></a>
+      <a href="#data"><span data-ep="chapters.5.no">06</span><span data-ep="chapters.5.title">整车检测数据开发过程详解</span></a>
+      <a href="#joint"><span data-ep="chapters.6.no">07</span><span data-ep="chapters.6.title">和其他项目结合</span></a>
+  </nav>
+</div>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="atmo-dots" aria-hidden="true"></div>
+    <div class="wrap hero__inner">
+      <div class="hero__layout">
+        <div class="hero__content">
+          <p class="hero__eyebrow rise" data-ep="site.subtitle">新能源汽车高压诊断套件</p>
+
+          <h1 class="hero__title">
+            <span class="rise" data-ep="site.title">EVKit2</span>
+            <span class="thin rise" data-ep="site.title_sub">项目开发分享</span>
+          </h1>
+
+          <p class="hero__sub rise" data-ep="site.hero_sub">从传统高压测量设备的痛点出发，到一台覆盖各个高压测量场景的多合一智能检测设备 —— 以及数据开发过程中，自建的一条工具链。</p>
+
+          <svg class="hero__wave rise" viewBox="0 0 620 90" preserveAspectRatio="none"
+               width="620" height="90" role="img" aria-label="测量波形示意">
+            <path class="hero__wave-base"
+                  d="M0 60 L108 60 L120 22 L134 78 L148 44 L162 60 L298 60
+                     L310 28 L324 74 L338 46 L350 60 L468 60 L480 16 L494 80
+                     L508 38 L522 60 L620 60"/>
+            <path class="hero__wave-pulse"
+                  d="M0 60 L108 60 L120 22 L134 78 L148 44 L162 60 L298 60
+                     L310 28 L324 74 L338 46 L350 60 L468 60 L480 16 L494 80
+                     L508 38 L522 60 L620 60" aria-hidden="true"/>
+          </svg>
+        </div>
+
+        <div class="hero__stage rise" id="heroStage">
+          <div class="hero-3d" id="hero3d" role="region" aria-label="EVDiag Box2 三维交互模型"></div>
+        </div>
+      </div>
+
+      <div class="readout rise">
+          <div class="readout__item">
+            <span class="readout__v" data-ep="site.facts.0.0">07</span>
+            <span class="readout__u" data-ep="site.facts.0.1">章</span>
+            <span class="readout__l" data-ep="site.facts.0.2">项目脉络</span>
+          </div>
+          <div class="readout__item">
+            <span class="readout__v" data-ep="site.facts.1.0">55</span>
+            <span class="readout__u" data-ep="site.facts.1.1">张</span>
+            <span class="readout__l" data-ep="site.facts.1.2">界面与实拍</span>
+          </div>
+          <div class="readout__item">
+            <span class="readout__v" data-ep="site.facts.2.0">01</span>
+            <span class="readout__u" data-ep="site.facts.2.1">段</span>
+            <span class="readout__l" data-ep="site.facts.2.2">功能演示视频</span>
+          </div>
+      </div>
+    </div>
+  </section>
+
+<section class="section" id="background" data-chapter="background">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <div class="sec-head__no">
+            <span><span data-ep="chapters.0.no">01</span><em>/</em>07</span>
+            <small data-ep="ui.chapter_label">CHAPTER</small>
+          </div>
+          <div>
+            <h2 class="sec-head__title" data-ep="chapters.0.title">项目背景</h2>
+<p class="sec-head__kicker" data-ep="chapters.0.kicker">从传统万用表的痛点，到一个市场缺口</p>          </div>
+        </header>
+
+        <div class="grid12">
+                <div class="b-lede reveal"><p data-ep="chapters.0.blocks.0.text">当前市场上的主流设备为 <strong>Fluke、Hioki</strong> 等品牌的通用型万用表，主要面向基础通用型电子测量场景设计，没有针对新能源汽车维修领域做专门的优化。</p></div>
+
+
+                <div class="b-points reveal">
+<span class="b-points__label" data-ep="chapters.0.blocks.1.label">现有产品的三个痛点</span>      <div class="points">
+<div class="points__item">
+            <span class="points__k" data-ep="chapters.0.blocks.1.items.0.k">a</span>
+            <span>
+              <b class="points__title" data-ep="chapters.0.blocks.1.items.0.title">功能单一</b>
+              <span class="points__text" data-ep="chapters.0.blocks.1.items.0.text">测量绝缘、内阻等专业参数需要配备多台独立设备，携带和操作繁琐，工具成本高且效率低。</span>
+            </span>
+          </div>
+<div class="points__item">
+            <span class="points__k" data-ep="chapters.0.blocks.1.items.1.k">b</span>
+            <span>
+              <b class="points__title" data-ep="chapters.0.blocks.1.items.1.title">界面设计简陋</b>
+              <span class="points__text" data-ep="chapters.0.blocks.1.items.1.text">缺乏针对汽车高压系统的可视化指引，新手操作门槛高，易出现误判或操作风险。</span>
+            </span>
+          </div>
+<div class="points__item">
+            <span class="points__k" data-ep="chapters.0.blocks.1.items.2.k">c</span>
+            <span>
+              <b class="points__title" data-ep="chapters.0.blocks.1.items.2.title">维修报告质量差</b>
+              <span class="points__text" data-ep="chapters.0.blocks.1.items.2.text">生成的维修报告质量较差，难以满足汽车售后记录需求。</span>
+            </span>
+          </div>
+      </div>
+    </div>
+
+
+                <div class="b-figures reveal">
+    <div class="figs figs--3up">
+        <figure class="fig" data-frame="phone">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="background-2"
+            data-full="media/bg_fluke1507.webp"
+            data-cap="痛点 a —— 一台 Fluke 1507 只能测绝缘"
+            data-kind="phone"
+            aria-label="放大查看：Fluke 1507 绝缘测试仪电商页面">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="media/bg_fluke1507.webp" width="135" height="316"             alt="Fluke 1507 绝缘测试仪电商页面"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.0.blocks.2.items.0.cap">痛点 a —— 一台 Fluke 1507 只能测绝缘</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="phone">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="background-2"
+            data-full="media/bg_fluke_batt.webp"
+            data-cap="痛点 a —— 测内阻还需另购电池内存测量仪"
+            data-kind="phone"
+            aria-label="放大查看：Fluke 电池容量分析仪电商页面">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/bg_fluke_batt_480.webp" srcset="thumbs/bg_fluke_batt_480.webp 480w" sizes="(max-width:900px) 92vw, 31vw" width="870" height="390"             alt="Fluke 电池容量分析仪电商页面"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.0.blocks.2.items.1.cap">痛点 a —— 测内阻还需另购电池内存测量仪</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="background-2"
+            data-full="media/bg_hioki.webp"
+            data-cap="痛点 a —— 一台内阻测量设备的购买成本较高"
+            data-kind="plain"
+            aria-label="放大查看：Hioki BT3554 电池测试仪电商页面">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="media/bg_hioki.webp" width="387" height="319"             alt="Hioki BT3554 电池测试仪电商页面"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.0.blocks.2.items.2.cap">痛点 a —— 一台内阻测量设备的购买成本较高</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+
+
+                <div class="b-figures reveal">
+    <div class="figs figs--2up">
+        <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="background-3"
+            data-full="media/bg_avl.webp"
+            data-cap="痛点 b —— 功能菜单按测量项逐一拆开，界面本身不提供高压系统的可视化指引"
+            data-kind="plain"
+            aria-label="放大查看：AVL DITEST 高压安全测量仪软件功能菜单">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/bg_avl_480.webp" srcset="thumbs/bg_avl_480.webp 480w, thumbs/bg_avl_960.webp 960w, thumbs/bg_avl_1600.webp 1600w" sizes="(max-width:900px) 92vw, 47vw" width="1914" height="1018"             alt="AVL DITEST 高压安全测量仪软件功能菜单"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.0.blocks.3.items.0.cap">痛点 b —— 功能菜单按测量项逐一拆开，界面本身不提供高压系统的可视化指引</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="table">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="background-3"
+            data-full="media/bg_report.webp"
+            data-cap="痛点 c —— 导出的检测报告是一串没有车辆上下文、没有结论的数据流水账"
+            data-kind="table"
+            aria-label="放大查看：传统高压安全测量仪导出的检测报告">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/bg_report_480.webp" srcset="thumbs/bg_report_480.webp 480w" sizes="(max-width:900px) 92vw, 47vw" width="922" height="662"             alt="传统高压安全测量仪导出的检测报告"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.0.blocks.3.items.1.cap">痛点 c —— 导出的检测报告是一串没有车辆上下文、没有结论的数据流水账</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+
+
+                  <div class="b-link reveal">
+    <a class="linkcard" href="https://q00enigbkuh.feishu.cn/file/HXeTbadazoujN0xn02ecn7HxnRg" target="_blank" rel="noopener noreferrer">
+      <span class="linkcard__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M10 10.2l4.4 2.3-4.4 2.3v-4.6z" fill="currentColor"/>
+          </svg>
+      </span>
+      <span class="linkcard__body">
+        <span class="linkcard__title" data-ep="chapters.0.blocks.4.title">safty2000 操作视频</span>
+        <span class="linkcard__desc" data-ep="chapters.0.blocks.4.desc">传统高压安全测量仪的实际操作流程，用于对照说明操作繁琐的程度。</span>
+      </span>
+      <span class="linkcard__note" data-ep="chapters.0.blocks.4.note">飞书云文档 </span>
+      <span class="linkcard__go" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M6 12l6-6M12 6H7.5M12 6v4.5" stroke="currentColor"
+                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </a>
+  </div>
+
+
+
+                <div class="b-mark reveal"><p data-ep="chapters.0.blocks.5.text">除了价格较高的 AVL、Hella 产品外，市面上缺少多合一高性价比产品。</p></div>
+
+
+                <div class="b-figures reveal">
+    <div class="figs figs--spread">
+        <figure class="fig" data-frame="table">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="background-6"
+            data-full="media/bg_matrix.webp"
+            data-cap="横向对比：EVBox2 是唯一把高压测量、绝缘、等电位、内阻与部件驱动集成在一台设备上的方案"
+            data-kind="table"
+            aria-label="放大查看：多品牌多合一高压检测设备参数对比表">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/bg_matrix_480.webp" srcset="thumbs/bg_matrix_480.webp 480w, thumbs/bg_matrix_960.webp 960w" sizes="(max-width:1080px) 92vw, 1000px" width="1349" height="570"             alt="多品牌多合一高压检测设备参数对比表"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.0.blocks.6.items.0.cap">横向对比：EVBox2 是唯一把高压测量、绝缘、等电位、内阻与部件驱动集成在一台设备上的方案</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+
+
+        </div>
+      </div>
+    </section>
+<section class="section" id="product" data-chapter="product">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <div class="sec-head__no">
+            <span><span data-ep="chapters.1.no">02</span><em>/</em>07</span>
+            <small data-ep="ui.chapter_label">CHAPTER</small>
+          </div>
+          <div>
+            <h2 class="sec-head__title" data-ep="chapters.1.title">EVKit2 产品展示</h2>
+<p class="sec-head__kicker" data-ep="chapters.1.kicker">一台主机，两套表笔，覆盖五类高压测量</p>          </div>
+        </header>
+
+        <div class="grid12">
+                <div class="b-lede reveal"><p data-ep="chapters.1.blocks.0.text">EVKit2 设备主要包含一个 <strong>EVBox2 盒子</strong>，一套普通万用表表笔，一套 <strong>开尔文表笔</strong>。</p></div>
+
+
+                <div class="b-figures reveal">
+    <div class="figs figs--3up">
+        <figure class="fig" data-frame="phone">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="product-1"
+            data-full="media/prod_box.webp"
+            data-cap="EVBox2 主机盒，面板含绝缘／供电／电流三路状态指示"
+            data-kind="phone"
+            aria-label="放大查看：EVBox2 主机盒本体">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/prod_box_480.webp" srcset="thumbs/prod_box_480.webp 480w" sizes="(max-width:900px) 92vw, 31vw" width="960" height="1113" style="max-height: 262px"             alt="EVBox2 主机盒本体"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.1.blocks.1.items.0.cap">EVBox2 主机盒，面板含绝缘／供电／电流三路状态指示</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="phone">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="product-1"
+            data-full="media/prod_leads.webp"
+            data-cap="一套普通万用表表笔"
+            data-kind="phone"
+            aria-label="放大查看：普通万用表表笔">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="media/prod_leads.webp" width="287" height="261"             alt="普通万用表表笔"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.1.blocks.1.items.1.cap">一套普通万用表表笔</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="phone">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="product-1"
+            data-full="media/prod_kelvin.webp"
+            data-cap="一套开尔文四线表笔，用于内阻测量"
+            data-kind="phone"
+            aria-label="放大查看：开尔文四线表笔">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="media/prod_kelvin.webp" width="286" height="260"             alt="开尔文四线表笔"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.1.blocks.1.items.2.cap">一套开尔文四线表笔，用于内阻测量</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+
+
+                <div class="b-para reveal">
+      <p data-ep="chapters.1.blocks.2.text">与 <strong>S2 平板绑定使用</strong>，可以通过蓝牙或有线连接方式，连接到 S2 平板。</p>
+    </div>
+
+
+                <div class="b-figures reveal">
+    <div class="figs figs--hero">
+        <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="product-3"
+            data-full="media/prod_struct.webp"
+            data-cap="EVBox2 工业设计图：前视、俯视、底视三视图"
+            data-kind="plain"
+            aria-label="放大查看：EVBox2 前视／俯视／底视结构设计图">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/prod_struct_480.webp" srcset="thumbs/prod_struct_480.webp 480w, thumbs/prod_struct_960.webp 960w" sizes="(max-width:1080px) 92vw, 960px" width="1012" height="504"             alt="EVBox2 前视／俯视／底视结构设计图"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.1.blocks.3.items.0.cap">EVBox2 工业设计图：前视、俯视、底视三视图</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+
+
+                <div class="b-para reveal">
+<span class="b-para__label" data-ep="chapters.1.blocks.4.label">核心卖点</span>      <p data-ep="chapters.1.blocks.4.text"><strong>EV 诊断必备工具</strong>，一机覆盖以下五类测量场景。</p>
+    </div>
+
+
+                <div class="b-chips reveal">
+      <div class="chips">
+<span class="chip" data-ep="chapters.1.blocks.5.items.0">电压测量</span><span class="chip" data-ep="chapters.1.blocks.5.items.1">绝缘电阻检测</span><span class="chip" data-ep="chapters.1.blocks.5.items.2">等电位电阻测量</span><span class="chip" data-ep="chapters.1.blocks.5.items.3">电芯内阻测量</span><span class="chip" data-ep="chapters.1.blocks.5.items.4">高压部件车下测试</span>      </div>
+    </div>
+
+
+        </div>
+      </div>
+    </section>
+<section class="section" id="process" data-chapter="process">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <div class="sec-head__no">
+            <span><span data-ep="chapters.2.no">03</span><em>/</em>07</span>
+            <small data-ep="ui.chapter_label">CHAPTER</small>
+          </div>
+          <div>
+            <h2 class="sec-head__title" data-ep="chapters.2.title">前期开发确认流程</h2>
+<p class="sec-head__kicker" data-ep="chapters.2.kicker">UE 定内容，UI 定表现，销量定范围</p>          </div>
+        </header>
+
+        <div class="grid12">
+                <div class="b-steps">
+<div class="step reveal">
+          <span class="step__no" data-ep="chapters.2.blocks.0.items.0.no">a</span>
+          <h3 class="step__title" data-ep="chapters.2.blocks.0.items.0.title">UE 确认</h3>
+          <div class="step__body">
+<p class="step__text" data-ep="chapters.2.blocks.0.items.0.text">由技术部确认需要哪些内容和功能，并绘制出简易的 UE 界面和产品对齐。</p>              <div class="figs figs--2up">
+                  <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="process-0"
+            data-full="media/ue_1.webp"
+            data-cap="高压绝缘测量功能的 UE 线框图"
+            data-kind="plain"
+            aria-label="放大查看：UE 交互说明：高压系统测量功能线框图">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/ue_1_480.webp" srcset="thumbs/ue_1_480.webp 480w, thumbs/ue_1_960.webp 960w" sizes="(max-width:900px) 92vw, 47vw" width="1481" height="839"             alt="UE 交互说明：高压系统测量功能线框图"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.2.blocks.0.items.0.figures.items.0.cap">高压绝缘测量功能的 UE 线框图</figcaption>
+  </figure>
+
+                  <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="process-0"
+            data-full="media/ue_2.webp"
+            data-cap="绝缘测量流程与实机位置对照"
+            data-kind="plain"
+            aria-label="放大查看：UE 交互说明：测量流程与实机对照">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/ue_2_480.webp" srcset="thumbs/ue_2_480.webp 480w, thumbs/ue_2_960.webp 960w" sizes="(max-width:900px) 92vw, 47vw" width="1476" height="833"             alt="UE 交互说明：测量流程与实机对照"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.2.blocks.0.items.0.figures.items.1.cap">绝缘测量流程与实机位置对照</figcaption>
+  </figure>
+
+                  <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="process-0"
+            data-full="media/ue_3.webp"
+            data-cap="整车互锁测量方案的界面结构"
+            data-kind="plain"
+            aria-label="放大查看：UE 交互说明：整车测量方案线框图">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/ue_3_480.webp" srcset="thumbs/ue_3_480.webp 480w, thumbs/ue_3_960.webp 960w" sizes="(max-width:900px) 92vw, 47vw" width="1394" height="793"             alt="UE 交互说明：整车测量方案线框图"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.2.blocks.0.items.0.figures.items.2.cap">整车互锁测量方案的界面结构</figcaption>
+  </figure>
+
+                  <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="process-0"
+            data-full="media/ue_4.webp"
+            data-cap="互锁测量的界面"
+            data-kind="plain"
+            aria-label="放大查看：UE 交互说明：车模标点与测量点指引">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/ue_4_480.webp" srcset="thumbs/ue_4_480.webp 480w, thumbs/ue_4_960.webp 960w" sizes="(max-width:900px) 92vw, 47vw" width="1403" height="796"             alt="UE 交互说明：车模标点与测量点指引"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.2.blocks.0.items.0.figures.items.3.cap">互锁测量的界面</figcaption>
+  </figure>
+
+              </div>
+          </div>
+        </div>
+<div class="step reveal">
+          <span class="step__no" data-ep="chapters.2.blocks.0.items.1.no">b</span>
+          <h3 class="step__title" data-ep="chapters.2.blocks.0.items.1.title">UI 确认</h3>
+          <div class="step__body">
+<p class="step__text" data-ep="chapters.2.blocks.0.items.1.text">UE 设计对齐通过后，和 UI、产品、前端相关同事再进一步确认具体的 UI 设计。</p>              <div class="callout" data-ep="chapters.2.blocks.0.items.1.callout.1">这里需要注意 <strong>确认好</strong> 相关图片和文件的尺寸、大小、格式及其他要求，避免后续返工修改。</div>
+              <div class="figs figs--hero">
+                  <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="process-0"
+            data-full="media/ui_figma.webp"
+            data-cap="Figma 中的 UI 设计稿"
+            data-kind="plain"
+            aria-label="放大查看：Figma 中的 UI 设计稿全屏排布">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/ui_figma_480.webp" srcset="thumbs/ui_figma_480.webp 480w, thumbs/ui_figma_960.webp 960w" sizes="(max-width:900px) 92vw, 47vw" width="1536" height="837"             alt="Figma 中的 UI 设计稿全屏排布"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.2.blocks.0.items.1.figures.items.0.cap">Figma 中的 UI 设计稿</figcaption>
+  </figure>
+
+              </div>
+          </div>
+        </div>
+<div class="step reveal">
+          <span class="step__no" data-ep="chapters.2.blocks.0.items.2.no">c</span>
+          <h3 class="step__title" data-ep="chapters.2.blocks.0.items.2.title">开发范围确认</h3>
+          <div class="step__body">
+<p class="step__text" data-ep="chapters.2.blocks.0.items.2.text">主要通过销量维度来确认开发车型范围，初期开发国外前 <strong>80%</strong> 的纯电车型，后续再逐步拓展。</p>              <ul class="bullets">
+<li data-ep="chapters.2.blocks.0.items.2.bullets.0">通过 <strong>Marklines</strong> 等专业渠道确认各区域相关车型销量。</li><li data-ep="chapters.2.blocks.0.items.2.bullets.1">对于以上渠道收集不到的销量数据，可以借助 AI 的深度研究功能，来确认相关车型的大概销量。</li><li data-ep="chapters.2.blocks.0.items.2.bullets.2">可以多个 AI 相互验证，确保数据偏差不会太大（推荐 Gemini、GPT、Grok）。</li>              </ul>
+              <div class="figs figs--2up">
+                  <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="process-0"
+            data-full="media/scope_ai.webp"
+            data-cap="渠道查不到的销量，用 AI 深度研究补齐"
+            data-kind="plain"
+            aria-label="放大查看：用 AI 深度研究功能调研车型销量">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/scope_ai_480.webp" srcset="thumbs/scope_ai_480.webp 480w" sizes="(max-width:900px) 92vw, 47vw" width="722" height="356"             alt="用 AI 深度研究功能调研车型销量"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.2.blocks.0.items.2.figures.items.0.cap">渠道查不到的销量，用 AI 深度研究补齐</figcaption>
+  </figure>
+
+                  <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="process-0"
+            data-full="media/scope_sales.webp"
+            data-cap="AI深度调查后的结果展示"
+            data-kind="plain"
+            aria-label="放大查看：Marklines 车型销量数据表">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/scope_sales_480.webp" srcset="thumbs/scope_sales_480.webp 480w, thumbs/scope_sales_960.webp 960w" sizes="(max-width:900px) 92vw, 47vw" width="1064" height="447"             alt="Marklines 车型销量数据表"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.2.blocks.0.items.2.figures.items.1.cap">AI深度调查后的结果展示</figcaption>
+  </figure>
+
+              </div>
+          </div>
+        </div>
+    </div>
+
+
+        </div>
+      </div>
+    </section>
+<section class="section" id="standalone" data-chapter="standalone">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <div class="sec-head__no">
+            <span><span data-ep="chapters.3.no">04</span><em>/</em>07</span>
+            <small data-ep="ui.chapter_label">CHAPTER</small>
+          </div>
+          <div>
+            <h2 class="sec-head__title" data-ep="chapters.3.title">独立测量功能界面介绍</h2>
+<p class="sec-head__kicker" data-ep="chapters.3.kicker">传统测量功能的优化展示</p>          </div>
+        </header>
+
+        <div class="grid12">
+                <div class="b-para reveal">
+<span class="b-para__label" data-ep="chapters.3.blocks.0.label">落地界面</span>      <p data-ep="chapters.3.blocks.0.text">独立测量功能在 App 端最终落地的界面如下。</p>
+    </div>
+
+
+                  <div class="b-board reveal">
+    <div class="board">
+      <i class="board__dot" aria-hidden="true"></i><i class="board__dot" aria-hidden="true"></i>
+      <i class="board__dot" aria-hidden="true"></i><i class="board__dot" aria-hidden="true"></i>
+      <div class="board__inner" style="aspect-ratio: 3558.53 / 4885.52">
+            <span class="board__tag"
+                  style="left:0.0%;top:-0.0%;width:11.89%;height:2.62%"
+                  data-ep="chapters.3.blocks.1.groups.0.name">DC电压测量</span>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_dc_setup.webp"
+                    data-cap="DC 电压测量：接线指引与注意事项，仅允许测量直流电压、禁止充电时测量"
+                    data-kind="tablet"
+                    style="left:0.0%;top:3.08%;width:29.7%;height:16.27%"
+                    aria-label="放大查看：DC 电压测量：接线指引与注意事项">
+              <img src="thumbs/appui_dc_setup_480.webp" srcset="thumbs/appui_dc_setup_480.webp 480w, thumbs/appui_dc_setup_960.webp 960w" sizes="(max-width:900px) 70vw, 320px"                   alt="DC 电压测量：接线指引与注意事项" loading="lazy" decoding="async">
+            </button>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_dc_read.webp"
+                    data-cap="DC 电压测量：768.2 VDC 实时读数，测量记录逐条留存，超限值自动标红"
+                    data-kind="tablet"
+                    style="left:33.58%;top:3.18%;width:29.76%;height:16.17%"
+                    aria-label="放大查看：DC 电压测量：768.2 VDC 读数与测量记录">
+              <img src="thumbs/appui_dc_read_480.webp" srcset="thumbs/appui_dc_read_480.webp 480w, thumbs/appui_dc_read_960.webp 960w" sizes="(max-width:900px) 70vw, 320px"                   alt="DC 电压测量：768.2 VDC 读数与测量记录" loading="lazy" decoding="async">
+            </button>
+            <span class="board__tag"
+                  style="left:0.0%;top:21.64%;width:13.26%;height:2.62%"
+                  data-ep="chapters.3.blocks.1.groups.1.name">高压断电测量</span>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_poweroff_read.webp"
+                    data-cap="高压断电测量：28.2 VDC，确认高压已下电"
+                    data-kind="tablet"
+                    style="left:0.52%;top:24.72%;width:27.03%;height:14.78%"
+                    aria-label="放大查看：高压断电测量：28.2 VDC 读数">
+              <img src="thumbs/appui_poweroff_read_480.webp" srcset="thumbs/appui_poweroff_read_480.webp 480w, thumbs/appui_poweroff_read_960.webp 960w" sizes="(max-width:900px) 70vw, 320px"                   alt="高压断电测量：28.2 VDC 读数" loading="lazy" decoding="async">
+            </button>
+            <span class="board__tag"
+                  style="left:33.58%;top:21.64%;width:13.26%;height:2.62%"
+                  data-ep="chapters.3.blocks.1.groups.2.name">高压绝缘测量</span>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_insulation_read.webp"
+                    data-cap="高压绝缘测量：1768.1 MΩ"
+                    data-kind="tablet"
+                    style="left:34.91%;top:25.74%;width:25.4%;height:13.75%"
+                    aria-label="放大查看：高压绝缘测量：1768.1 MΩ 读数">
+              <img src="thumbs/appui_insulation_read_480.webp" srcset="thumbs/appui_insulation_read_480.webp 480w" sizes="(max-width:900px) 70vw, 320px"                   alt="高压绝缘测量：1768.1 MΩ 读数" loading="lazy" decoding="async">
+            </button>
+            <span class="board__tag"
+                  style="left:67.68%;top:21.64%;width:13.26%;height:2.62%"
+                  data-ep="chapters.3.blocks.1.groups.3.name">电池内阻测量</span>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_resistance_read.webp"
+                    data-cap="电池内阻测量：10.56 mΩ，同步显示电池电压 68.1 VDC"
+                    data-kind="tablet"
+                    style="left:67.68%;top:25.22%;width:27.23%;height:14.82%"
+                    aria-label="放大查看：电池内阻测量：10.56 mΩ 读数">
+              <img src="thumbs/appui_resistance_read_480.webp" srcset="thumbs/appui_resistance_read_480.webp 480w, thumbs/appui_resistance_read_960.webp 960w" sizes="(max-width:900px) 70vw, 320px"                   alt="电池内阻测量：10.56 mΩ 读数" loading="lazy" decoding="async">
+            </button>
+            <span class="board__tag"
+                  style="left:0.0%;top:42.32%;width:11.24%;height:2.62%"
+                  data-ep="chapters.3.blocks.1.groups.4.name">等电位测量</span>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_equipotential_read.webp"
+                    data-cap="等电位测量：0.07 Ω，提示连接导线电阻正常，异常记录在列表中标红"
+                    data-kind="tablet"
+                    style="left:0.87%;top:45.9%;width:29.87%;height:16.29%"
+                    aria-label="放大查看：等电位测量：0.07 Ω 读数与测量记录">
+              <img src="thumbs/appui_equipotential_read_480.webp" srcset="thumbs/appui_equipotential_read_480.webp 480w, thumbs/appui_equipotential_read_960.webp 960w" sizes="(max-width:900px) 70vw, 320px"                   alt="等电位测量：0.07 Ω 读数与测量记录" loading="lazy" decoding="async">
+            </button>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_safety_warning.webp"
+                    data-cap="测量前的安全提示：危险与警告分级说明，可一键跳转「高压断电指引」"
+                    data-kind="tablet"
+                    style="left:0.52%;top:64.27%;width:26.53%;height:14.68%"
+                    aria-label="放大查看：安全提示弹窗：危险与警告分级说明，可跳转高压断电指引">
+              <img src="thumbs/appui_safety_warning_480.webp" srcset="thumbs/appui_safety_warning_480.webp 480w" sizes="(max-width:900px) 70vw, 320px"                   alt="安全提示弹窗：危险与警告分级说明，可跳转高压断电指引" loading="lazy" decoding="async">
+            </button>
+            <span class="board__tag"
+                  style="left:44.53%;top:42.32%;width:14.84%;height:2.62%"
+                  data-ep="chapters.3.blocks.1.groups.5.name">SAE J1766测量</span>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_sae_intro.webp"
+                    data-cap="SAE J1766 法规测量：标准说明、表笔连接示意与 S1→S4 测量原理"
+                    data-kind="tablet"
+                    style="left:36.13%;top:45.91%;width:30.86%;height:16.58%"
+                    aria-label="放大查看：SAE J1766 法规测量：标准说明、表笔连接示意与测量原理">
+              <img src="thumbs/appui_sae_intro_480.webp" srcset="thumbs/appui_sae_intro_480.webp 480w, thumbs/appui_sae_intro_960.webp 960w" sizes="(max-width:900px) 70vw, 320px"                   alt="SAE J1766 法规测量：标准说明、表笔连接示意与测量原理" loading="lazy" decoding="async">
+            </button>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_sae_measure.webp"
+                    data-cap="按电池电压 → 标准电阻 → HV± 对地电压 → 计算 Riso 分步引导测量"
+                    data-kind="tablet"
+                    style="left:69.2%;top:46.38%;width:30.8%;height:16.6%"
+                    aria-label="放大查看：SAE J1766 法规测量：分步测量引导界面">
+              <img src="thumbs/appui_sae_measure_480.webp" srcset="thumbs/appui_sae_measure_480.webp 480w, thumbs/appui_sae_measure_960.webp 960w" sizes="(max-width:900px) 70vw, 320px"                   alt="SAE J1766 法规测量：分步测量引导界面" loading="lazy" decoding="async">
+            </button>
+            <span class="board__tag"
+                  style="left:0.0%;top:79.9%;width:9.22%;height:2.62%"
+                  data-ep="chapters.3.blocks.1.groups.6.name">维修报告</span>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_report_1.webp"
+                    data-cap="维修报告样例 —— DC 电压测量（异常）：1088 VDC 超出 ±1000 阈值，红头标出"
+                    data-kind="table"
+                    style="left:0.0%;top:84.1%;width:14.53%;height:14.94%"
+                    aria-label="放大查看：维修报告样例：DC 电压测量（异常），超限值红头标出">
+              <img src="thumbs/appui_report_1_480.webp" srcset="thumbs/appui_report_1_480.webp 480w" sizes="(max-width:900px) 70vw, 320px"                   alt="维修报告样例：DC 电压测量（异常），超限值红头标出" loading="lazy" decoding="async">
+            </button>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_report_2.webp"
+                    data-cap="维修报告样例 —— DC 电压测量（正常）：结果在阈值内，绿头通过"
+                    data-kind="table"
+                    style="left:14.53%;top:84.1%;width:14.53%;height:14.94%"
+                    aria-label="放大查看：维修报告样例：DC 电压测量（正常），绿头通过">
+              <img src="thumbs/appui_report_2_480.webp" srcset="thumbs/appui_report_2_480.webp 480w" sizes="(max-width:900px) 70vw, 320px"                   alt="维修报告样例：DC 电压测量（正常），绿头通过" loading="lazy" decoding="async">
+            </button>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_report_3.webp"
+                    data-cap="维修报告样例 —— 整车高压绝缘检测（异常）：C1-2 绝缘值 0.05 MΩ 低于 ≥2 阈值"
+                    data-kind="table"
+                    style="left:38.26%;top:83.13%;width:16.28%;height:16.87%"
+                    aria-label="放大查看：维修报告样例：整车高压绝缘检测（异常），C1-2 绝缘值低于阈值">
+              <img src="thumbs/appui_report_3_480.webp" srcset="thumbs/appui_report_3_480.webp 480w" sizes="(max-width:900px) 70vw, 320px"                   alt="维修报告样例：整车高压绝缘检测（异常），C1-2 绝缘值低于阈值" loading="lazy" decoding="async">
+            </button>
+<button class="board__item" type="button"
+                    data-lightbox="1"
+                    data-group="standalone-1"
+                    data-full="media/appui_report_4.webp"
+                    data-cap="维修报告样例 —— 整车高压绝缘检测（正常）：三点绝缘全部合格"
+                    data-kind="table"
+                    style="left:54.55%;top:83.13%;width:16.28%;height:16.87%"
+                    aria-label="放大查看：维修报告样例：整车高压绝缘检测（正常），全部合格">
+              <img src="thumbs/appui_report_4_480.webp" srcset="thumbs/appui_report_4_480.webp 480w" sizes="(max-width:900px) 70vw, 320px"                   alt="维修报告样例：整车高压绝缘检测（正常），全部合格" loading="lazy" decoding="async">
+            </button>
+      </div>
+      <p class="board__hint" data-ep="chapters.3.blocks.1.hint">点击任意截图放大浏览，共 13 张</p>
+    </div>
+  </div>
+
+
+
+                  <div class="b-link b-link--narrow reveal">
+    <a class="linkcard" href="https://www.figma.com/design/mJecdbZzOwQz8GBReKX2TZ/EV-Kit2?node-id=5635-37033&amp;p=f&amp;t=mxq9AhFBIdGYWdGa-0" target="_blank" rel="noopener noreferrer">
+      <span class="linkcard__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect x="4" y="3" width="10" height="10" rx="2.5" stroke="currentColor" stroke-width="1.7"/>
+            <rect x="10" y="11" width="10" height="10" rx="2.5" stroke="currentColor" stroke-width="1.7"/>
+          </svg>
+      </span>
+      <span class="linkcard__body">
+        <span class="linkcard__title" data-ep="chapters.3.blocks.2.title">EV-Kit2 设计稿</span>
+        <span class="linkcard__desc" data-ep="chapters.3.blocks.2.desc">独立测量功能的完整界面设计稿，可在 Figma 中查看。</span>
+      </span>
+      <span class="linkcard__note" data-ep="chapters.3.blocks.2.note">Figma 设计文件</span>
+      <span class="linkcard__go" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M6 12l6-6M12 6H7.5M12 6v4.5" stroke="currentColor"
+                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </a>
+  </div>
+
+
+
+                <div class="b-para reveal">
+<span class="b-para__label" data-ep="chapters.3.blocks.3.label">操作示意图绘制</span>      <p data-ep="chapters.3.blocks.3.text">利用 <strong>AI 生图功能 + Adobe Illustrator / PS</strong> 来实现简单的示意图绘制，也给 UI 提供绘制素材。</p>
+    </div>
+
+
+                <div class="b-figures reveal">
+    <div class="figs figs--hero">
+        <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="standalone-4"
+            data-full="media/illu_grid.webp"
+            data-cap="批量产出的表笔操作示意图，统一风格后交付 UI 使用"
+            data-kind="plain"
+            aria-label="放大查看：批量绘制的插头操作示意图">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/illu_grid_480.webp" srcset="thumbs/illu_grid_480.webp 480w, thumbs/illu_grid_960.webp 960w" sizes="(max-width:1080px) 92vw, 960px" width="1526" height="443"             alt="批量绘制的插头操作示意图"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.3.blocks.4.items.0.cap">批量产出的表笔操作示意图，统一风格后交付 UI 使用</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+
+
+        </div>
+      </div>
+    </section>
+<section class="section" id="vehicle" data-chapter="vehicle">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <div class="sec-head__no">
+            <span><span data-ep="chapters.4.no">05</span><em>/</em>07</span>
+            <small data-ep="ui.chapter_label">CHAPTER</small>
+          </div>
+          <div>
+            <h2 class="sec-head__title" data-ep="chapters.4.title">整车检测功能介绍</h2>
+<p class="sec-head__kicker" data-ep="chapters.4.kicker">把散落在原厂资料里的测量点，收进一个界面</p>          </div>
+        </header>
+
+        <div class="grid12">
+                <div class="b-para reveal">
+<span class="b-para__label" data-ep="chapters.4.blocks.0.label">A. 传统新能源维修中的痛点</span>      <p data-ep="chapters.4.blocks.0.text">在传统的新能源汽车的绝缘故障排查中，往往面临 <strong>资料分散、流程繁琐、定位困难且伴随较高高压安全隐患</strong> 等挑战，对技师的要求较高。</p>
+    </div>
+
+
+                <div class="b-para reveal">
+      <p data-ep="chapters.4.blocks.1.text">以大众为例，下面是大众的高压系统相关资料，电路图和需要测量的部件位置通常分散在不同的资料中，查看起来十分麻烦。</p>
+    </div>
+
+
+                <div class="b-figures reveal">
+    <div class="figs figs--duo-link">
+        <figure class="fig" data-frame="sheet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="vehicle-2"
+            data-full="media/pain_terminal.webp"
+            data-cap="资料 A：高压端子分布图"
+            data-kind="sheet"
+            aria-label="放大查看：原厂资料中的高压端子分布图">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/pain_terminal_480.webp" srcset="thumbs/pain_terminal_480.webp 480w" sizes="(max-width:900px) 92vw, 47vw" width="667" height="752"             alt="原厂资料中的高压端子分布图"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.4.blocks.2.items.0.cap">资料 A：高压端子分布图</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="sheet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="vehicle-2"
+            data-full="media/pain_doc.webp"
+            data-cap="资料 B：端子位置说明文档"
+            data-kind="sheet"
+            aria-label="放大查看：原厂资料中的端子位置说明文档">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/pain_doc_480.webp" srcset="thumbs/pain_doc_480.webp 480w" sizes="(max-width:900px) 92vw, 47vw" width="582" height="712"             alt="原厂资料中的端子位置说明文档"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.4.blocks.2.items.1.cap">资料 B：端子位置说明文档</figcaption>
+  </figure>
+
+<p class="figs__note" data-ep="chapters.4.blocks.2.note">同样的信息被拆在两份资料里，技师需要在中间反复对照。</p>    </div>
+  </div>
+
+
+
+                <div class="b-bullets reveal">
+<span class="b-bullets__label" data-ep="chapters.4.blocks.3.label">痛点</span>      <ul class="bullets">
+<li data-ep="chapters.4.blocks.3.items.0">原厂资料翻阅繁琐，维修过程中去反复查看资料也容易引发操作事故。</li><li data-ep="chapters.4.blocks.3.items.1">缺少测量点位置指引和断电操作引导。</li><li data-ep="chapters.4.blocks.3.items.2">缺少完整的高压系统框架引导，容易漏查或发生没必要的拆装。</li>      </ul>
+    </div>
+
+
+                <div class="b-para reveal">
+<span class="b-para__label" data-ep="chapters.4.blocks.4.label">绝缘检测</span>      <p data-ep="chapters.4.blocks.4.text">围绕高压系统绝缘场景，先给出断电指引，再给系统框图选择测量点，最后给出测量位置辅助用户进行测量。</p>
+    </div>
+
+
+                <div class="b-figures reveal">
+    <div class="figs figs--3up">
+        <figure class="fig" data-frame="tablet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="vehicle-5"
+            data-full="media/ins_guide.webp"
+            data-cap="分步断电指引，含实拍位置与连接器操作说明"
+            data-kind="tablet"
+            aria-label="放大查看：高压断电指引：分步图文引导断电操作">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/ins_guide_480.webp" srcset="thumbs/ins_guide_480.webp 480w, thumbs/ins_guide_960.webp 960w, thumbs/ins_guide_1600.webp 1600w" sizes="(max-width:900px) 92vw, 31vw" width="2176" height="1600"             alt="高压断电指引：分步图文引导断电操作"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.4.blocks.5.items.0.cap">分步断电指引，含实拍位置与连接器操作说明</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="tablet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="vehicle-5"
+            data-full="media/ins_points.webp"
+            data-cap="高压系统测量点线路图"
+            data-kind="tablet"
+            aria-label="放大查看：绝缘检测：高压系统测量点线路图">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/ins_points_480.webp" srcset="thumbs/ins_points_480.webp 480w, thumbs/ins_points_960.webp 960w" sizes="(max-width:900px) 92vw, 31vw" width="1468" height="1080"             alt="绝缘检测：高压系统测量点线路图"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.4.blocks.5.items.1.cap">高压系统测量点线路图</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="tablet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="vehicle-5"
+            data-full="media/ins_measure.webp"
+            data-cap="绝缘阻值读数与测量点位置图并列显示"
+            data-kind="tablet"
+            aria-label="放大查看：绝缘检测：MQ 读数与测量点位置图">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/ins_measure_480.webp" srcset="thumbs/ins_measure_480.webp 480w, thumbs/ins_measure_960.webp 960w" sizes="(max-width:900px) 92vw, 31vw" width="1468" height="1080"             alt="绝缘检测：MQ 读数与测量点位置图"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.4.blocks.5.items.2.cap">绝缘阻值读数与测量点位置图并列显示</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+
+
+                <div class="b-para reveal">
+      <p data-ep="chapters.4.blocks.6.text">按这种相同的思路，开发了其他测量功能，如互锁检测、等电位检测的功能。</p>
+    </div>
+
+
+                <div class="b-para reveal">
+<span class="b-para__label" data-ep="chapters.4.blocks.7.label">等电位检测</span>      <p data-ep="chapters.4.blocks.7.text">选择测量点后，直接给出位置图与实拍指引，并下拉读取测量值。</p>
+    </div>
+
+
+                <div class="b-figures reveal">
+    <div class="figs figs--2up">
+        <figure class="fig" data-frame="tablet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="vehicle-8"
+            data-full="media/eq_points.webp"
+            data-cap="在系统图上选择等电位测量点"
+            data-kind="tablet"
+            aria-label="放大查看：等电位检测：选择测量点">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/eq_points_480.webp" srcset="thumbs/eq_points_480.webp 480w, thumbs/eq_points_960.webp 960w" sizes="(max-width:900px) 92vw, 47vw" width="1468" height="1080"             alt="等电位检测：选择测量点"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.4.blocks.8.items.0.cap">在系统图上选择等电位测量点</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="tablet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="vehicle-8"
+            data-full="media/eq_position.webp"
+            data-cap="测量点位置图与实拍画面，并显示测量值"
+            data-kind="tablet"
+            aria-label="放大查看：等电位检测：测量点位置图与实拍指引">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/eq_position_480.webp" srcset="thumbs/eq_position_480.webp 480w, thumbs/eq_position_960.webp 960w" sizes="(max-width:900px) 92vw, 47vw" width="1468" height="1080"             alt="等电位检测：测量点位置图与实拍指引"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.4.blocks.8.items.1.cap">测量点位置图与实拍画面，并显示测量值</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+
+
+                <div class="b-para reveal">
+<span class="b-para__label" data-ep="chapters.4.blocks.9.label">互锁检测</span>      <p data-ep="chapters.4.blocks.9.text">高压互锁回路的通断检查，同样由线路图引导到具体端子。</p>
+    </div>
+
+
+                <div class="b-figures reveal">
+    <div class="figs figs--2up">
+        <figure class="fig" data-frame="tablet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="vehicle-10"
+            data-full="media/lock_step.webp"
+            data-cap="互锁检测的测量步骤与实拍位置"
+            data-kind="tablet"
+            aria-label="放大查看：互锁检测：测量步骤与实拍位置">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/lock_step_480.webp" srcset="thumbs/lock_step_480.webp 480w, thumbs/lock_step_960.webp 960w" sizes="(max-width:900px) 92vw, 47vw" width="1468" height="1080"             alt="互锁检测：测量步骤与实拍位置"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.4.blocks.10.items.0.cap">互锁检测的测量步骤与实拍位置</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="tablet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="vehicle-10"
+            data-full="media/lock_line.webp"
+            data-cap="高压互锁测量线路"
+            data-kind="tablet"
+            aria-label="放大查看：互锁检测：高压互锁测量线路">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/lock_line_480.webp" srcset="thumbs/lock_line_480.webp 480w, thumbs/lock_line_960.webp 960w" sizes="(max-width:900px) 92vw, 47vw" width="1468" height="1080"             alt="互锁检测：高压互锁测量线路"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.4.blocks.10.items.1.cap">高压互锁测量线路</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+
+
+                <div class="b-para reveal">
+<span class="b-para__label" data-ep="chapters.4.blocks.11.label">B. 功能演示</span>      <p data-ep="chapters.4.blocks.11.text">可以通过车辆高压系统框图，选中测量点，然后展示测量点位置，指导用户测量。通过 <strong>高压框图、车模标点图、位置图、端子图</strong> 等元素来解决以上痛点。</p>
+    </div>
+
+
+                  <div class="b-video reveal">
+    <div class="video" data-src="media/box_intro_video.mp4">
+      <video class="video__el" controls preload="none" playsinline
+style="aspect-ratio: 1920 / 1080"></video>
+      <button class="video__cover" type="button"
+              aria-label="播放视频：整车检测功能实际操作演示">
+        <span class="video__play" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M7 4.5l12 7.5-12 7.5V4.5z" fill="#14130F"/>
+          </svg>
+        </span>
+        <span class="video__label" data-ep="ui.video_label">点击播放 · EVKit2 功能演示</span>
+      </button>
+    </div>
+<p class="video__note" data-ep="chapters.4.blocks.12.note">整车检测功能实际操作演示</p>  </div>
+
+
+
+        </div>
+      </div>
+    </section>
+<section class="section" id="data" data-chapter="data">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <div class="sec-head__no">
+            <span><span data-ep="chapters.5.no">06</span><em>/</em>07</span>
+            <small data-ep="ui.chapter_label">CHAPTER</small>
+          </div>
+          <div>
+            <h2 class="sec-head__title" data-ep="chapters.5.title">整车检测数据开发过程详解</h2>
+<p class="sec-head__kicker" data-ep="chapters.5.kicker">从原厂资料到入库表，以及相关的自制工具</p>          </div>
+        </header>
+
+        <div class="grid12">
+                <div class="b-para reveal">
+<span class="b-para__label" data-ep="chapters.5.blocks.0.label">A. 收集资料，开发数据</span>      <p data-ep="chapters.5.blocks.0.text">整车的测量数据由三步流水作业产出，每一步都对应一个固定的交付物。</p>
+    </div>
+
+
+                <div class="b-steps">
+<div class="step reveal">
+          <span class="step__no" data-ep="chapters.5.blocks.1.items.0.no">1</span>
+          <h3 class="step__title" data-ep="chapters.5.blocks.1.items.0.title">资料整理</h3>
+          <div class="step__body">
+<p class="step__text" data-ep="chapters.5.blocks.1.items.0.text">通过 OE 资料、用户手册、配件网站等渠道，收集高压部件的连接关系、位置等信息。</p>              <div class="figs figs--2up">
+                  <figure class="fig" data-frame="sheet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-1"
+            data-full="media/src_terminal.webp"
+            data-cap="原厂资料里的高压端子分布图"
+            data-kind="sheet"
+            aria-label="放大查看：原厂资料中的高压端子分布图">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/src_terminal_480.webp" srcset="thumbs/src_terminal_480.webp 480w" sizes="(max-width:900px) 92vw, 47vw" width="667" height="752"             alt="原厂资料中的高压端子分布图"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.1.items.0.figures.items.0.cap">原厂资料里的高压端子分布图</figcaption>
+  </figure>
+
+                  <figure class="fig" data-frame="sheet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-1"
+            data-full="media/src_doc.webp"
+            data-cap="同一批信息的端子位置说明文档"
+            data-kind="sheet"
+            aria-label="放大查看：原厂资料中的端子位置说明文档">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/src_doc_480.webp" srcset="thumbs/src_doc_480.webp 480w" sizes="(max-width:900px) 92vw, 47vw" width="582" height="712"             alt="原厂资料中的端子位置说明文档"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.1.items.0.figures.items.1.cap">同一批信息的端子位置说明文档</figcaption>
+  </figure>
+
+              </div>
+          </div>
+        </div>
+<div class="step reveal">
+          <span class="step__no" data-ep="chapters.5.blocks.1.items.1.no">2</span>
+          <h3 class="step__title" data-ep="chapters.5.blocks.1.items.1.title">素材绘制</h3>
+          <div class="step__body">
+<p class="step__text" data-ep="chapters.5.blocks.1.items.1.text">根据收集到的信息，绘制对应的框图、测量位置图、高压端子图。</p>              <div class="figs figs--2up">
+                  <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-1"
+            data-full="media/draw_block.webp"
+            data-cap="绘制出的高压系统连接框图"
+            data-kind="plain"
+            aria-label="放大查看：绘制的高压系统连接框图">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/draw_block_480.webp" srcset="thumbs/draw_block_480.webp 480w" sizes="(max-width:900px) 92vw, 47vw" width="614" height="470"             alt="绘制的高压系统连接框图"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.1.items.1.figures.items.0.cap">绘制出的高压系统连接框图</figcaption>
+  </figure>
+
+                  <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-1"
+            data-full="media/draw_position.webp"
+            data-cap="绘制出的测量位置图与高压端子图"
+            data-kind="plain"
+            aria-label="放大查看：绘制的位置图与高压端子端子图">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/draw_position_480.webp" srcset="thumbs/draw_position_480.webp 480w" sizes="(max-width:900px) 92vw, 47vw" width="902" height="442"             alt="绘制的位置图与高压端子端子图"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.1.items.1.figures.items.1.cap">绘制出的测量位置图与高压端子图</figcaption>
+  </figure>
+
+              </div>
+          </div>
+        </div>
+<div class="step reveal">
+          <span class="step__no" data-ep="chapters.5.blocks.1.items.2.no">3</span>
+          <h3 class="step__title" data-ep="chapters.5.blocks.1.items.2.title">数据入库</h3>
+          <div class="step__body">
+<p class="step__text" data-ep="chapters.5.blocks.1.items.2.text">将整理好的测量数据、图片文件等加到入库表中。</p>              <div class="figs figs--2up">
+                  <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-1"
+            data-full="media/db_full.webp"
+            data-cap="高压测量入库表全貌"
+            data-kind="plain"
+            aria-label="放大查看：高压测量入库表">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/db_full_480.webp" srcset="thumbs/db_full_480.webp 480w, thumbs/db_full_960.webp 960w, thumbs/db_full_1600.webp 1600w" sizes="(max-width:900px) 92vw, 47vw" width="1760" height="792"             alt="高压测量入库表"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.1.items.2.figures.items.0.cap">高压测量入库表全貌</figcaption>
+  </figure>
+
+                  <figure class="fig" data-frame="plain">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-1"
+            data-full="media/db_head.webp"
+            data-cap="车型路径入库"
+            data-kind="plain"
+            aria-label="放大查看：入库表字段与坐标数据局部">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/db_head_480.webp" srcset="thumbs/db_head_480.webp 480w, thumbs/db_head_960.webp 960w, thumbs/db_head_1600.webp 1600w" sizes="(max-width:900px) 92vw, 47vw" width="1631" height="763"             alt="入库表字段与坐标数据局部"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.1.items.2.figures.items.1.cap">车型路径入库</figcaption>
+  </figure>
+
+              </div>
+          </div>
+        </div>
+    </div>
+
+
+                <div class="b-para reveal">
+<span class="b-para__label" data-ep="chapters.5.blocks.2.label">B. 高压绝缘开发过程工具提效</span>      <p data-ep="chapters.5.blocks.2.text">数据量上来之后，靠人工肉眼核对既不现实也不可靠。因此开发了以下工具，进行提效。</p>
+    </div>
+
+
+                <div class="b-tool">  <article class="tool reveal">
+    <div class="tool__head">
+      <span class="tool__idx"><span data-ep="ui.tool_prefix">工具</span> 04</span>
+      <h3 class="tool__title" data-ep="chapters.5.blocks.3.title">入库测量数据可视化审核工具</h3>
+    </div>
+    <p class="tool__desc" data-ep="chapters.5.blocks.3.desc">将入库表中的文本数据转化为可视化网页，把坐标、框图、位置图、端子图放在同一屏内比对，以提高审核的效率。</p>
+    <div class="tool__body">
+        <div class="b-figures reveal">
+    <div class="figs figs--3up">
+        <figure class="fig" data-frame="desk">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-3"
+            data-full="media/tool_audit_list.webp"
+            data-cap="将已开发的车型品牌直观的展示出来"
+            data-kind="desk"
+            aria-label="放大查看：审核工具：车型列表与审核状态">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true">内网工具／车型审核总览</span>
+        <img class="fig__img"
+             src="thumbs/tool_audit_list_480.webp" srcset="thumbs/tool_audit_list_480.webp 480w, thumbs/tool_audit_list_960.webp 960w, thumbs/tool_audit_list_1600.webp 1600w" sizes="(max-width:900px) 92vw, 31vw" width="1902" height="899"             alt="审核工具：车型列表与审核状态"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.3.figures.items.0.cap">将已开发的车型品牌直观的展示出来</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="desk">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-3"
+            data-full="media/tool_audit_view.webp"
+            data-cap="框图 × 车模标点 × 位置图 × 端子图，四联同屏比对"
+            data-kind="desk"
+            aria-label="放大查看：审核工具：框图／车模标点／位置图／端子图四联视图">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true">内网工具／高压测量数据可视化</span>
+        <img class="fig__img"
+             src="thumbs/tool_audit_view_480.webp" srcset="thumbs/tool_audit_view_480.webp 480w, thumbs/tool_audit_view_960.webp 960w, thumbs/tool_audit_view_1600.webp 1600w" sizes="(max-width:900px) 92vw, 31vw" width="1896" height="956"             alt="审核工具：框图／车模标点／位置图／端子图四联视图"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.3.figures.items.1.cap">框图 × 车模标点 × 位置图 × 端子图，四联同屏比对</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="desk">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-3"
+            data-full="media/tool_audit_single.webp"
+            data-cap="车型的高压断电流程展示"
+            data-kind="desk"
+            aria-label="放大查看：审核工具：单车型数据可视化">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true">内网工具／单车型数据</span>
+        <img class="fig__img"
+             src="thumbs/tool_audit_single_480.webp" srcset="thumbs/tool_audit_single_480.webp 480w, thumbs/tool_audit_single_960.webp 960w, thumbs/tool_audit_single_1600.webp 1600w" sizes="(max-width:900px) 92vw, 31vw" width="1904" height="615"             alt="审核工具：单车型数据可视化"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.3.figures.items.2.cap">车型的高压断电流程展示</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+  <div class="code" data-open="true">
+    <div class="code__bar">
+      <span class="code__label" data-ep="chapters.5.blocks.3.code.label">工具开发提示词大致结构</span>
+      <button class="code__copybtn" type="button"
+              data-copied="已复制" title=""
+              aria-label="">
+        <svg class="ic ic-copy" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M4.5 12.5h7a1 1 0 001-1v-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <svg class="ic ic-done" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M2.5 7.5l3 3 6-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="code__toggle" type="button" aria-expanded="true"
+              data-verb-open="展开全文" data-verb-close="收起">
+        <span class="code__verb" data-ep="ui.code_close">收起</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="code__inner">
+      <div class="code__clip"><pre data-ep="chapters.5.blocks.3.code.text" data-multiline="1">## 需求
+开发一个基于 Web 的测量数据可视化工具，能读取 Excel 中的数据，把相关内容以网页的形式展示。
+
+## 表格介绍
+- Excel 文件：-EV测量入库表.xlsx，读取工作表「高压测量」
+- 对应字段：
+  - [表头名] 为局部位置图的图片名称
+  - [表头名] 为高压框图的 svg 图名称
+  - [表头名] 为坐标（基准坐标系为 400*400）
+  - [表头名] 为坐标对应的底图
+- 底图比例：标注点需根据 400*400 坐标系等比自适应贴合在底图上，缩放不能跑偏。
+
+## 资源路径
+- 图片存放路径：[如：./static/images/]
+- SVG 存放路径：[如：./static/svg/]
+
+## 页面与交互要求
+1. 左侧：显示高压框图（svg）。
+2. 右侧：显示局部位置图、车模标点图、高压端子图。
+3. 交互：电机 svg 图上的插头需要可以点击，点击后右侧滑动到对应的局部位置图。
+
+## 技术栈与输出
+- 后端：Python (Flask) + Pandas 处理 Excel
+- 前端：单页面 HTML + 原生 JS（或轻量库）
+- 输出要求：给出完整的项目结构、app.py、前端页面代码及启动说明。</pre></div>
+    </div>
+  </div>
+    </div>
+    <div class="tool__foot">
+    </div>
+  </article>
+</div>
+
+
+                <div class="b-tool">  <article class="tool reveal">
+    <div class="tool__head">
+      <span class="tool__idx"><span data-ep="ui.tool_prefix">工具</span> 05</span>
+      <h3 class="tool__title" data-ep="chapters.5.blocks.4.title">位置图批量 AI 转换工具</h3>
+    </div>
+    <p class="tool__desc" data-ep="chapters.5.blocks.4.desc">批量转化工具，可以快速配置提示词，对比转换后的图片效果，把位置图的风格统一交给 AI 批量完成。</p>
+    <div class="tool__body">
+        <div class="b-figures reveal">
+    <div class="figs figs--hero">
+        <figure class="fig" data-frame="desk">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-4"
+            data-full="media/tool_ai_batch.webp"
+            data-cap="左侧随时改提示词，右侧即时对比转换后的效果"
+            data-kind="desk"
+            aria-label="放大查看：位置图批量 AI 转换工具：提示词配置与效果对比">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true">内网工具／位置图批量 AI 转换</span>
+        <img class="fig__img"
+             src="thumbs/tool_ai_batch_480.webp" srcset="thumbs/tool_ai_batch_480.webp 480w, thumbs/tool_ai_batch_960.webp 960w, thumbs/tool_ai_batch_1600.webp 1600w" sizes="(max-width:1080px) 92vw, 960px" width="1907" height="918"             alt="位置图批量 AI 转换工具：提示词配置与效果对比"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.4.figures.items.0.cap">左侧随时改提示词，右侧即时对比转换后的效果</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+    </div>
+    <div class="tool__foot">
+      <a class="tool__iconbtn tool__openbtn" href="../tools/imageproc-tool.html" target="_blank"
+         rel="noopener noreferrer"
+         title="站内静态演示 · 打开 →" aria-label="站内静态演示">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6.5 3.5H12.5V9.5M12.5 3.5L7 9M10 11.5v1a1 1 0 01-1 1h-6a1 1 0 01-1-1v-6a1 1 0 011-1h1"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <button class="tool__iconbtn tool__copybtn" type="button" data-copy="../tools/imageproc-tool.html"
+              data-copied="已复制" title="复制地址"
+              aria-label="复制地址">
+        <svg class="ic ic-copy" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M4.5 12.5h7a1 1 0 001-1v-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <svg class="ic ic-done" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M2.5 7.5l3 3 6-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </article>
+</div>
+
+
+                <div class="b-tool">  <article class="tool reveal">
+    <div class="tool__head">
+      <span class="tool__idx"><span data-ep="ui.tool_prefix">工具</span> 06</span>
+      <h3 class="tool__title" data-ep="chapters.5.blocks.5.title">标点工具优化</h3>
+    </div>
+    <p class="tool__desc" data-ep="chapters.5.blocks.5.desc">旧的标点工具，找模型底图不太方便，因此重新优化了一版，提高后续标点效率。</p>
+    <div class="tool__body">
+        <div class="compare">
+          <div class="compare__side">
+            <span class="compare__tag compare__tag--old" data-ep="chapters.5.blocks.5.compare.old_note">Old</span>
+            <figure class="fig" data-frame="desk">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-5"
+            data-full="media/tool_mark_old.webp"
+            data-cap="Old —— 仅有坐标输入框，底图需人工翻找"
+            data-kind="desk"
+            aria-label="放大查看：优化前的标点工具界面">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true">标点工具／优化前</span>
+        <img class="fig__img"
+             src="thumbs/tool_mark_old_480.webp" srcset="thumbs/tool_mark_old_480.webp 480w, thumbs/tool_mark_old_960.webp 960w, thumbs/tool_mark_old_1600.webp 1600w" sizes="(max-width:900px) 92vw, 47vw" width="1920" height="954"             alt="优化前的标点工具界面"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.5.compare.old_cap">Old —— 仅有坐标输入框，底图需人工翻找</figcaption>
+  </figure>
+
+          </div>
+          <div class="compare__side">
+            <span class="compare__tag compare__tag--new" data-ep="chapters.5.blocks.5.compare.new_note">New</span>
+            <figure class="fig" data-frame="desk">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-5"
+            data-full="media/tool_mark_new.webp"
+            data-cap="New —— 车型缩略图墙 + 分组筛选，底图一键切换"
+            data-kind="desk"
+            aria-label="放大查看：优化后的标点工具界面">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true">内网工具／标点工具</span>
+        <img class="fig__img"
+             src="thumbs/tool_mark_new_480.webp" srcset="thumbs/tool_mark_new_480.webp 480w, thumbs/tool_mark_new_960.webp 960w, thumbs/tool_mark_new_1600.webp 1600w" sizes="(max-width:900px) 92vw, 47vw" width="1920" height="954"             alt="优化后的标点工具界面"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.5.compare.new_cap">New —— 车型缩略图墙 + 分组筛选，底图一键切换</figcaption>
+  </figure>
+
+          </div>
+        </div>
+    </div>
+    <div class="tool__foot">
+      <a class="tool__iconbtn tool__openbtn" href="../tools/point-tool.html" target="_blank"
+         rel="noopener noreferrer"
+         title="站内静态演示 · 打开 →" aria-label="站内静态演示">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6.5 3.5H12.5V9.5M12.5 3.5L7 9M10 11.5v1a1 1 0 01-1 1h-6a1 1 0 01-1-1v-6a1 1 0 011-1h1"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <button class="tool__iconbtn tool__copybtn" type="button" data-copy="../tools/point-tool.html"
+              data-copied="已复制" title="复制地址"
+              aria-label="复制地址">
+        <svg class="ic ic-copy" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M4.5 12.5h7a1 1 0 001-1v-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <svg class="ic ic-done" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M2.5 7.5l3 3 6-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </article>
+</div>
+
+
+                <div class="b-tool">  <article class="tool reveal">
+    <div class="tool__head">
+      <span class="tool__idx"><span data-ep="ui.tool_prefix">工具</span> 07</span>
+      <h3 class="tool__title" data-ep="chapters.5.blocks.6.title">高压端子标点工具</h3>
+    </div>
+    <p class="tool__desc" data-ep="chapters.5.blocks.6.desc">结合高压端子图标注特点，开发相应工具对其进行统一标注、统一调用，实现同一个插头只标注一次，就可以批量注入。</p>
+    <div class="tool__body">
+        <div class="b-figures reveal">
+    <div class="figs figs--hero">
+        <figure class="fig" data-frame="desk">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="data-6"
+            data-full="media/tool_terminal.webp"
+            data-cap="同一个插头只标注一次，即可批量注入到全部车型"
+            data-kind="desk"
+            aria-label="放大查看：高压端子标点工具：统一标注与批量注入">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true">内网工具／高压端子标点</span>
+        <img class="fig__img"
+             src="thumbs/tool_terminal_480.webp" srcset="thumbs/tool_terminal_480.webp 480w, thumbs/tool_terminal_960.webp 960w, thumbs/tool_terminal_1600.webp 1600w" sizes="(max-width:1080px) 92vw, 960px" width="1910" height="944"             alt="高压端子标点工具：统一标注与批量注入"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.5.blocks.6.figures.items.0.cap">同一个插头只标注一次，即可批量注入到全部车型</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+    </div>
+    <div class="tool__foot">
+      <a class="tool__iconbtn tool__openbtn" href="../tools/terminal-tool.html" target="_blank"
+         rel="noopener noreferrer"
+         title="站内静态演示 · 打开 →" aria-label="站内静态演示">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6.5 3.5H12.5V9.5M12.5 3.5L7 9M10 11.5v1a1 1 0 01-1 1h-6a1 1 0 01-1-1v-6a1 1 0 011-1h1"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <button class="tool__iconbtn tool__copybtn" type="button" data-copy="../tools/terminal-tool.html"
+              data-copied="已复制" title="复制地址"
+              aria-label="复制地址">
+        <svg class="ic ic-copy" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="8" height="8" rx="1.6" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M4.5 12.5h7a1 1 0 001-1v-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <svg class="ic ic-done" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M2.5 7.5l3 3 6-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </article>
+</div>
+
+
+        </div>
+      </div>
+    </section>
+<section class="section" id="joint" data-chapter="joint">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <div class="sec-head__no">
+            <span><span data-ep="chapters.6.no">07</span><em>/</em>07</span>
+            <small data-ep="ui.chapter_label">CHAPTER</small>
+          </div>
+          <div>
+            <h2 class="sec-head__title" data-ep="chapters.6.title">和其他项目结合</h2>
+<p class="sec-head__kicker" data-ep="chapters.6.kicker">从「大概哪里坏了」到「具体哪一点坏了」</p>          </div>
+        </header>
+
+        <div class="grid12">
+                <div class="b-lede reveal"><p data-ep="chapters.6.blocks.0.text">EV 测量功能可以接入其他高压检测相关功能，作为进一步的补充检查。</p></div>
+
+
+                <div class="b-para reveal">
+      <p data-ep="chapters.6.blocks.1.text">在 <strong>免拆快检</strong> 功能中，通过数据流、故障码等信息在一些情况下只能定位到大概的故障，而接入 EV 测量后，可以辅助用户在免拆快检的基础上，进一步去定位故障发生的位置。</p>
+    </div>
+
+
+                <div class="b-figures reveal">
+    <div class="figs figs--2up">
+        <figure class="fig" data-frame="tablet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="joint-2"
+            data-full="media/joint_quick.webp"
+            data-cap="免拆快检检出高压输出相关故障，但数据流与故障码无法判定是电池包内还是包外"
+            data-kind="tablet"
+            aria-label="放大查看：免拆快检检出高压输出相关故障">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/joint_quick_480.webp" srcset="thumbs/joint_quick_480.webp 480w, thumbs/joint_quick_960.webp 960w, thumbs/joint_quick_1600.webp 1600w" sizes="(max-width:900px) 92vw, 47vw" width="2176" height="1600"             alt="免拆快检检出高压输出相关故障"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.6.blocks.2.items.0.cap">免拆快检检出高压输出相关故障，但数据流与故障码无法判定是电池包内还是包外</figcaption>
+  </figure>
+
+        <figure class="fig" data-frame="tablet">
+    <button class="fig__btn" type="button"
+            data-lightbox="1"
+            data-group="joint-2"
+            data-full="media/joint_ev.webp"
+            data-cap="调用 EV 测量进一步定位是外部故障，还是内部故障"
+            data-kind="tablet"
+            aria-label="放大查看：调用 EV 测量进一步定位故障位置">
+      <span class="fig__shell">
+        <span class="fig__chrome" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="fig__url" aria-hidden="true"></span>
+        <img class="fig__img"
+             src="thumbs/joint_ev_480.webp" srcset="thumbs/joint_ev_480.webp 480w, thumbs/joint_ev_960.webp 960w, thumbs/joint_ev_1600.webp 1600w" sizes="(max-width:900px) 92vw, 47vw" width="2176" height="1600"             alt="调用 EV 测量进一步定位故障位置"
+             loading="lazy" decoding="async">
+      </span>
+    </button>
+    <figcaption class="fig__cap" data-ep="chapters.6.blocks.2.items.1.cap">调用 EV 测量进一步定位是外部故障，还是内部故障</figcaption>
+  </figure>
+
+    </div>
+  </div>
+
+
+
+                <div class="b-note reveal">
+<span class="b-note__label" data-ep="chapters.6.blocks.3.label">衔接逻辑</span>      <span data-ep="chapters.6.blocks.3.text">免拆快检先圈定范围，EV 测量再收窄到具体测量点 —— 两步合起来，把「存疑问题」变成「确定故障」。</span>
+    </div>
+
+
+        </div>
+      </div>
+    </section>
+
+</main>
+
+<section class="footer-showcase" id="showcase" aria-label="EVDiag Box2 工业设计展示">
+  <div class="footer-showcase__ambient" aria-hidden="true"></div>
+  <div class="footer-showcase__inner">
+    <div class="footer-showcase__stage">
+      <div class="footer-showcase__screen" id="showcaseTheater" title="点击暂停 / 播放">
+        <video class="footer-showcase__video" id="showcaseVideo"
+               src="media/box_intro_video.mp4"
+               loop muted playsinline
+               preload="none"
+               aria-label="EVDiag Box2 工业设计与功能全景展示"></video>
+
+        <div class="footer-showcase__playpause" id="showcasePlayOverlay" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="6 4 20 12 6 20 6 4"/>
+          </svg>
+        </div>
+
+        <div class="footer-showcase__dock" role="toolbar" aria-label="视频播放控制">
+          <button class="footer-showcase__ctrl" id="showcaseMuteBtn" type="button" aria-label="开启声音" title="静音 / 开启声音">
+            <svg class="icon-sound-off" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+              <line x1="23" y1="9" x2="17" y2="15"/>
+              <line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+            <svg class="icon-sound-on" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer footer--dark">
+      <div class="footer__row">
+        <span class="footer__title">
+          <span data-ep="site.title">EVKit2</span>
+          <span class="footer__sep">·</span>
+          <span data-ep="site.title_sub">项目开发分享</span>
+        </span>
+        <span class="footer__meta" data-ep="site.meta">汽车技术部 · 黄谦</span>
+      </div>
+    </footer>
+  </div>
+</section>
+
+<button class="totop" id="totop" type="button" aria-label="回到顶部" title="回到顶部">
+  <svg class="totop__svg" width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+    <g transform="rotate(-90 20 20)">
+      <circle class="totop__track" cx="20" cy="20" r="18.5"/>
+      <circle class="totop__bar" cx="20" cy="20" r="18.5"/>
+    </g>
+    <g class="totop__arrow" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="20" y1="24.5" x2="20" y2="14"/>
+      <polyline points="15.8 18.2 20 14 24.2 18.2"/>
+    </g>
+  </svg>
+</button>
+
+
+<dialog class="lightbox" id="lightbox" aria-label="图片放大查看">
+  <div class="lightbox__stage" id="lbStage">
+    <img class="lightbox__img" id="lbImg" alt="" data-hide="true">
+  </div>
+
+  <button class="lb-btn lightbox__close" id="lbClose" type="button" aria-label="关闭">
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor"
+            stroke-width="1.9" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <div class="lightbox__bar">
+    <button class="lb-btn" id="lbPrev" type="button" aria-label="上一张">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.9"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <span class="lightbox__cap" id="lbCap"></span>
+    <span class="lightbox__count" id="lbCount"></span>
+
+    <span class="lightbox__tools">
+      <button class="lb-btn" id="lbOut" type="button" aria-label="缩小">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M3.5 8h9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="lb-btn" id="lbReset" type="button" aria-label="重置缩放">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M2.5 6V2.5H6M13.5 10v3.5H10" stroke="currentColor"
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2.5 2.5l4 4M13.5 13.5l-4-4" stroke="currentColor"
+                stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="lb-btn" id="lbIn" type="button" aria-label="放大">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </span>
+
+    <button class="lb-btn" id="lbNext" type="button" aria-label="下一张">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.9"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</dialog>
+
+
+
+<script src="./assets/js/main.js?v=20260921_v15" defer></script>
+<script type="module" src="./assets/js/hero-3d.js?v=20260921_v12"></script>
+
+<script>
+  addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || parent === window) return;
+    var busy = document.querySelector(
+      'dialog[open], .toolvideomodal.is-open, .navselect[data-open="true"]');
+    if (!busy) parent.postMessage({ type: 'evkit-share:escape' }, location.origin);
+  });
+</script>
+</body>
+</html>

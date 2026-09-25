@@ -6,23 +6,28 @@ import { EmText } from '../ui/EmText';
 import { useLightbox } from '../modal/LightboxProvider';
 import { Reveal } from '../motion/Reveal';
 
+/**
+ * 卡片上带文字的按钮组。包一层容器让它们整体作为**一个** flex item 参与换行：
+ * featured 卡里这一行还有 min-w-[220px] 的成果徽章，两个按钮若各自成 item，
+ * 会在按钮之间断行、留下一个孤儿。
+ */
 function DemoButtons({ actions }: { actions: ProjectIframeAction[] }) {
   const { open } = useLightbox();
   return (
-    <>
+    <div className="flex shrink-0 flex-wrap items-center gap-2.5">
       {actions.map((action, i) => (
         <Button
           key={i}
-          variant="primary"
+          variant={action.variant ?? 'primary'}
           className="shrink-0"
           onClick={() => open(action)}
           ariaLabel={action.ariaLabel}
         >
-          <Icon name="play" className="h-4 w-4" stroke={false} />
+          <Icon name={action.icon ?? 'play'} className="h-4 w-4" />
           {action.label}
         </Button>
       ))}
-    </>
+    </div>
   );
 }
 

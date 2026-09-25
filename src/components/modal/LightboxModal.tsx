@@ -64,9 +64,18 @@ export function LightboxModal() {
         first.focus();
       }
     };
+    /* iframe 内容的按键落在它自己的 document 里，上面的 keydown 收不到，
+       Esc 就会在读者点进正文之后失效。导出页在页内没有浮层时把 Esc 转递过来。 */
+    const onMessage = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin) return;
+      if ((e.data as { type?: string } | null)?.type === 'evkit-share:escape') close();
+    };
+
     document.addEventListener('keydown', onKey);
+    window.addEventListener('message', onMessage);
     return () => {
       document.removeEventListener('keydown', onKey);
+      window.removeEventListener('message', onMessage);
       restoreFocusRef.current?.focus();
       restoreFocusRef.current = null;
     };

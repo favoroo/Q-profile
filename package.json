@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "export:evkit-share": "python3 scripts/export-evkit-share.py",
+    "//export:evkit-share": "本地开发工具，产物 public/evkit/share/ 需提交。CI 无 Python，切勿串进 build"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

@@ -47,6 +47,8 @@ export function FrameContent({ src, title, tabs }: { src: string; title: string;
             <span>正在加载体验页面…</span>
           </div>
         )}
+        {/* 故意不加 sandbox：分享文档的站内图片灯箱靠 <dialog>.showModal()，
+            一旦加上 sandbox 就必须额外开 allow-modals，否则静默失效。 */}
         <iframe
           src={currentSrc}
           title={title}

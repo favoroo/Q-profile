@@ -28,9 +28,13 @@ npm ci        # 安装依赖（CI 用 ci，本地可用 npm install）
 npm run dev   # 启动开发服务器
 npm run build # tsc -b 类型检查 + vite build，产物输出 dist/
 npm run preview # 本地预览构建产物
+npm run export:evkit-share # 重新生成 public/evkit/share/（EV Kit 2 分享文档）
 ```
 
 **注意：`build` 包含 `tsc -b`，类型错误会导致构建失败。提交前务必跑一次 `npm run build`。**
+
+`export:evkit-share` 是**本地工具**，需要 Python ≥3.10 + Flask + Pillow（脚本会自动挑一个可用的解释器）。
+CI 里没有 Python，所以它的产物必须提交进 git —— **绝不要把它串进 `build`**。
 
 ## 部署
 
@@ -56,6 +60,9 @@ npm run preview # 本地预览构建产物
 | `index.ts` | 统一出口，组件从这里 import |
 
 **规范：改文案/加项目 → 只改 `src/data/`；改样式/交互 → 才动 `src/components/`。**
+
+一个例外：`projects.ts` 里 evkit2 的「分享文档」按钮指向 `public/evkit/share/`，那是**生成产物**
+而非手写数据（见 §5）。改它的正文要去 `EV项目分享部署/` 改再重跑导出。
 
 ### 2. 组件分层 `src/components/`
 
@@ -90,6 +97,18 @@ import { withBase } from '../lib/asset';
 | `videos/` | 演示视频（mp4） |
 | `docs/` | 项目开发手册（Markdown + 图片） |
 | `evkit/` | EV Kit 在线体验的静态演示页 |
+| `evkit/share/` | **EV Kit 2 项目开发分享** —— Flask 模板的静态导出产物，勿手改 |
+
+`evkit/share/` 由 [scripts/export-evkit-share.py](scripts/export-evkit-share.py) 从 `EV项目分享部署/web/`
+生成（163 个文件 / 约 18 MB）。导出时做了三件事，改源码时别把它们改回去：
+
+- **剥离内网痕迹**：工具卡的 `10.230.x.x` 跳转换成站内 `evkit/tools/` 演示、图片假地址栏里的
+  host 换成「内网工具」、`old_url` 的本机路径清空。映射表在脚本顶部 `TOOL_DEMO` / `TOOL_NO_DEMO`，
+  **新增工具卡必须同步**，否则脚本会主动报错而不是静默发布内网地址。
+- **剥离演讲功能**：签到/问卷扫码（Ctrl+D）、编辑模式（Ctrl+E）、X/Z 演示激光笔。
+- **产物内部全是相对路径**，所以 `withBase()` 只管 iframe 的 src，二级路径自动正确。
+
+页面自带一套 `static_export` Jinja 守卫；不传该参数时内网版渲染结果与改动前完全一致。
 
 ### 6. 样式规范
 
@@ -106,6 +125,7 @@ import { withBase } from '../lib/asset';
 5. **类型安全**：禁止 `any`；公共数据形状必须过 `types.ts`，享受编译期检查
 6. **提交规范**：Conventional Commits + 中文描述（`feat: xxx` / `fix: xxx` / `perf: xxx` / `refactor: xxx` / `chore: xxx`），参照 git log 现有风格
 7. **本地素材目录勿动**：`组件/`、`项目展示素材/` 是未跟踪的本地原始素材，仅作参考，不要提交也不要修改；`archive/legacy.html` 为旧版存档
+8. **`EV项目分享部署/` 是导出源，不是普通素材**：同样未跟踪、不提交，但它**可以改**（分享文档的正文与图片都在那里），改完要重跑 `npm run export:evkit-share` 并提交 `public/evkit/share/`。它自带一个 Flask 应用，本地预览用 `python3.12 EV项目分享部署/web/app.py`
 
 ## 验证清单（完成任务前自查）
 
@@ -113,4 +133,5 @@ import { withBase } from '../lib/asset';
 - [ ] `npm run dev` 本地视觉/交互正常
 - [ ] 新增静态资源路径均经 `withBase()` 包裹
 - [ ] 改动涉及文案时只动了 `src/data/`
+- [ ] 改了分享文档正文 → 重跑 `npm run export:evkit-share` 并提交了 `public/evkit/share/`
 - [ ] 推送 main 即触发部署，确认线上路径资源可达

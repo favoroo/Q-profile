@@ -106,11 +106,21 @@ export type VideoKey = 'trans' | 'docs';
 export type DocKey = 'trans-doc' | 'docs-doc';
 
 export type ProjectAction =
-  | { kind: 'iframe'; label: string; ariaLabel: string; frameSrc: string; frameTabs?: FrameTab[] }
+  | {
+      kind: 'iframe';
+      label: string;
+      ariaLabel: string;
+      frameSrc: string;
+      frameTabs?: FrameTab[];
+      /** 卡片按钮视觉层级，默认 'primary'。同一张卡有多个体验入口时用 'secondary' 分主次 */
+      variant?: 'primary' | 'secondary';
+      /** 卡片按钮图标，默认 'play' */
+      icon?: IconName;
+    }
   | { kind: 'video'; ariaLabel: string; videoKey: VideoKey }
   | { kind: 'doc'; ariaLabel: string; docKey: DocKey };
 
-/** iframe 在线体验动作（项目卡「在线体验」按钮） */
+/** iframe 动作（项目卡上带文字的按钮：「在线体验」「分享文档」） */
 export type ProjectIframeAction = Extract<ProjectAction, { kind: 'iframe' }>;
 
 export type ProjectSize = 'featured' | 'standard' | 'compact';
