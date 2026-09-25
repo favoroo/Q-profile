@@ -218,6 +218,18 @@ function ModelInner({
   const cPar = useRef({ x: 0, y: 0 });
   const tHov = useRef({ x: 0, y: 0 });
   const cHov = useRef({ x: 0, y: 0 });
+  /* 画布是否在视口内：不在时鼠标视差/悬停不再触发重渲染（默认 true，IO 不可用时行为不变） */
+  const inViewRef = useRef(true);
+
+  useEffect(() => {
+    const el = gl.domElement;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([entry]) => {
+      inViewRef.current = entry.isIntersecting;
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [gl]);
 
   const gltf = useGLTF(url) as any;
   const content = useMemo(() => {
@@ -529,6 +541,12 @@ function ModelInner({
   useEffect(() => {
     if (isTouch) return;
     const mm = (e: MouseEvent) => {
+      /* 性能门控：弹窗打开（body.lb-lock）或画布滚出视口时，鼠标移动不触发
+         WebGL 重渲染。前者让全屏 backdrop-blur 背后彻底静止（合成器可缓存模糊结果），
+         后者杀掉"滚过 Contact 后鼠标一动就后台渲染"的常态开销。
+         可见/弹窗关闭后的第一次 mousemove 会立即刷新视差目标，无需补偿。 */
+      if (document.body.classList.contains('lb-lock')) return;
+      if (!inViewRef.current) return;
       const nx = (e.clientX / window.innerWidth) * 2 - 1;
       const ny = (e.clientY / window.innerHeight) * 2 - 1;
       if (enableMouseParallax) tPar.current = { x: -nx * PARALLAX_MAG, y: -ny * PARALLAX_MAG };
@@ -708,6 +726,8 @@ export function ModelViewer({
       <Canvas
         shadows
         frameloop="demand"
+        /* Retina 上限 1.75：观感几乎无损，每帧像素量比 2.0 少约 23% */
+        dpr={[1, 1.75]}
         gl={{ preserveDrawingBuffer: true, alpha: true, antialias: true }}
         onCreated={({ gl, scene, camera }) => {
           rendererRef.current = gl;

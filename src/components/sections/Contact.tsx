@@ -1,5 +1,5 @@
 import { useState, useRef, lazy, Suspense } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { contact } from '../../data';
 import { Icon } from '../ui/icons';
 import { Reveal } from '../motion/Reveal';
@@ -9,6 +9,10 @@ const CarSceneBackground = lazy(() => import('../3d/CarSceneBackground'));
 export function Contact() {
   const [toast, setToast] = useState<string | null>(null);
   const toastTimerRef = useRef<number | null>(null);
+  /* 3D 场景（5.6MB GLB + 1.8MB HDR + three chunk）临近视口才挂载，
+     once: true —— 挂载过一次后保持挂载，避免反复下载闪烁 */
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const sceneNearby = useInView(sectionRef, { once: true, margin: '600px 0px 600px 0px' });
 
   const handleCopy = async (text: string, notice?: string) => {
     let success = false;
@@ -49,11 +53,14 @@ export function Contact() {
   // 桌面端内容顶对齐（lg:justify-start），让左侧标题块与右上角 "NEVER IDLE"
   // 标语形成同高度视觉对齐；移动端保持垂直居中。
   return (
-    <section className="relative bg-black pt-[84px] pb-[96px] max-md:pb-[340px] lg:justify-start lg:pt-[76px] text-[#F5F5F7] overflow-hidden min-h-[640px] flex flex-col justify-center" id="contact">
-      {/* 3D 车模全景背景 (React Bits ModelViewer) */}
-      <Suspense fallback={null}>
-        <CarSceneBackground showSlogan={true} slogan={contact.slogan} />
-      </Suspense>
+    <section ref={sectionRef} className="relative bg-black pt-[84px] pb-[96px] max-md:pb-[340px] lg:justify-start lg:pt-[76px] text-[#F5F5F7] overflow-hidden min-h-[640px] flex flex-col justify-center" id="contact">
+      {/* 3D 车模全景背景 (React Bits ModelViewer)：临近视口才挂载，卸载首屏的
+          GLB/HDR/three 全家桶下载与 WebGL 上下文创建 */}
+      {sceneNearby && (
+        <Suspense fallback={null}>
+          <CarSceneBackground showSlogan={true} slogan={contact.slogan} />
+        </Suspense>
+      )}
 
       {/* pointer-events-none：放行鼠标到底下的 3D canvas（车模可拖拽旋转），
           需要交互的元素在内部单独开 pointer-events-auto */}

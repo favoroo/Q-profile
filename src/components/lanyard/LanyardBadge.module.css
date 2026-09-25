@@ -193,6 +193,14 @@
   }
 }
 
+/* 弹窗打开（body.lb-lock，由 useBodyScrollLock 切换）时暂停表情浮动：
+   Hero 处在全屏 backdrop-blur 遮罩背后，infinite 动画会迫使合成器每帧重算模糊。
+   关闭弹窗后从暂停处继续，视觉无损。
+   lb-lock 是挂在 <body> 上的全局类，须用 :global() 避免被 CSS Modules 哈希。 */
+:global(body.lb-lock) .emojiItem {
+  animation-play-state: paused;
+}
+
 /* 无障碍：减少动态时取消翻转过渡 */
 @media (prefers-reduced-motion: reduce) {
   .cardInner {

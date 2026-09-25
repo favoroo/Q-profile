@@ -18,7 +18,7 @@ export const projects: Project[] = [
     ],
     result: '成果：高压测量全流程从设计到落地完整交付',
     image: withBase('/images/project-1.webp'),
-    imageAlt: 'EV Kit 2 高压测量项目配图',
+    imageAlt: 'EV Kit 2 高压测量项目配图：新能源高压电池、防触电橙色线束与测量表笔',
     gallery: [
       {
         src: withBase('/images/project-1-tool-marking.webp'),
@@ -84,7 +84,7 @@ export const projects: Project[] = [
     ],
     result: '成果：翻译环节效率与规范性显著提升',
     image: withBase('/images/project-4.webp'),
-    imageAlt: '翻译 Agent 工具配图',
+    imageAlt: '翻译 Agent 工具配图：A与文中英双语转换积木',
     actions: [
       {
         kind: 'iframe',
@@ -110,7 +110,7 @@ export const projects: Project[] = [
     ],
     result: '成果：资料治理为知识库，检索使用更高效',
     image: withBase('/images/project-5.webp'),
-    imageAlt: '资料治理 Agent 项目配图',
+    imageAlt: '资料治理 Agent 项目配图：分类工程技术文档卡册与检索放大镜',
     actions: [
       { kind: 'video', ariaLabel: '查看资料治理 Agent 演示视频', videoKey: 'docs' },
       { kind: 'doc', ariaLabel: '查看资料治理 Agent 开发手册', docKey: 'docs-doc' },
@@ -128,7 +128,7 @@ export const projects: Project[] = [
       '负责四轮定位功能中定位参数与作业流程的开发，**精准定义底盘定位参数**并完成标定，保障定位作业规范、数据精准且可工程化复用。',
     result: '成果：四轮定位参数与流程稳定交付',
     image: withBase('/images/project-2.webp'),
-    imageAlt: '四轮定位项目配图',
+    imageAlt: '四轮定位项目配图：汽车轮胎与底盘定位激光角度标定',
     tags: [
       { label: '四轮定位' },
       { label: '参数标定' },
@@ -146,7 +146,7 @@ export const projects: Project[] = [
       '负责公司覆盖**几十个汽车品牌**的 VIN 车型识别解析规则与数据开发，把车辆底层 VIN 码准确、结构化地识别解析为具体车型与配置信息。',
     result: '成果：几十个品牌的 VIN 车型识别稳定可用',
     image: withBase('/images/project-3.webp'),
-    imageAlt: 'VIN 车型识别项目配图',
+    imageAlt: 'VIN 车型识别项目配图：车辆识别码金属铭牌与激光扫码器',
     tags: [
       { label: 'VIN 识别' },
       { label: '多品牌覆盖' },
@@ -164,7 +164,7 @@ export const projects: Project[] = [
       '负责部门对于 TPMS（胎压监测）、IM（防盗匹配）、BT 608（电池检测）等多个项目与产品线的日常技术答疑与底层专业支撑。在海量原厂维修手册、通信协议及技术文档中具备极强的**信息查找、精准检索与资料沉淀**能力，能够快速定位疑难问题根因并输出标准化解答与技术支持方案。',
     result: '成果：具备极强的技术资料查找与沉淀能力，跨项目高效攻关与技术赋能',
     image: withBase('/images/project-6.webp'),
-    imageAlt: 'TPMS / IM / BT 608 项目支撑配图',
+    imageAlt: 'TPMS / IM / BT 608 专项支撑配图：胎压传感器、防盗钥匙与电池夹',
     tags: [
       { label: 'TPMS 胎压监测' },
       { label: 'IM 防盗匹配' },

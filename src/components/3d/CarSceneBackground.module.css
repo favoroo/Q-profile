@@ -44,3 +44,11 @@
     animation: none;
   }
 }
+
+/* 弹窗打开（body.lb-lock，由 useBodyScrollLock 切换）时暂停 infinite 扫光：
+   全屏 backdrop-blur 遮罩背后的画面静止后，合成器可以缓存模糊结果，
+   不必每帧重算整个视口的高斯模糊。关闭弹窗后从暂停处继续扫，视觉无损。
+   lb-lock 是挂在 <body> 上的全局类，须用 :global() 避免被 CSS Modules 哈希。 */
+:global(body.lb-lock) .sheenSweep {
+  animation-play-state: paused;
+}
