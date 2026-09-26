@@ -49,13 +49,10 @@ export interface Site {
 export interface Profile {
   name: string;
   title: string;
-  /** 支持 `**关键词**` 行内强调标记（由 ui/EmText 渲染为强调色） */
-  lead: string;
-  avatar: string;
-  /** 工牌背面：emoji 贴纸池（组件用固定种子伪随机撒落排版，纯装饰） */
-  badgeBack: {
-    emojis: string[];
-  };
+  /** 首页人物抠像素材（透明背景 WebP，用于 Hero 破框排版） */
+  portrait: string;
+  /** Hero 悬浮关键词芯片（沿人物卡片边缘排布，纯装饰） */
+  highlights: string[];
 }
 
 export interface AboutFact {
