@@ -14,6 +14,12 @@
  * 用法：npm run recolor:toycar
  * 幂等可重跑（蓝图里已没有绿/红/橙色带，再跑是无操作）；换配色改下方参数即可。
  *
+ * ⚠️ 改 BODY_BANDS 等贴图参数后重跑时，必须先恢复**原始绿模**再跑（蓝图上色相带
+ * 不再命中，改了也不会生效）：
+ *   git checkout 41bf5e1 -- public/models/ToyCar.glb   # 41bf5e1 = 蓝白涂装引入前的提交
+ *   npm run recolor:toycar
+ * 只改 SHEEN/GLASS 等材质因子参数则无需恢复（因子是绝对赋值，直接重跑即可）。
+ *
  * 注意：产物 public/models/ToyCar.glb 需提交；CI 不跑本脚本（与 export:evkit-share 同理）。
  */
 
@@ -42,6 +48,14 @@ const PREVIEW_DIR = '/tmp/toycar-recolor-preview';
 const SHEEN_COLOR = '#2f7bff';
 /** 车窗透射色：浅蓝灰玻璃（原 [0.3,0.8,0.3] 绿玻璃） */
 const GLASS_COLOR = '#b9d2e8';
+/**
+ * 车窗透射率（原 1 = 全透射）。全透射玻璃在黑色页面背景里透进来的只有黑色，
+ * 车窗看上去就是几个黑洞；调低后玻璃本体的浅蓝着色参与混合，车窗清晰可见，
+ * 同时保留三成透视看到白色内饰。
+ */
+const GLASS_TRANSMISSION = 0.3;
+/** 车窗粗糙度（原 0 = 完美镜面）：轻微磨砂让环境反射更宽，玻璃「存在感」更强 */
+const GLASS_ROUGHNESS = 0.08;
 
 /**
  * 车身贴图（ToyCar.baseColor）的色相迁移规则。
@@ -226,7 +240,9 @@ if (sheenMat) {
 const glassMat = root.listMaterials().find((m) => m.getName() === 'Glass');
 if (glassMat) {
   glassMat.setBaseColorFactor([...srgbHexToLinear(GLASS_COLOR), 1]);
-  console.log(`✓ Glass.baseColorFactor → ${GLASS_COLOR}`);
+  glassMat.setRoughnessFactor(GLASS_ROUGHNESS);
+  glassMat.getExtension('KHR_materials_transmission')?.setTransmissionFactor(GLASS_TRANSMISSION);
+  console.log(`✓ Glass.baseColorFactor → ${GLASS_COLOR}，transmission → ${GLASS_TRANSMISSION}，roughness → ${GLASS_ROUGHNESS}`);
 }
 
 await io.write(MODEL, doc);
