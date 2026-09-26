@@ -3,26 +3,6 @@ import { Button } from '../ui/Button';
 import { Icon } from '../ui/icons';
 import { Reveal } from '../motion/Reveal';
 
-/** 悬浮关键词芯片（玻璃质感，压在人物卡片边缘营造嵌套层次） */
-function FloatChip({
-  label,
-  className,
-  anim,
-}: {
-  label: string;
-  className: string;
-  anim: 'float-a' | 'float-b';
-}) {
-  return (
-    <span
-      className={`absolute z-30 flex items-center gap-2 rounded-2xl bg-white/80 px-4 py-2.5 text-[13px] font-medium text-ink shadow-[0_12px_32px_-12px_rgba(0,0,0,0.18)] ring-1 ring-black/[0.06] backdrop-blur-md animate-${anim} max-sm:px-3 max-sm:py-2 max-sm:text-[12px] ${className}`}
-    >
-      <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-      {label}
-    </span>
-  );
-}
-
 export function Hero() {
   return (
     <section className="relative overflow-hidden" id="home">
@@ -80,10 +60,6 @@ export function Hero() {
                 className="absolute bottom-0 left-1/2 z-20 h-full w-auto max-w-none -translate-x-1/2 object-contain object-bottom"
                 style={{ filter: 'drop-shadow(0 28px 36px rgba(29,29,31,0.16))' }}
               />
-              {/* 关键词芯片 */}
-              <FloatChip label={profile.highlights[0]} anim="float-a" className="top-[10%] left-[-14px] sm:left-[-150px]" />
-              <FloatChip label={profile.highlights[1]} anim="float-b" className="right-[-14px] bottom-[7%] sm:right-[-150px]" />
-              <FloatChip label={profile.highlights[2]} anim="float-a" className="bottom-[8%] left-[-150px] hidden lg:flex" />
             </div>
           </div>
         </Reveal>

@@ -51,8 +51,6 @@ export interface Profile {
   title: string;
   /** 首页人物抠像素材（透明背景 WebP，用于 Hero 破框排版） */
   portrait: string;
-  /** Hero 悬浮关键词芯片（沿人物卡片边缘排布，纯装饰） */
-  highlights: string[];
 }
 
 export interface AboutFact {
