@@ -13,11 +13,14 @@ interface CarSceneBackgroundProps {
 /**
  * ToyCar.glb（Khronos 官方样例，也就是 React Bits ModelViewer 用的那个模型）里一共三个网格：
  *
- *  - `ToyCar`  绿色玩具赛车（自带 clearcoat 清漆车漆）
- *  - `Fabric`  车底下的红色绒布台座（自带 sheen 绒面光泽），比车身大 3~4 倍
+ *  - `ToyCar`  蓝色玩具赛车（品牌蓝白涂装，自带 clearcoat 清漆车漆）
+ *  - `Fabric`  车底下的深蓝绒布台座（自带 sheen 绒面光泽），比车身大 3~4 倍
  *  - `Glass`   车窗（原本用 transmission 折射，已降级为 alpha 玻璃）
  *
- * 红布是整套观感的灵魂（参考 React Bits 官方示例），所以**不能剔除**；但它的尺寸远大于车身，
+ * 涂装颜色烤在 GLB 的贴图与材质因子里，由 scripts/recolor-toycar.mjs 离线重涂
+ * （绿漆/红内饰 → 品牌蓝白，红绒布 → 深蓝丝绒），换配色改脚本参数重跑即可。
+ *
+ * 绒布台座是整套观感的灵魂（参考 React Bits 官方示例），所以**不能剔除**；但它的尺寸远大于车身，
  * 直接进包围盒会把车缩得极小、布铺满整屏。这里的做法是：整体（车 + 布）一起取景，
  * 再把取景参数与偏移调到「车在右下、布在下方铺开」的位置。
  */
@@ -54,7 +57,7 @@ export function CarSceneBackground({ showSlogan = true, slogan }: CarSceneBackgr
   const isPhone = useMediaQuery('(max-width: 639px)');
   // 车模在屏幕上的占比随可视宽度变化，按屏宽反向补偿相机距离。
   // 上限不能给太大：手机屏窄，若按 1280/390 全额补偿（≈3.3）相机会拉得极远，
-  // 车缩成指甲盖大小、光影细节全丢。收到 1.9 后手机上仍能看清车身与红绒布台。
+  // 车缩成指甲盖大小、光影细节全丢。收到 1.9 后手机上仍能看清车身与蓝绒布台。
   const zoom = Math.min(
     Math.max(BASE_ZOOM * (BASE_WIDTH / viewportWidth), BASE_ZOOM * 0.6),
     BASE_ZOOM * 1.9,
@@ -62,7 +65,7 @@ export function CarSceneBackground({ showSlogan = true, slogan }: CarSceneBackgr
   // 窄屏（手机 / 竖屏平板）下联系卡片几乎占满宽度，车只能退到卡片下方靠右陈列，
   // 靠太近会被卡片压住、太靠下又会被画布底边裁掉。
   // 手机端（≤639px）联系区额外加了底部留白当「车模展示区」，车整体上抬
-  // 让红绒布台完整入镜，不再贴着画布底边被裁切。
+  // 让蓝绒布台完整入镜，不再贴着画布底边被裁切。
   const xOffset = isPhone ? 0.12 : isNarrow ? 0.16 : 0.54;
   const yOffset = isPhone ? -0.55 : isNarrow ? -0.78 : -0.20;
 
