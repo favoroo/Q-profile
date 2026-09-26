@@ -47,15 +47,21 @@ const PREVIEW_DIR = '/tmp/toycar-recolor-preview';
 /** 绒布 sheen 色：深蓝丝绒辉光（原 [1,0,0] 正红） */
 const SHEEN_COLOR = '#2f7bff';
 /** 车窗透射色：浅蓝灰玻璃（原 [0.3,0.8,0.3] 绿玻璃） */
-const GLASS_COLOR = '#b9d2e8';
+const GLASS_COLOR = '#cfe3f6';
 /**
  * 车窗透射率（原 1 = 全透射）。全透射玻璃在黑色页面背景里透进来的只有黑色，
- * 车窗看上去就是几个黑洞；调低后玻璃本体的浅蓝着色参与混合，车窗清晰可见，
- * 同时保留三成透视看到白色内饰。
+ * 车窗看上去就是几个黑洞；调低后玻璃本体的浅蓝着色参与混合，车窗清晰可见。
  */
-const GLASS_TRANSMISSION = 0.3;
+const GLASS_TRANSMISSION = 0.2;
 /** 车窗粗糙度（原 0 = 完美镜面）：轻微磨砂让环境反射更宽，玻璃「存在感」更强 */
-const GLASS_ROUGHNESS = 0.08;
+const GLASS_ROUGHNESS = 0.09;
+/**
+ * 车窗自发光（极淡的蓝）。挡风玻璃是斜面、吃得到环境顶光，但四个车门侧窗是
+ * 垂直面 —— 环境光主要从上往下打，垂直面 irradiance 很低，只靠本体色侧视角
+ * 依然发黑。自发光是与视角/光照无关的项，保证任何角度下车窗都「在」。
+ * 值要克制：这是暗棚 + 霓虹蓝的场景，淡淡一层刚好，亮了会像灯箱。
+ */
+const GLASS_EMISSIVE = '#16283c';
 
 /**
  * 车身贴图（ToyCar.baseColor）的色相迁移规则。
@@ -241,8 +247,12 @@ const glassMat = root.listMaterials().find((m) => m.getName() === 'Glass');
 if (glassMat) {
   glassMat.setBaseColorFactor([...srgbHexToLinear(GLASS_COLOR), 1]);
   glassMat.setRoughnessFactor(GLASS_ROUGHNESS);
+  glassMat.setEmissiveFactor(srgbHexToLinear(GLASS_EMISSIVE));
   glassMat.getExtension('KHR_materials_transmission')?.setTransmissionFactor(GLASS_TRANSMISSION);
-  console.log(`✓ Glass.baseColorFactor → ${GLASS_COLOR}，transmission → ${GLASS_TRANSMISSION}，roughness → ${GLASS_ROUGHNESS}`);
+  console.log(
+    `✓ Glass.baseColorFactor → ${GLASS_COLOR}，transmission → ${GLASS_TRANSMISSION}，` +
+      `roughness → ${GLASS_ROUGHNESS}，emissive → ${GLASS_EMISSIVE}`,
+  );
 }
 
 await io.write(MODEL, doc);
