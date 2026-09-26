@@ -1,0 +1,78 @@
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS metadata
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Agent & AI Tool temporary directories
+.trae/
+.agents/
+.workbuddy/
+.gemini/
+.antigravity/
+
+# Dependencies & Lockfiles
+node_modules/
+skills-lock.json
+
+# Build output
+dist/
+
+# Local temp & scratch directories
+evkit2-image/
+tmp/
+temp/
+scratch/
+组件/
+项目展示素材/
+.zcode/
+
+# EV Kit 分享文档的导出源（Flask 应用），只本地用；产物 public/evkit/share/ 需提交
+EV项目分享部署/
+
+# ===== ↑ 以上同步自 .gitignore（「从 .gitignore 同步」只重写以上部分）=====
+.git/
+.hg/
+.svn/
+bower_components/
+jspm_packages/
+__pycache__/
+site-packages/
+venv/
+coverage/
+htmlcov/
+lcov-report/
+cmakefiles/
+cmake-build-*/
+bazel-*/
+pods/
+deriveddata/
+storybook-static/
+playwright-report/
+test-results/
+allure-results/
+allure-report/
+cdk.out/
+*.egg-info/
+*.dist-info/
+eggs/
+pip-wheel-metadata/
+wheels/
+# ----- ↑ 以上为 ZCode 默认排除规则（自定义规则请写在本行下方，不会被同步/恢复改动）-----
+# 自定义规则写在下方（本行提示可删除）
