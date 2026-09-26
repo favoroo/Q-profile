@@ -13,17 +13,20 @@
  *
  * 用法：npm run recolor:toycar
  * 幂等可重跑（蓝图里已没有绿/红/橙色带，再跑是无操作）；换配色改下方参数即可。
+ * 除重涂外，本脚本还会给 4 个车门窗洞补玻璃面片（原版模型是开放式座舱，车门
+ * 侧窗处没有玻璃几何，详见 DOOR_GLASS 注释）；面片已存在时自动跳过。
  *
  * ⚠️ 改 BODY_BANDS 等贴图参数后重跑时，必须先恢复**原始绿模**再跑（蓝图上色相带
  * 不再命中，改了也不会生效）：
  *   git checkout 41bf5e1 -- public/models/ToyCar.glb   # 41bf5e1 = 蓝白涂装引入前的提交
  *   npm run recolor:toycar
- * 只改 SHEEN/GLASS 等材质因子参数则无需恢复（因子是绝对赋值，直接重跑即可）。
+ * 只改 SHEEN/GLASS 等材质因子参数、或重跑车门玻璃补面，则无需恢复（因子是绝对
+ * 赋值、补面有幂等守卫，直接重跑即可）。
  *
  * 注意：产物 public/models/ToyCar.glb 需提交；CI 不跑本脚本（与 export:evkit-share 同理）。
  */
 
-import { NodeIO } from '@gltf-transform/core';
+import { NodeIO, Primitive } from '@gltf-transform/core';
 import {
   KHRMaterialsClearcoat,
   KHRMaterialsSheen,
@@ -62,6 +65,33 @@ const GLASS_ROUGHNESS = 0.09;
  * 值要克制：这是暗棚 + 霓虹蓝的场景，淡淡一层刚好，亮了会像灯箱。
  */
 const GLASS_EMISSIVE = '#16283c';
+
+/**
+ * 车门侧窗玻璃补面。Khronos 原版 ToyCar 是「开放式座舱」：Glass 网格只有前挡风
+ * （带包角）和后窗两块面片，4 个车门窗洞处从来没有玻璃——洞里透出暗内饰 + 黑背景，
+ * 侧视角下车窗看上去就是「空的/黑的」。本步骤按车身网格自动提取每侧窗洞的边界
+ * （腰线轨顶 / 车顶轨下沿 / A 柱内缘 / B 柱 / C 柱斜缘），生成贴合的玻璃面片并入
+ * Glass mesh，与前挡/后窗共用 Glass 材质（调 GLASS_* 参数四处同步生效）。
+ *
+ * 已测得的洞口结构（原始顶点坐标系，见下）：每侧一个大连通开口，B 柱圆珠
+ * （L≈-2.5..2.5）把它分成前后两个门窗洞；前缘 A 柱内缘后倾（(≈-66,91)→(≈-54,113)）、
+ * 后缘 C 柱内缘前倾（(≈76,91)→(≈53,116)）、顶部沿车顶轨下沿（U≈117-119，前部
+ * 下潜到≈113）、底部腰线轨顶（U≈89-92）。窗框轨/柱都是圆珠，截面 |x|≈47-66
+ * （凹槽内缘≈55、外缘≈65），面片放在 |x|=58 恰好落进凹槽，边缘藏进珠体。
+ *
+ * 坐标系：原始顶点空间（节点变换前）x=车宽、y=车长、-z=向上；三个 mesh 节点共享
+ * 同一变换（绕 X +90° + 统一缩放 1e-4），按原始坐标建面即可与现有玻璃对齐。
+ * 幂等：Glass mesh 已含车门玻璃 primitive（>1 个 primitive）时跳过，可安全重跑。
+ */
+const DOOR_GLASS = {
+  /** 玻璃所在横向平面 |x|：与现有玻璃house最大半宽（57.4）齐平，落进窗框轨凹槽 */
+  HALF_W: 58,
+  /** 面片边界相对洞口轮廓的内收量（原始单位），防止与钣金圆角共面闪烁 */
+  INSET: 1.2,
+  /** 每块面片的网格密度（车长向 × 高度向段数），Coons 补片拟合斜边与车顶起伏 */
+  COLS: 14,
+  ROWS: 6,
+};
 
 /**
  * 车身贴图（ToyCar.baseColor）的色相迁移规则。
@@ -254,6 +284,187 @@ if (glassMat) {
       `roughness → ${GLASS_ROUGHNESS}，emissive → ${GLASS_EMISSIVE}`,
   );
 }
+
+// ── 车门侧窗玻璃补面（详见 DOOR_GLASS 注释）──────────────────────────────────
+function addDoorGlass(doc, root, glassMat) {
+  const glassMesh = root.listMeshes().find((m) => m.getName() === 'Glass');
+  const bodyMesh = root.listMeshes().find((m) => m.getName() === 'ToyCar');
+  const mat = glassMat || root.listMaterials().find((m) => m.getName() === 'Glass');
+  if (!glassMesh || !bodyMesh || !mat) {
+    console.warn('⚠️ 找不到 Glass/ToyCar 网格或 Glass 材质，跳过车门玻璃补面');
+    return;
+  }
+  if (glassMesh.listPrimitives().length > 1) {
+    console.log('✓ 车门侧窗玻璃已存在（Glass mesh 多 primitive），跳过补面');
+    return;
+  }
+
+  const bodyPos = bodyMesh.listPrimitives()[0].getAttribute('POSITION').getArray();
+  // 侧窗带内的车身顶点（原始坐标）：宽 |x|∈[40,72]、L=y、U=-z
+  const V = [];
+  for (let i = 0; i < bodyPos.length / 3; i++) {
+    const W = Math.abs(bodyPos[i * 3]);
+    const L = bodyPos[i * 3 + 1];
+    const U = -bodyPos[i * 3 + 2];
+    if (W < 40 || W > 72 || U < 80 || U > 126 || L < -82 || L > 102) continue;
+    V.push([L, U]);
+  }
+  const colExtremumU = (Lc, half, lo, hi, isMin) => {
+    let m = isMin ? Infinity : -Infinity;
+    for (const [L, U] of V) {
+      if (Math.abs(L - Lc) > half || U < lo || U > hi) continue;
+      m = isMin ? Math.min(m, U) : Math.max(m, U);
+    }
+    return m;
+  };
+  const rowExtremumL = (Ur, half, lo, hi, isMin) => {
+    let m = isMin ? Infinity : -Infinity;
+    for (const [L, U] of V) {
+      if (Math.abs(U - Ur) > half || L < lo || L > hi) continue;
+      m = isMin ? Math.min(m, L) : Math.max(m, L);
+    }
+    return m;
+  };
+
+  // 底沿 = 腰线轨顶（中段各列取最大 U 的中位数，再略下沉藏进轨珠）
+  const beltTops = [];
+  for (let L = -40; L <= 44; L += 4) {
+    const m = colExtremumU(L, 2.5, 84, 96, false);
+    if (isFinite(m)) beltTops.push(m);
+  }
+  beltTops.sort((a, b) => a - b);
+  const beltU = (beltTops.length ? beltTops[Math.floor(beltTops.length / 2)] : 89.5) - 0.5;
+
+  // 前洞前缘 = A 柱内缘（后倾直线）：底/顶两点采样（顶部封顶 -50 防车顶前檐污染）
+  const frontLBottom = rowExtremumL(93, 1.75, -80, -8, true);
+  const frontLTop = Math.min(rowExtremumL(112.5, 1.75, -80, -8, true), -50);
+  // 后洞后缘 = C 柱内缘（前倾直线）：顶点取 U≈115 采样，底点由 U≈96 采样向腰线外推
+  const rearLTop = rowExtremumL(115, 1.75, 6, 100, true);
+  const rearLBottom = Math.min(rowExtremumL(96, 1.75, 6, 100, true) + 4, 82);
+  console.log(
+    `窗洞边界采样：腰线 U=${beltU.toFixed(1)}，A柱内缘 L ${frontLBottom?.toFixed?.(1)}→${frontLTop?.toFixed?.(1)}，` +
+      `C柱内缘 L ${rearLBottom?.toFixed?.(1)}→${rearLTop?.toFixed?.(1)}`,
+  );
+
+  const bPillar = 2.5 + DOOR_GLASS.INSET; // B 柱珠（L≈±2.5）两侧各内收
+  /** 前洞：前缘 A 柱斜边，后缘 B 柱竖直；后洞：前缘 B 柱竖直，后缘 C 柱斜边 */
+  const edges = [
+    { l0: isFinite(frontLBottom) ? frontLBottom : -64, l1: isFinite(frontLTop) ? frontLTop : -54, r0: -bPillar, r1: -bPillar },
+    { l0: bPillar, l1: bPillar, r0: isFinite(rearLBottom) ? rearLBottom : 76, r1: isFinite(rearLTop) ? Math.max(rearLTop, 46) : 52 },
+  ];
+
+  /** 车顶轨下沿逐列采样（U 带 [112,124]），NaN 邻列补齐 + 轻平滑，端点即角点 */
+  function roofEdge(l0, l1) {
+    const { COLS, INSET } = DOOR_GLASS;
+    const half = (l1 - l0) / COLS / 2 + 0.6;
+    const raw = [];
+    for (let i = 0; i <= COLS; i++) {
+      const m = colExtremumU(l0 + ((l1 - l0) * i) / COLS, half, 112, 124, true);
+      raw.push(isFinite(m) ? m : NaN);
+    }
+    for (let i = 0; i <= COLS; i++) {
+      if (isFinite(raw[i])) continue;
+      const prev = raw[i - 1];
+      const next = raw[i + 1];
+      raw[i] = isFinite(prev) && isFinite(next) ? (prev + next) / 2 : isFinite(prev) ? prev : isFinite(next) ? next : 117.5;
+    }
+    return raw
+      .map((v, i) => (raw[Math.max(0, i - 1)] + v + raw[Math.min(COLS, i + 1)]) / 3)
+      .map((u) => Math.min(Math.max(u - INSET, beltU + 12), 122));
+  }
+
+  /** 一块侧窗面片：Coons 补片（底=腰线水平线，顶=车顶下沿采样线，前后=直边） */
+  function buildPanel(side, e) {
+    const { COLS, ROWS, HALF_W } = DOOR_GLASS;
+    const top = roofEdge(e.l1, e.r1);
+    const lerp = (a, b, t) => a + (b - a) * t;
+    // 角点 P00=前下 P10=后下 P01=前上 P11=后上（L,U）
+    const P00 = [e.l0, beltU];
+    const P10 = [e.r0, beltU];
+    const P01 = [e.l1, top[0]];
+    const P11 = [e.r1, top[COLS]];
+    const grid = [];
+    for (let j = 0; j <= ROWS; j++) {
+      const v = j / ROWS;
+      for (let i = 0; i <= COLS; i++) {
+        const u = i / COLS;
+        const bL = lerp(P00[0], P10[0], u);
+        const tL = lerp(P01[0], P11[0], u);
+        const fL = lerp(P00[0], P01[0], v);
+        const rL = lerp(P10[0], P11[0], v);
+        const bU = beltU;
+        const tU = top[i];
+        const fU = lerp(beltU, P01[1], v);
+        const rU = lerp(beltU, P11[1], v);
+        const bil = (1 - u) * (1 - v) * P00[0] + u * (1 - v) * P10[0] + (1 - u) * v * P01[0] + u * v * P11[0];
+        const bilU = (1 - u) * (1 - v) * P00[1] + u * (1 - v) * P10[1] + (1 - u) * v * P01[1] + u * v * P11[1];
+        const L = (1 - v) * bL + v * tL + (1 - u) * fL + u * rL - bil;
+        const U = (1 - v) * bU + v * tU + (1 - u) * fU + u * rU - bilU;
+        grid.push([side * HALF_W, L, -U]); // 原始坐标：x=宽、y=车长、z=-向上
+      }
+    }
+    const idx = (i, j) => j * (COLS + 1) + i;
+    const indices = [];
+    for (let j = 0; j < ROWS; j++) {
+      for (let i = 0; i < COLS; i++) {
+        const a = idx(i, j);
+        const b = idx(i + 1, j);
+        const c = idx(i + 1, j + 1);
+        const d = idx(i, j + 1);
+        indices.push(a, b, c, a, c, d);
+      }
+    }
+    // 绕序校验：首三角形法线须指向车外（+x 侧 → +x，-x 侧 → -x）
+    const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+    const n = cross(sub(grid[indices[1]], grid[indices[0]]), sub(grid[indices[2]], grid[indices[0]]));
+    if (n[0] * side < 0) {
+      for (let k = 0; k < indices.length; k += 3) {
+        const t = indices[k + 1];
+        indices[k + 1] = indices[k + 2];
+        indices[k + 2] = t;
+      }
+    }
+    return { grid, indices };
+  }
+
+  const panels = [];
+  for (const side of [1, -1]) for (const e of edges) panels.push(buildPanel(side, e));
+  const vertTotal = panels.reduce((n, p) => n + p.grid.length, 0);
+  const idxTotal = panels.reduce((n, p) => n + p.indices.length, 0);
+  const positions = new Float32Array(vertTotal * 3);
+  const normals = new Float32Array(vertTotal * 3);
+  const indices = new Uint16Array(idxTotal);
+  let vOff = 0;
+  let iOff = 0;
+  for (const p of panels) {
+    p.grid.forEach((v, k) => {
+      positions.set(v, (vOff + k) * 3);
+      normals.set([Math.sign(v[0]), 0, 0], (vOff + k) * 3);
+    });
+    for (const ix of p.indices) indices[iOff++] = vOff + ix;
+    vOff += p.grid.length;
+  }
+
+  const buffer = doc.getRoot().listBuffers()[0];
+  const posAcc = doc.createAccessor('DoorGlassPosition', buffer).setArray(positions).setType('VEC3');
+  const nrmAcc = doc.createAccessor('DoorGlassNormal', buffer).setArray(normals).setType('VEC3');
+  const idxAcc = doc.createAccessor('DoorGlassIndices', buffer).setArray(indices).setType('SCALAR');
+  const prim = doc
+    .createPrimitive()
+    .setMode(Primitive.Mode.TRIANGLES)
+    .setAttribute('POSITION', posAcc)
+    .setAttribute('NORMAL', nrmAcc)
+    .setIndices(idxAcc)
+    .setMaterial(mat);
+  glassMesh.addPrimitive(prim);
+  console.log(`✓ 车门侧窗玻璃补面：4 块 Coons 面片（${vertTotal} 顶点 / ${idxTotal / 3} 三角）已并入 Glass mesh`);
+}
+
+function cross(a, b) {
+  return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+}
+
+addDoorGlass(doc, root, glassMat);
 
 await io.write(MODEL, doc);
 console.log(`\n已写回 ${MODEL}`);
