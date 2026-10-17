@@ -10,5 +10,9 @@ export const VIDEO_TABS: Record<VideoKey, VideoTab[]> = {
     { src: withBase('/videos/docs-agent-01.mp4'), label: '资料检索' },
     { src: withBase('/videos/docs-agent-02.mp4'), label: '资料数量统计' },
   ],
+  evkit: [
+    { src: withBase('/videos/evkit-tool-point.mp4'), label: '标点工具' },
+    { src: withBase('/videos/evkit-tool-imageproc.mp4'), label: '图片处理工具' },
+  ],
 };
 

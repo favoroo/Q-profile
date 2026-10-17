@@ -56,6 +56,7 @@ export const projects: Project[] = [
           { label: '图片处理工具', src: withBase('/evkit/tools/imageproc-tool.html') },
         ],
       },
+      { kind: 'video', ariaLabel: '查看 EV Kit 2 工具演示视频', videoKey: 'evkit' },
       {
         kind: 'iframe',
         label: '分享文档',

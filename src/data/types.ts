@@ -97,7 +97,7 @@ export interface Skill {
   tags: string[];
 }
 
-export type VideoKey = 'trans' | 'docs';
+export type VideoKey = 'trans' | 'docs' | 'evkit';
 export type DocKey = 'trans-doc' | 'docs-doc';
 
 export type ProjectAction =
