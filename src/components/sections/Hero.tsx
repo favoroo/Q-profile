@@ -1,14 +1,15 @@
-import { profile, site } from '../../data';
+import { site } from '../../data';
 import { Button } from '../ui/Button';
 import { Icon } from '../ui/icons';
 import { Reveal } from '../motion/Reveal';
+import styles from './Hero.module.css';
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden" id="home">
-      {/* 背景装饰：顶部冷光晕 + 点阵网格 */}
+      {/* 背景装饰：顶部冷光晕（呼吸） + 点阵网格 + 扫光 + 浮动粒子 */}
       <div
-        className="pointer-events-none absolute top-0 left-1/2 z-0 h-[560px] w-[min(1200px,120vw)] -translate-x-1/2"
+        className={`pointer-events-none absolute top-0 left-1/2 z-0 h-[560px] w-[min(1200px,120vw)] -translate-x-1/2 ${styles.glowBreathe}`}
         style={{
           background:
             'radial-gradient(circle at 50% 30%, rgba(0,113,227,0.08) 0%, rgba(0,113,227,0.02) 46%, transparent 70%)',
@@ -28,39 +29,55 @@ export function Hero() {
         }}
         aria-hidden="true"
       />
+      {/* 点阵扫光层 */}
+      <div
+        className={`pointer-events-none absolute inset-x-0 top-0 z-0 h-[560px] ${styles.dotShimmer}`}
+        style={{
+          backgroundImage: 'radial-gradient(rgba(0,113,227,0.28) 1px, transparent 1px)',
+          backgroundSize: '26px 26px',
+          maskImage:
+            'radial-gradient(ellipse 72% 62% at 50% 18%, black 26%, transparent 74%)',
+          WebkitMaskImage:
+            'radial-gradient(ellipse 72% 62% at 50% 18%, black 26%, transparent 74%)',
+          opacity: 0.8,
+        }}
+        aria-hidden="true"
+      />
+      {/* 浮动微粒子 */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[560px] overflow-hidden"
+        style={{
+          maskImage:
+            'radial-gradient(ellipse 72% 62% at 50% 18%, black 26%, transparent 74%)',
+          WebkitMaskImage:
+            'radial-gradient(ellipse 72% 62% at 50% 18%, black 26%, transparent 74%)',
+        }}
+        aria-hidden="true"
+      >
+        <span className={styles.particle} style={{ left: '18%', bottom: '10%', width: 3, height: 3, '--duration': '14s', '--delay': '0s', '--particle-opacity': '0.18', '--drift': '24px', '--rise': '-500px' } as React.CSSProperties} />
+        <span className={styles.particle} style={{ left: '32%', bottom: '5%', width: 2, height: 2, '--duration': '18s', '--delay': '3s', '--particle-opacity': '0.15', '--drift': '-18px', '--rise': '-520px' } as React.CSSProperties} />
+        <span className={styles.particle} style={{ left: '55%', bottom: '8%', width: 3, height: 3, '--duration': '12s', '--delay': '1.5s', '--particle-opacity': '0.22', '--drift': '30px', '--rise': '-480px' } as React.CSSProperties} />
+        <span className={styles.particle} style={{ left: '72%', bottom: '12%', width: 2, height: 2, '--duration': '16s', '--delay': '5s', '--particle-opacity': '0.16', '--drift': '-22px', '--rise': '-540px' } as React.CSSProperties} />
+        <span className={styles.particle} style={{ left: '42%', bottom: '2%', width: 2, height: 2, '--duration': '15s', '--delay': '7s', '--particle-opacity': '0.2', '--drift': '16px', '--rise': '-510px' } as React.CSSProperties} />
+        <span className={styles.particle} style={{ left: '64%', bottom: '15%', width: 3, height: 3, '--duration': '11s', '--delay': '2s', '--particle-opacity': '0.25', '--drift': '-28px', '--rise': '-460px' } as React.CSSProperties} />
+        <span className={styles.particle} style={{ left: '25%', bottom: '6%', width: 2, height: 2, '--duration': '17s', '--delay': '8s', '--particle-opacity': '0.14', '--drift': '20px', '--rise': '-530px' } as React.CSSProperties} />
+      </div>
 
       <div className="relative z-1 mx-auto flex w-full max-w-[980px] flex-col items-center px-6 pt-4 pb-12 md:pb-14">
-        {/* 居中舞台：巨型标题(中层) < 人物(最上)，标题穿过颈部、下缘沉入深色衣服自然融合 */}
+        {/* 巨型标题（居中双行） */}
         <Reveal delay={0.1} className="w-full">
-          <div className="relative mx-auto h-[400px] w-full max-w-[980px] @container sm:h-[440px] lg:h-[480px]">
-            {/* 底部光斑 */}
+          <div className="relative mx-auto w-full max-w-[980px] py-12 @container sm:py-16">
+            {/* 底部光斑（呼吸） */}
             <div
               aria-hidden="true"
-              className="absolute bottom-[4%] left-1/2 z-0 h-[220px] w-[64%] -translate-x-1/2 rounded-full bg-accent/10 blur-[80px]"
+              className={`absolute bottom-[2%] left-1/2 z-0 h-[180px] w-[56%] -translate-x-1/2 rounded-full bg-accent/10 blur-[80px] ${styles.spotBreathe}`}
             />
-
-            {/* 巨型标题（中层）：双行环抱人物 —— 第一行悬于头顶上方零遮挡，第二行穿过颈部 */}
-            <h1 className="absolute inset-x-0 top-[9%] z-10 text-center text-[clamp(36px,10.5cqw,88px)] leading-[1.12] font-bold tracking-[-0.025em] text-ink sm:inset-x-0 sm:top-0 sm:h-full">
-              <span className="block sm:absolute sm:inset-x-0 sm:top-[12%]">
+            <h1 className="relative z-10 text-center text-[clamp(36px,10.5cqw,88px)] leading-[1.14] font-bold tracking-[-0.025em] text-ink">
+              <span className="block">
                 <span className="text-accent">AI 时代</span>的
               </span>
-              <span className="block sm:absolute sm:inset-x-0 sm:top-[76%] sm:-translate-y-1/2 sm:-translate-x-[4.6cqw] sm:flex sm:justify-center sm:gap-[min(248px,25.3cqw)]">
-                <span>汽车技术</span>
-                <span>工程师</span>
-              </span>
+              <span className="block">汽车技术工程师</span>
             </h1>
-
-            {/* 人物舞台（最上层） */}
-            <div className="absolute bottom-0 left-1/2 z-20 h-[68%] w-[min(420px,88%)] -translate-x-1/2 sm:h-[58%]">
-              {/* 人物抠像 */}
-              <img
-                src={profile.portrait}
-                alt={profile.name}
-                draggable={false}
-                className="absolute bottom-0 left-1/2 z-20 h-full w-auto max-w-none -translate-x-1/2 object-contain object-bottom"
-                style={{ filter: 'drop-shadow(0 28px 36px rgba(29,29,31,0.16))' }}
-              />
-            </div>
           </div>
         </Reveal>
 

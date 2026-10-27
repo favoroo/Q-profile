@@ -49,8 +49,6 @@ export interface Site {
 export interface Profile {
   name: string;
   title: string;
-  /** 首页人物抠像素材（透明背景 WebP，用于 Hero 破框排版） */
-  portrait: string;
 }
 
 export interface AboutFact {

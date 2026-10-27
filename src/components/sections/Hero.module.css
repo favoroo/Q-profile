@@ -1,0 +1,109 @@
+/* Hero 区背景动效 —— 呼吸光晕、扫光、浮动粒子
+   所有循环动画收在 CSS Modules 内（同 CarSceneBackground / LanyardBadge 的组织方式）。
+   动画仅使用 transform / opacity，compositor-friendly。 */
+
+/* ── 顶部光晕呼吸 ── */
+.glowBreathe {
+  animation: glowBreathe 8s ease-in-out infinite;
+}
+
+@keyframes glowBreathe {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── 底部光斑呼吸 ── */
+.spotBreathe {
+  animation: spotBreathe 6s ease-in-out infinite;
+}
+
+@keyframes spotBreathe {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: translateX(-50%) scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.05);
+  }
+}
+
+/* ── 点阵扫光（与 CarSceneBackground.module.css 的 sheenSweep 同技法） ── */
+.dotShimmer {
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(105deg, transparent 40%, #000 50%, transparent 60%);
+  mask-image: linear-gradient(105deg, transparent 40%, #000 50%, transparent 60%);
+  -webkit-mask-size: 300% 100%;
+  mask-size: 300% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: 100% 0;
+  mask-position: 100% 0;
+  animation: dotShimmer 12s ease-in-out 2s infinite;
+}
+
+@keyframes dotShimmer {
+  0%,
+  65% {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+  88% {
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+  }
+  100% {
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+  }
+}
+
+/* ── 浮动微粒子 ── */
+.particle {
+  position: absolute;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  animation: heroFloat var(--duration, 14s) ease-in-out var(--delay, 0s) infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes heroFloat {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--particle-opacity, 0.2);
+  }
+  90% {
+    opacity: var(--particle-opacity, 0.2);
+  }
+  100% {
+    transform: translateY(var(--rise, -480px)) translateX(var(--drift, 20px));
+    opacity: 0;
+  }
+}
+
+/* ── prefers-reduced-motion：全部关停 ── */
+@media (prefers-reduced-motion: reduce) {
+  .glowBreathe,
+  .spotBreathe,
+  .dotShimmer,
+  .particle {
+    animation: none;
+  }
+}
+
+/* 弹窗打开时暂停（同 sheenSweep 的逻辑） */
+:global(body.lb-lock) .glowBreathe,
+:global(body.lb-lock) .spotBreathe,
+:global(body.lb-lock) .dotShimmer,
+:global(body.lb-lock) .particle {
+  animation-play-state: paused;
+}
