@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FrameTab } from '../../data/types';
+import { Icon } from '../ui/icons';
 
-/** iframe 弹窗（EV Kit 在线体验）：可选顶部板块切换 + spinner 加载态 + 小屏横屏提示。 */
+/** iframe 弹窗（EV Kit 在线体验）：可选顶部板块切换 + 两侧左右箭头/键盘循环切换 + spinner 加载态 + 小屏横屏提示。 */
 export function FrameContent({ src, title, tabs }: { src: string; title: string; tabs?: FrameTab[] }) {
   const [active, setActive] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const activeChipRef = useRef<HTMLButtonElement | null>(null);
 
   const tabList = tabs ?? [];
   const currentSrc = tabList.length > 0 ? tabList[Math.min(active, tabList.length - 1)].src : src;
@@ -15,6 +17,35 @@ export function FrameContent({ src, title, tabs }: { src: string; title: string;
     setLoaded(false);
   };
 
+  const go = useCallback(
+    (delta: number) => {
+      if (tabList.length < 2) return;
+      const next = (active + delta + tabList.length) % tabList.length;
+      if (next === active) return;
+      setActive(next);
+      setLoaded(false);
+    },
+    [active, tabList.length],
+  );
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') go(-1);
+      if (e.key === 'ArrowRight') go(1);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [go]);
+
+  /* 箭头/键盘切换后，把高亮 chip 滚回可视区（chips 行窄屏下可横向滚动） */
+  useEffect(() => {
+    activeChipRef.current?.scrollIntoView({
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    });
+  }, [active]);
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       {tabList.length > 1 && (
@@ -22,6 +53,7 @@ export function FrameContent({ src, title, tabs }: { src: string; title: string;
           {tabList.map((tab, i) => (
             <button
               key={tab.src}
+              ref={i === active ? activeChipRef : undefined}
               type="button"
               onClick={() => handleTabChange(i)}
               aria-pressed={i === active}
@@ -56,6 +88,26 @@ export function FrameContent({ src, title, tabs }: { src: string; title: string;
           onLoad={() => setLoaded(true)}
           className="block h-full w-full border-none"
         />
+        {tabList.length > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="上一板块"
+              onClick={() => go(-1)}
+              className="absolute top-1/2 left-3 z-3 grid h-10 w-10 -translate-y-1/2 cursor-pointer place-items-center rounded-full border-none bg-white/85 text-ink shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-xl transition-all duration-300 hover:scale-[1.08] hover:text-accent active:scale-95"
+            >
+              <Icon name="chevron" className="h-4 w-4 rotate-180" strokeWidth={2} />
+            </button>
+            <button
+              type="button"
+              aria-label="下一板块"
+              onClick={() => go(1)}
+              className="absolute top-1/2 right-3 z-3 grid h-10 w-10 -translate-y-1/2 cursor-pointer place-items-center rounded-full border-none bg-white/85 text-ink shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-xl transition-all duration-300 hover:scale-[1.08] hover:text-accent active:scale-95"
+            >
+              <Icon name="chevron" className="h-4 w-4" strokeWidth={2} />
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

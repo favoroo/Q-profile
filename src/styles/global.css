@@ -76,3 +76,9 @@ button:focus-visible {
   outline-offset: 3px;
   border-radius: 6px;
 }
+
+/* 圆形元素（rounded-full）的焦点态保持圆形，避免被上面的 6px 圆角改成方形 */
+a.rounded-full:focus-visible,
+button.rounded-full:focus-visible {
+  border-radius: 9999px;
+}
