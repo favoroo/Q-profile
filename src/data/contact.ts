@@ -3,7 +3,7 @@ import type { Contact } from './types';
 export const contact: Contact = {
   eyebrow: 'Contact',
   title: '联系我',
-  description: '无论是项目合作、职位机会，还是行业交流，都欢迎随时联系。',
+  description: '项目合作、职位机会或行业交流，欢迎随时联系。',
   slogan: 'Never idle',
   rows: [
     { icon: 'mail', label: '邮箱', value: 'favoro@qq.com', href: 'mailto:favoro@qq.com' },
