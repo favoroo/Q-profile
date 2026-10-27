@@ -107,6 +107,9 @@ export function CarSceneBackground({ showSlogan = true, slogan }: CarSceneBackgr
           autoRotate={false}
           fadeIn={true}
           onModelLoaded={handleLoaded}
+          showGrid={true}
+          showParticles={true}
+          fog={[2, 8]}
         />
       </div>
 

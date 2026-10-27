@@ -11,8 +11,9 @@ import {
   type CSSProperties,
 } from 'react';
 import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
-import { OrbitControls, useGLTF, useProgress, Html, ContactShadows, Environment } from '@react-three/drei';
+import { OrbitControls, useGLTF, useProgress, Html, ContactShadows, Environment, Grid } from '@react-three/drei';
 import { ProceduralEnv } from './ProceduralEnv';
+import { FloatingParticles } from './FloatingParticles';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 
@@ -84,6 +85,12 @@ export interface ModelViewerProps {
   autoRotate?: boolean;
   autoRotateSpeed?: number;
   onModelLoaded?: () => void;
+  /** 显示地面网格（showroom 风格）。静态几何体，不触发逐帧渲染。 */
+  showGrid?: boolean;
+  /** 显示浮动尘埃粒子。需要 useFrame + invalidate() 驱动动画。 */
+  showParticles?: boolean;
+  /** 线性雾的近/远裁距 [near, far]。让远处网格自然淡入背景色。不传则不启用。 */
+  fog?: [number, number];
 }
 
 const isTouch =
@@ -644,6 +651,9 @@ export function ModelViewer({
   autoRotate = false,
   autoRotateSpeed = 0.35,
   onModelLoaded,
+  showGrid = false,
+  showParticles = false,
+  fog,
 }: ModelViewerProps) {
   useEffect(() => {
     if (url) {
@@ -764,6 +774,29 @@ export function ModelViewer({
           far={fitRadius * 2.1}
           resolution={512}
         />
+
+        {/* 线性雾 —— 远处自然淡入黑色 */}
+        {fog && <fog attach="fog" args={['#000000', fog[0], fog[1]]} />}
+
+        {/* 地面网格 —— showroom 风格 */}
+        {showGrid && (
+          <Grid
+            position={[0, floorY + 0.001, 0]}
+            args={[20, 20]}
+            cellSize={0.3}
+            cellThickness={0.5}
+            cellColor="#0071e3"
+            sectionSize={1.2}
+            sectionThickness={1}
+            sectionColor="#0071e3"
+            fadeDistance={4}
+            fadeStrength={1.5}
+            infiniteGrid
+          />
+        )}
+
+        {/* 浮动尘埃粒子 */}
+        {showParticles && <FloatingParticles />}
 
         <Suspense fallback={<Loader placeholderSrc={placeholderSrc} />}>
           <ModelInner
