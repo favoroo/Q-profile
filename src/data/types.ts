@@ -13,6 +13,7 @@ export type IconName =
   | 'quote'
   | 'play'
   | 'doc'
+  | 'download'
   | 'chevron'
   | 'close'
   | 'menu';
@@ -35,10 +36,22 @@ export interface HeroAction {
   variant: 'primary' | 'secondary';
 }
 
+export interface ResumeFile {
+  /** 按钮视觉文案 */
+  label: string;
+  /** 无障碍名称：视觉文案过短时补全用途（屏幕阅读器/仅图标场景） */
+  ariaLabel: string;
+  /** 相对站点根的文件路径，渲染时经 withBase() 适配二级路径 */
+  href: string;
+  /** 下载时浏览器保存的文件名 */
+  filename: string;
+}
+
 export interface Site {
   brand: { name: string; subtitle: string };
   navLinks: NavLink[];
   mobileHomeLink: NavLink;
+  resume: ResumeFile;
   sections: {
     skills: SectionCopy;
     projects: SectionCopy;

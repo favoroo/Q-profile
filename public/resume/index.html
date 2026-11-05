@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>黄谦 · 简历 · HUANG QIAN RESUME</title>
+<style>
+  /* ============================================================
+     黄谦 · 简历 —— A4 单页
+     设计延续个人网站品牌色：
+       米白纸面 #faf7f2  /  墨色 #1b1815  /  品牌红 #e0342b
+     ============================================================ */
+
+  :root {
+    --paper: #faf7f2;
+    --ink: #1b1815;
+    --dim: #77706a;
+    --faint: #a89f95;
+    --red: #e0342b;
+    --rule: #e3ddd2;
+    --chip: #f1ece2;
+
+    --ff-serif: "Songti SC", "Noto Serif SC", "STSong", serif;
+    --ff-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    --ff-mono: "SF Mono", "JetBrains Mono", "Menlo", "Courier New", monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #d9d4cb;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    font-family: var(--ff-sans);
+    font-size: 10pt;
+    line-height: 1.5;
+    color: var(--ink);
+    padding: 24px 0 48px;
+  }
+
+  /* ---------- A4 页面 ---------- */
+  .page {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 auto;
+    background: var(--paper);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, .18), 0 1px 4px rgba(0, 0, 0, .10);
+    padding: 11mm 12mm 10mm;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @page { size: A4; margin: 0; }
+
+  @media print {
+    html, body { background: #fff; }
+    body { padding: 0; }
+    .page { box-shadow: none; margin: 0; }
+    .print-hint { display: none !important; }
+  }
+
+  /* ============================================================
+     页眉
+     ============================================================ */
+  .hd {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10mm;
+    padding-bottom: 4.6mm;
+    border-bottom: 1.6px solid var(--ink);
+  }
+
+  .hd__main { flex: 1; min-width: 0; }
+
+  .hd__id .eyebrow {
+    font-family: var(--ff-mono);
+    font-size: 7pt;
+    letter-spacing: .22em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 1.6mm;
+  }
+
+  .hd__row {
+    display: flex;
+    align-items: baseline;
+    gap: 5mm;
+  }
+
+  .hd__name {
+    font-family: var(--ff-serif);
+    font-size: 32pt;
+    font-weight: 900;
+    letter-spacing: .06em;
+    line-height: 1;
+  }
+
+  .hd__logo {
+    font-family: var(--ff-mono);
+    font-size: 12pt;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .hd__logo em { color: var(--red); font-style: normal; }
+
+  .hd__title {
+    margin-top: 2.4mm;
+    font-size: 10.5pt;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+  .hd__title .sep { color: var(--faint); margin: 0 1.5mm; font-weight: 300; }
+  .hd__title b { color: var(--red); font-weight: 700; }
+  .hd__title strong { color: var(--ink); font-weight: 700; }
+
+  .hd__tag {
+    margin-top: 1.2mm;
+    font-size: 8pt;
+    color: var(--dim);
+    font-family: var(--ff-mono);
+    letter-spacing: .04em;
+  }
+
+  /* 联系信息：页眉左侧底部的双列网格 */
+  .hd__contact {
+    margin-top: 2.8mm;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 8mm;
+    row-gap: 1.1mm;
+    font-family: var(--ff-mono);
+    font-size: 7.6pt;
+    color: var(--dim);
+  }
+  .hd__contact a { color: inherit; text-decoration: none; }
+  .hd__contact b {
+    display: inline-block;
+    min-width: 4.6em;
+    letter-spacing: .08em;
+    font-weight: 500;
+    font-size: 7pt;
+    color: var(--faint);
+  }
+  .hd__contact span.v { color: var(--ink); }
+
+  /* 教育信息：联系方式网格内整行（学校 / 学历 / 专业） */
+  .hd__edu {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    margin-top: .8mm;
+  }
+  .hd__edu > b { padding-right: 1.6mm; }
+  .hd__edu p { color: var(--ink); }
+
+  /* 右侧圆形照片，顶部对齐左侧文字块 */
+  .hd__photo {
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: 40mm;
+    height: 40mm;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+  .hd__photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 22%;
+  }
+
+  /* ============================================================
+     概述条
+     ============================================================ */
+  .lede {
+    display: grid;
+    grid-template-columns: 22mm 1fr;
+    gap: 5mm;
+    padding: 2.8mm 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .lede__label {
+    font-family: var(--ff-mono);
+    font-size: 7pt;
+    letter-spacing: .2em;
+    color: var(--faint);
+    text-transform: uppercase;
+    padding-top: 1mm;
+  }
+  .lede__text { font-size: 9.3pt; color: #3f3a34; text-align: justify; }
+  .lede__text b { color: var(--ink); }
+
+  /* ============================================================
+     区块标题
+     ============================================================ */
+  .sec { margin-top: 4.4mm; }
+
+  .sec__head {
+    display: flex;
+    align-items: baseline;
+    gap: 3mm;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 1.4mm;
+    margin-bottom: 2.8mm;
+  }
+  .sec__no {
+    font-family: var(--ff-mono);
+    font-size: 8pt;
+    font-weight: 700;
+    color: var(--red);
+  }
+  .sec__title {
+    font-family: var(--ff-serif);
+    font-size: 12.5pt;
+    font-weight: 900;
+    letter-spacing: .1em;
+  }
+  .sec__en {
+    margin-left: auto;
+    font-family: var(--ff-mono);
+    font-size: 6.8pt;
+    letter-spacing: .24em;
+    color: var(--faint);
+    text-transform: uppercase;
+  }
+
+  /* ============================================================
+     职业经历
+     ============================================================ */
+  .job__bar {
+    display: flex;
+    align-items: baseline;
+    gap: 3.5mm;
+  }
+  .job__company { font-size: 10.5pt; font-weight: 700; }
+  .job__role { font-size: 9pt; color: var(--dim); }
+  .job__role b { color: var(--ink); font-weight: 600; }
+  .job__meta {
+    margin-left: auto;
+    font-family: var(--ff-mono);
+    font-size: 7.6pt;
+    color: var(--dim);
+    white-space: nowrap;
+  }
+  .job__sum {
+    margin: 2.4mm 0 .5mm;
+    font-size: 9.7pt;
+    color: #3f3a34;
+  }
+
+  /* ============================================================
+     重点项目 —— 无卡片，悬挂式条目
+     ============================================================ */
+  .proj-list { border-top: 1px solid var(--rule); }
+  .proj-row {
+    display: grid;
+    grid-template-columns: 48mm 1fr;
+    gap: 4mm;
+    align-items: center;
+    padding: 2mm 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .proj-row__name { font-size: 9.8pt; font-weight: 700; line-height: 1.35; }
+  .proj-row__meta {
+    margin-top: .5mm;
+    font-family: var(--ff-mono);
+    font-size: 6.5pt;
+    letter-spacing: .14em;
+    color: var(--faint);
+  }
+  .proj-row__desc { font-size: 9.4pt; color: #4a453f; line-height: 1.5; }
+  .proj-row__desc b { color: var(--ink); font-weight: 600; }
+  .proj__more {
+    margin-top: 2mm;
+    text-align: right;
+    font-family: var(--ff-mono);
+    font-size: 7.8pt;
+    letter-spacing: .02em;
+    color: var(--dim);
+  }
+  .proj__more a {
+    color: var(--red);
+    text-decoration: none;
+  }
+
+  /* ============================================================
+     AIGC 作品 —— 整行条目
+     ============================================================ */
+  .aigc {
+    display: flex;
+    align-items: baseline;
+    gap: 6mm;
+    padding: .5mm 0;
+  }
+  .aigc__text { font-size: 9.4pt; color: #3f3a34; }
+  .aigc__text b { color: var(--ink); font-weight: 700; }
+  .aigc__link {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-family: var(--ff-mono);
+    font-size: 7.8pt;
+    letter-spacing: .02em;
+    color: var(--dim);
+    white-space: nowrap;
+  }
+  .aigc__link a { color: var(--red); text-decoration: none; }
+
+  /* ============================================================
+     教育 & 技能 —— 底部双栏
+     ============================================================ */
+  .duo { display: grid; grid-template-columns: 1fr 1.35fr; gap: 8mm; }
+
+  .edu__row { display: flex; align-items: baseline; gap: 2.8mm; }
+  .edu__name { font-size: 9.8pt; font-weight: 700; }
+  .edu__meta {
+    margin-left: auto;
+    font-family: var(--ff-mono);
+    font-size: 7.6pt;
+    color: var(--dim);
+    white-space: nowrap;
+  }
+  .edu__major { margin-top: 1mm; font-size: 8.8pt; color: #4a453f; line-height: 1.5; }
+  .edu__honors {
+    margin-top: 1.6mm;
+    font-size: 8.4pt;
+    color: var(--dim);
+    letter-spacing: .02em;
+  }
+  .edu__honors b { color: var(--ink); font-weight: 600; }
+
+  .skill-rows { display: flex; flex-direction: column; gap: 2.4mm; }
+  .skill-row { display: flex; align-items: baseline; gap: 3.5mm; }
+  .skill-row__label {
+    flex-shrink: 0;
+    width: 19mm;
+    font-size: 9.3pt;
+    font-weight: 700;
+  }
+  .skill-row__tags { font-size: 9.2pt; color: #4a453f; line-height: 1.5; }
+
+  /* ============================================================
+     页脚
+     ============================================================ */
+  .ft {
+    position: absolute;
+    left: 12mm; right: 12mm; bottom: 4.8mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-top: 1px solid var(--rule);
+    padding-top: 1.6mm;
+    font-family: var(--ff-mono);
+    font-size: 6.6pt;
+    letter-spacing: .14em;
+    color: var(--faint);
+    text-transform: uppercase;
+  }
+  .ft b { color: var(--red); font-weight: 700; letter-spacing: .14em; }
+
+  /* 屏幕预览提示（打印时隐藏） */
+  .print-hint {
+    position: fixed;
+    right: 18px; bottom: 18px;
+    font-family: var(--ff-sans);
+    font-size: 12px;
+    color: #fff;
+    background: rgba(20, 18, 16, .82);
+    border-radius: 8px;
+    padding: 9px 14px;
+    line-height: 1.5;
+    box-shadow: 0 4px 14px rgba(0,0,0,.25);
+  }
+  .print-hint kbd {
+    background: rgba(255,255,255,.16);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 11px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ===== 页眉 ===== -->
+  <header class="hd">
+    <div class="hd__main">
+      <div class="hd__id">
+        <p class="eyebrow">Resume · 2026</p>
+        <div class="hd__row">
+          <h1 class="hd__name">黄谦</h1>
+          <span class="hd__logo">HQ<em>/</em></span>
+        </div>
+        <p class="hd__title">汽车技术工程师<span class="sep">×</span><strong>独立 AI 开发者</strong></p>
+        <p class="hd__tag">用 AI 把想法落地。 // Never idle.</p>
+      </div>
+      <div class="hd__contact">
+        <div><b>求职意向</b> <span class="v">汽车技术工程师</span></div>
+        <div><b>所在城市</b> <span class="v">湖南 · 长沙&nbsp;&nbsp;在职 / 开放机会</span></div>
+        <div><b>电话</b> <span class="v">137-8913-0001（微信同号）</span></div>
+        <div><b>邮箱</b> <span class="v">favoro@qq.com</span></div>
+        <div class="hd__edu">
+          <b>教育背景</b>
+          <p>中南林业科技大学 · 汽车服务工程 · 本科</p>
+        </div>
+      </div>
+    </div>
+    <div class="hd__photo">
+      <img src="assets/portrait.jpg" alt="黄谦" />
+    </div>
+  </header>
+
+  <!-- ===== 概述 ===== -->
+  <div class="lede">
+    <p class="lede__label">Profile</p>
+    <p class="lede__text">
+      5 年汽车技术工程经验，专注<b>维修资料与数据开发</b>；近 2 年主导部门 <b>AI 提效</b>，把重复流程自动化。
+    </p>
+  </div>
+
+  <!-- ===== 职业经历 ===== -->
+  <section class="sec">
+    <div class="sec__head">
+      <span class="sec__no">01</span>
+      <h2 class="sec__title">职业经历</h2>
+      <span class="sec__en">Experience</span>
+    </div>
+    <div class="job__bar">
+      <span class="job__company">湖南省道通科技有限公司</span>
+      <span class="job__role">从汽车技术工程师逐渐成长为部门 <b>AI 提效负责人</b></span>
+      <span class="job__meta">2021.07 — 至今 · 长沙</span>
+    </div>
+    <p class="job__sum">把维修手册与诊断资料转化为结构化数据与标准流程，服务研发、测试和翻译团队。</p>
+  </section>
+
+  <!-- ===== 重点项目 ===== -->
+  <section class="sec">
+    <div class="sec__head">
+      <span class="sec__no">02</span>
+      <h2 class="sec__title">重点项目</h2>
+      <span class="sec__en">Key Projects</span>
+    </div>
+    <div class="proj-list">
+      <div class="proj-row">
+        <div>
+          <p class="proj-row__name">四轮定位 · 参数标定</p>
+          <p class="proj-row__meta">专项研发</p>
+        </div>
+        <p class="proj-row__desc">负责<b>多个品牌</b>的四轮定位参数，以及相关调整流程的开发</p>
+      </div>
+      <div class="proj-row">
+        <div>
+          <p class="proj-row__name">VIN 车型识别</p>
+          <p class="proj-row__meta">数据开发</p>
+        </div>
+        <p class="proj-row__desc">开发了<b>几十个品牌</b>的识别规则与车型数据，根据 VIN 码准确解析出品牌、车型与配置</p>
+      </div>
+      <div class="proj-row">
+        <div>
+          <p class="proj-row__name">TPMS / IM / BT608</p>
+          <p class="proj-row__meta">技术支撑</p>
+        </div>
+        <p class="proj-row__desc">胎压监测 / 防盗匹配 / 电池检测<b>多项目</b>业务支持，高效解决各类问题</p>
+      </div>
+      <div class="proj-row">
+        <div>
+          <p class="proj-row__name">EV Kit 2 · 高压测量</p>
+          <p class="proj-row__meta">全流程主导</p>
+        </div>
+        <p class="proj-row__desc">新能源高压测量：<b>主导了</b>全流程的高压测量数据与系统图开发，自研配套工具链提升效率</p>
+      </div>
+      <div class="proj-row">
+        <div>
+          <p class="proj-row__name">翻译 Agent</p>
+          <p class="proj-row__meta">AI 提效</p>
+        </div>
+        <p class="proj-row__desc">为翻译团队开发 <b>AI 翻译与规范整改</b>工具，效率与规范性双提升</p>
+      </div>
+      <div class="proj-row">
+        <div>
+          <p class="proj-row__name">资料治理 Agent</p>
+          <p class="proj-row__meta">AI 提效</p>
+        </div>
+        <p class="proj-row__desc">把海量维修手册<b>结构化</b>为可检索知识库，让海量资料精准接入 Agent 应用</p>
+      </div>
+    </div>
+    <p class="proj__more">项目详情可见该网址：<a href="https://favoroo.github.io/Q-profile/">favoroo.github.io/Q-profile</a> <span aria-hidden="true">→</span></p>
+  </section>
+
+  <!-- ===== 教育 & 核心技能 ===== -->
+  <section class="sec">
+    <div class="duo">
+      <div>
+        <div class="sec__head">
+          <span class="sec__no">03</span>
+          <h2 class="sec__title">教育背景</h2>
+          <span class="sec__en">Education</span>
+        </div>
+        <div class="edu__row">
+          <span class="edu__name">中南林业科技大学</span>
+          <span class="edu__meta">2017.09 — 2021.06</span>
+        </div>
+        <p class="edu__major">汽车服务工程 · 本科</p>
+        <p class="edu__major">系统掌握汽车构造、电控与诊断体系。</p>
+        <p class="edu__honors"><b>专业前 20%</b> · 校级奖学金 · CET-4</p>
+      </div>
+      <div>
+        <div class="sec__head">
+          <span class="sec__no">04</span>
+          <h2 class="sec__title">核心技能</h2>
+          <span class="sec__en">Expertise</span>
+        </div>
+        <div class="skill-rows">
+          <div class="skill-row">
+            <span class="skill-row__label">汽车诊断</span>
+            <span class="skill-row__tags">维修资料 · EV 高压测量 · 四轮定位 · VIN 识别</span>
+          </div>
+          <div class="skill-row">
+            <span class="skill-row__label">数据开发</span>
+            <span class="skill-row__tags">结构化数据 · 知识库建设 · 识别规则开发</span>
+          </div>
+          <div class="skill-row">
+            <span class="skill-row__label">AI 提效</span>
+            <span class="skill-row__tags">Agent 开发 · 翻译整改 · 自动化工具</span>
+          </div>
+          <div class="skill-row">
+            <span class="skill-row__label">独立开发</span>
+            <span class="skill-row__tags">手机 App · 微信小程序 · 游戏（Godot / Cocos）</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AIGC 作品 ===== -->
+  <section class="sec">
+    <div class="sec__head">
+      <span class="sec__no">05</span>
+      <h2 class="sec__title">AIGC 作品</h2>
+      <span class="sec__en">AIGC Works</span>
+    </div>
+    <div class="aigc">
+      <p class="aigc__text">运用 AI <b>独立开发</b>了多款手机 App、微信小程序与各类引擎的游戏。</p>
+      <p class="aigc__link">作品见个人网站：<a href="https://favoroo.github.io/Huangqian/">favoroo.github.io/Huangqian</a> <span aria-hidden="true">→</span></p>
+    </div>
+  </section>
+
+  <!-- ===== 页脚 ===== -->
+  <footer class="ft">
+    <span>© 2026 HUANG QIAN <b>HQ/</b></span>
+    <span>favoro@qq.com · 137-8913-0001</span>
+    <span>CHANGSHA, CN</span>
+  </footer>
+
+</div>
+
+<div class="print-hint">确认无误后按 <kbd>⌘</kbd> + <kbd>P</kbd>，目标选「另存为 PDF」，边距选「无」即可导出。</div>
+
+</body>
+</html>

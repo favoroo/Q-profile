@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { site } from '../../data';
 import { Icon } from '../ui/icons';
+import { withBase } from '../../lib/asset';
 import { useScrollSpy } from '../../lib/useScrollSpy';
 
 /* 悬浮面板：缩放 + 下落入场，条目错落滑入（全局 MotionConfig 对 reduced-motion 用户自动降级为纯淡入淡出） */
@@ -89,25 +90,50 @@ export function Header() {
             </strong>
             <small className="text-[12px] tracking-[0.02em] text-ink-3">{site.brand.subtitle}</small>
           </a>
-          <nav className="hidden gap-[34px] md:flex" aria-label="主导航">
-            {site.navLinks.map((l) => (
-              <a key={l.href} className={linkCls(l.href)} href={l.href}>
-                {l.label}
-              </a>
-            ))}
-          </nav>
-          <button
-            type="button"
-            aria-expanded={menuOpen}
-            aria-controls="mobileMenu"
-            aria-label={menuOpen ? '关闭菜单' : '打开菜单'}
-            className={`grid h-[38px] w-[38px] cursor-pointer place-items-center rounded-[10px] border-none text-ink transition-colors duration-200 md:hidden ${
-              menuOpen ? 'bg-black/[0.06]' : 'bg-transparent hover:bg-black/5'
-            }`}
-            onClick={() => setMenuOpen((v) => !v)}
-          >
-            <Icon name={menuOpen ? 'close' : 'menu'} strokeWidth={2} />
-          </button>
+          {/* 桌面端：主导航 + 右侧简历下载 */}
+          <div className="hidden items-center gap-[26px] md:flex">
+            <nav className="flex gap-[34px]" aria-label="主导航">
+              {site.navLinks.map((l) => (
+                <a key={l.href} className={linkCls(l.href)} href={l.href}>
+                  {l.label}
+                </a>
+              ))}
+            </nav>
+            <a
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] py-[5px] pl-3 pr-3.5 text-[12.5px] font-medium text-ink-2 no-underline transition-colors duration-200 hover:border-black/[0.14] hover:bg-black/[0.025] hover:text-ink"
+              href={withBase(site.resume.href)}
+              download={site.resume.filename}
+              aria-label={site.resume.ariaLabel}
+            >
+              <Icon name="download" className="h-3 w-3" strokeWidth={1.75} />
+              {site.resume.label}
+            </a>
+          </div>
+
+          {/* 移动端：简历下载 + 菜单 */}
+          <div className="flex items-center gap-1.5 md:hidden">
+            <a
+              className="inline-flex h-8 items-center gap-1 rounded-full border border-black/[0.08] px-2.5 text-[12px] font-medium text-ink-2 no-underline transition-colors duration-200 hover:border-black/[0.14] hover:bg-black/[0.025] hover:text-ink"
+              href={withBase(site.resume.href)}
+              download={site.resume.filename}
+              aria-label={site.resume.ariaLabel}
+            >
+              <Icon name="download" className="h-3.5 w-3.5" strokeWidth={1.75} />
+              {site.resume.label}
+            </a>
+            <button
+              type="button"
+              aria-expanded={menuOpen}
+              aria-controls="mobileMenu"
+              aria-label={menuOpen ? '关闭菜单' : '打开菜单'}
+              className={`grid h-[38px] w-[38px] cursor-pointer place-items-center rounded-[10px] border-none text-ink transition-colors duration-200 ${
+                menuOpen ? 'bg-black/[0.06]' : 'bg-transparent hover:bg-black/5'
+              }`}
+              onClick={() => setMenuOpen((v) => !v)}
+            >
+              <Icon name={menuOpen ? 'close' : 'menu'} strokeWidth={2} />
+            </button>
+          </div>
         </div>
 
         {/* 悬浮下拉面板：绝对定位、不占据文档流，展开时不再把页面内容往下挤 */}
@@ -117,7 +143,7 @@ export function Header() {
               key="mobileMenu"
               id="mobileMenu"
               aria-label="移动端导航"
-              className="absolute right-6 top-[calc(100%+8px)] w-[min(216px,calc(100%-48px))] overflow-hidden rounded-2xl border border-black/[0.06] bg-white/85 p-1.5 shadow-[0_18px_48px_-12px_rgba(0,0,0,0.22)] backdrop-blur-[24px] backdrop-saturate-180 md:hidden"
+              className="absolute right-6 top-[calc(100%+8px)] w-[min(216px,calc(100%-48px))] overflow-hidden rounded-2xl border border-black/[0.06] bg-white p-1.5 shadow-[0_18px_48px_-12px_rgba(0,0,0,0.22)] md:hidden"
               style={{ transformOrigin: 'top right' }}
               variants={panelVariants}
               initial="hidden"

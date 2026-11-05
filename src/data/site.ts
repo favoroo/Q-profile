@@ -9,6 +9,12 @@ export const site: Site = {
     { label: '联系', href: '#contact' },
   ],
   mobileHomeLink: { label: '首页', href: '#home' },
+  resume: {
+    label: '简历',
+    ariaLabel: '下载简历 PDF',
+    href: 'resume/huangqian-resume.pdf',
+    filename: '黄谦-汽车技术工程师-简历.pdf',
+  },
   sections: {
     skills: {
       eyebrow: 'Expertise',
